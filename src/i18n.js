@@ -148,5 +148,9 @@
   KEYS.push('carry', 'tickhave', 'dofirst', 'papers', 'print');
   Object.keys(EXTRA2).forEach((l) => { if (S[l]) S[l].push(...EXTRA2[l]); });
 
+  const YOUNG = { en: 'Young people & students', hi: 'युवा और छात्र', bn: 'তরুণ ও ছাত্রছাত্রী', te: 'యువత & విద్యార్థులు', mr: 'तरुण आणि विद्यार्थी', ta: 'இளைஞர் & மாணவர்', ur: 'نوجوان اور طلبہ', gu: 'યુવાનો અને વિદ્યાર્થીઓ', kn: 'ಯುವಜನ & ವಿದ್ಯಾರ್ಥಿಗಳು', or: 'ଯୁବକ ଓ ଛାତ୍ରଛାତ୍ରୀ', ml: 'യുവാക്കളും വിദ്യാർത്ഥികളും', pa: 'ਨੌਜਵਾਨ ਅਤੇ ਵਿਦਿਆਰਥੀ', as: 'যুৱক আৰু ছাত্ৰ-ছাত্ৰী', mai: 'युवा आ छात्र', ne: 'युवा र विद्यार्थी', kok: 'तरणाटे आनी विद्यार्थी', doi: 'जुआन ते विद्यार्थी' };
+  KEYS.push('c_young');
+  Object.keys(YOUNG).forEach((l) => { if (S[l]) S[l].push(YOUNG[l]); });
+
   root.ER_I18N = { KEYS, LANGS, STRINGS: S };
 })(globalThis);

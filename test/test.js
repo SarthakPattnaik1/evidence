@@ -1,5 +1,5 @@
 /* Automated checks: KB invariants + branch behaviour. Run: node test/test.js */
-['kb','j-money','j-family','j-consumer','j-other','j-nri','j-business','j-more','stand','qa','engine'].forEach((f) => require('../src/' + f + '.js'));
+['kb','j-money','j-family','j-consumer','j-other','j-nri','j-business','j-more','j-genz','stand','qa','engine'].forEach((f) => require('../src/' + f + '.js'));
 const KB = globalThis.ER_KB, E = globalThis.ER_ENGINE;
 let fails = 0, passes = 0;
 const ok = (c, m) => { if (c) passes++; else { fails++; console.log('FAIL:', m); } };
@@ -84,7 +84,8 @@ ok(E.urgent(byId('digital-arrest-scam'), { da_now: 'ongoing' }).some((u) => u.le
 ok(E.urgent(byId('traffic-challan'), { tr_problem: 'wrong', tr_days: 'u45' }).length === 1, 'challan within 45 days => contest banner');
 ok(ev('ecommerce-order', { ec_problem: 'wrong', ec_paid: 'card', ec_complained: 'no', ec_value: 'u5k' }).includes('ec_e_unbox'), 'ecommerce wrong item asks for unboxing');
 ok(!ev('ecommerce-order', { ec_problem: 'notdel', ec_paid: 'cod', ec_complained: 'no', ec_value: 'u5k' }).includes('ec_e_pay'), 'COD: no payment proof');
-ok(KB.issues.length >= 56, 'at least 56 guides');
+ok(KB.issues.length >= 66, 'at least 66 guides');
+ok(KB.issues.filter((i) => i.cat === 'young' || (i.also || []).includes('young')).length >= 15, 'young people area has at least 15 guides');
 // QA journeys exist
 KB.questions.forEach((q) => ok(!q.journey || KB.issues.some((i) => i.id === q.journey), 'qa journey missing ' + q.id));
 ok(KB.issues.filter((i) => !i.general).length >= 40, 'expected >=40 journeys, got ' + KB.issues.length);

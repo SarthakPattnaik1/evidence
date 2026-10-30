@@ -8,7 +8,7 @@ A free, open-source preparation tool for people in India facing a legal problem.
 
 ## What's in it
 
-- **56 guided problems** with branching questions, chosen from what most often reaches Indian courts and Lok Adalats (cheque bounce, matrimonial, motor accident, traffic challans, bank recovery, electricity), the National Consumer Helpline (e-commerce, durables, banking, telecom, travel), the RBI Ombudsman (loans and credit cards lead) and NCRB cyber-crime data (fraud is 72.6% of cyber cases; "digital arrest" scams hit a record in 2024).
+- **66 guided problems** with branching questions, chosen from what most often reaches Indian courts and Lok Adalats (cheque bounce, matrimonial, motor accident, traffic challans, bank recovery, electricity), the National Consumer Helpline (e-commerce, durables, banking, telecom, travel), the RBI Ombudsman (loans and credit cards lead) and NCRB cyber-crime data (fraud is 72.6% of cyber cases; "digital arrest" scams hit a record in 2024).
 - **Where you stand**: after the quick questions, each guide shows what helps you, what to watch out for, and the usual next step.
 - **23 languages**: English plus all 22 scheduled languages; 16 with a hand-written interface, the rest and all guide text machine-translated live and labelled.
   - Money & banking: cheque bounce (both sides), loan/EMI recovery and SARFAESI, credit cards, CIBIL errors, UPI/online fraud, frozen accounts, failed payments
@@ -36,6 +36,8 @@ src/
   j-business.js  business and company guides
   j-more.js      high-search gaps: scams, loan apps, e-commerce, travel, telecom, bank service, challans, electricity,
                  court marriage, senior citizens, death claims, property purchase, PF/gratuity, medical, education
+  j-genz.js      young people & students: leaked/deepfake photos, hacked accounts, gaming/betting, internships &
+                 creator pay, ragging, live-in, trans & queer rights, police stops, gig workers
   stand.js       "Where you stand" situation checks for existing guides
   i18n.js        23 languages: UI strings and language metadata
   j-other.js     eviction, encroachment, termination, POSH, FIR, arrest, legal notice, road accident, online harassment

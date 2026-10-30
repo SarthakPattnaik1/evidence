@@ -25,6 +25,7 @@
     cal: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
     file: '<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-6-6Z"/><path d="M14 3v6h6M8 13h8M8 17h5"/>',
     check: '<path d="m5 12 4.5 4.5L19 7"/>',
+    spark: '<path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/><circle cx="12" cy="12" r="2.5"/>',
     chat: '<path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5V17h0A1.5 1.5 0 0 1 4 15.5Z"/><path d="M8.5 10.5h.01M12 10.5h.01M15.5 10.5h.01"/>',
     circlecheck: '<circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.7 2.7L16.5 9.5"/>',
     down: '<path d="m6 9 6 6 6-6"/>',
@@ -135,7 +136,7 @@ ${JSON.stringify(map)}`;
   function ensureCat(cid) {
     if (LANG === 'en') return Promise.resolve(true);
     const key = 'c:' + cid; if (RT.tr[LANG + '|' + key]) return Promise.resolve(true);
-    const map = {}; BUILT.filter((i) => i.cat === cid).forEach((i) => { map[i.id + '.s'] = i.short; map[i.id + '.t'] = i.title; });
+    const map = {}; BUILT.filter((i) => i.cat === cid || (i.also || []).includes(cid)).forEach((i) => { map[i.id + '.s'] = i.short; map[i.id + '.t'] = i.title; });
     KB.directory.forEach((d, idx) => { if (d.cat === cid) map['d' + idx] = d.title; });
     return translateMap(map, key, (o) => { RT.tr[LANG + '|' + key] = o; });
   }
@@ -213,11 +214,11 @@ ${JSON.stringify(map)}`;
   }
 
   /* ============ HOME ============ */
-  const SUGGEST = ['Cheque bounced', 'Money stolen online', '"Digital arrest" call', 'Divorce', 'Online order not delivered', 'Flight refund', 'Wrong challan', 'Legal heir certificate', 'Loan app harassment', 'Rent deposit not returned'];
+  const SUGGEST = ['Cheque bounced', 'Money stolen online', 'Leaked photos', 'Instagram hacked', '"Digital arrest" call', 'Divorce', 'Online order not delivered', 'Internship not paid', 'Flight refund', 'Wrong challan', 'Legal heir certificate', 'Rent deposit not returned'];
   const TOP_LANGS = ['en', 'hi', 'bn', 'te', 'mr', 'ta', 'ur', 'gu', 'kn', 'or', 'ml', 'pa'];
   const catTitle = (c) => T('c_' + c.id) || c.title;
   function problemRows(cid) {
-    const deep = BUILT.filter((i) => i.cat === cid);
+    const deep = BUILT.filter((i) => i.cat === cid).concat(BUILT.filter((i) => i.cat !== cid && (i.also || []).includes(cid)));
     const gen = KB.directory.map((d, idx) => ({ ...d, idx })).filter((d) => d.cat === cid);
     return deep.map((i) => `<button class="prob" data-play="${i.id}"><b>${esc(C(cid, i.id + '.s', i.short))}</b><span>${esc(C(cid, i.id + '.t', i.title))}</span>${ic('chev', 22)}</button>`).join('')
       + gen.map((d) => `<button class="prob" data-play="general" data-topic="${d.idx}"><b>${esc(C(cid, 'd' + d.idx, d.title))}</b><span>${esc(T('basic'))}</span>${ic('chev', 22)}</button>`).join('');
@@ -227,7 +228,7 @@ ${JSON.stringify(map)}`;
   function ensureHome() {
     if (LANG === 'en' || RT.tr[LANG + '|home']) return Promise.resolve(true);
     const map = {}; KB.categories.forEach((c) => { map['b_' + c.id] = c.blurb; }); SUGGEST.forEach((x, i) => { map['s' + i] = x; }); Object.assign(map, FOOT, HERO); delete map.tagline;
-    return translateMap(map, 'home3', (o) => { RT.tr[LANG + '|home'] = o; });
+    return translateMap(map, 'home4', (o) => { RT.tr[LANG + '|home'] = o; });
   }
   function viewHome() {
     if (translated() && sampler && !RT.tr[LANG + '|home']) setTimeout(() => ensureHome().then((ok) => { if (ok && /^#?(home)?$/.test(location.hash.replace('#', '')) ) render(); }), 0);
