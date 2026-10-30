@@ -28,7 +28,7 @@
     dgca: { t: 'DGCA Civil Aviation Requirement on refund of airline tickets', u: 'https://www.dgca.gov.in' },
     irdai: { t: 'IRDAI Master Circular on Health Insurance Business (29 May 2024)', u: 'https://irdai.gov.in' },
     bima: { t: 'Bima Bharosa (IRDAI grievance portal)', u: 'https://bimabharosa.irdai.gov.in' },
-    itRules: { t: 'IT (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021, as amended (MeitY)', u: 'https://www.meity.gov.in' },
+    itRules: { t: 'IT (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021, as amended — 2026 amendment in force 20 Feb 2026 (2-hour removal of intimate images)', u: 'https://www.meity.gov.in' },
     gaming: { t: 'Promotion and Regulation of Online Gaming Act, 2025 (MeitY)', u: 'https://www.meity.gov.in' },
     dpdp: { t: 'DPDP Rules, 2025 (PIB, 17 Nov 2025)', u: 'https://static.pib.gov.in/WriteReadData/specificdocs/documents/2025/nov/doc20251117695301.pdf' },
     trans: { t: 'Transgender Persons (Protection of Rights) Amendment Act, 2026 (in force 25 May 2026)', u: 'https://egazette.gov.in' },

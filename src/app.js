@@ -352,6 +352,26 @@ ${JSON.stringify(map)}`;
     const map = {}; KB.categories.forEach((c) => { map['b_' + c.id] = c.blurb; }); SUGGEST.forEach((x, i) => { map['s' + i] = x; }); Object.assign(map, FOOT, HERO); delete map.tagline; [['f1', 'Ask'], ['f1s', 'In your language'], ['f2', 'Prepare'], ['f2s', 'Step by step'], ['f3', 'Organize'], ['f3s', 'Your evidence'], ['f4', 'Be Ready'], ['f4s', 'With confidence']].forEach(([k, v]) => { map[k] = v; });
     return translateMap(map, 'home5', (o) => { RT.tr[LANG + '|home'] = o; });
   }
+  /* Home: act-now strip and situation cards. Every fact here is taken from the guide it opens. */
+  const URGENT_NOW = [
+    ['upi-cyber-fraud', 'cy1930', 'Money just stolen online', 'Call 1930 now. Money can still be frozen.'],
+    ['accused-arrest', 'l15100', 'Someone arrested or detained', 'Free legal aid. Must see a magistrate within 24 hours.'],
+    ['domestic-violence', 'e112', 'Violence at home or in danger', 'Call 112. Women\'s helpline: 181.']
+  ];
+  const SITU = [
+    ['upi-cyber-fraud', 'bank', 'Money stolen online', 'Call 1930 fast — money can still be frozen.', 'rose'],
+    ['cheque-bounce', 'file', 'Cheque bounced', 'Send a written notice within 30 days of the bank memo.', 'sand'],
+    ['digital-arrest-scam', 'alert', '"Digital arrest" call', 'Police never arrest anyone over a video call.', 'rose'],
+    ['intimate-images', 'lock', 'Leaked or morphed photos', 'Platforms must remove them within 2 hours of a complaint.', 'sky'],
+    ['loan-app-harassment', 'phone', 'Loan app harassment', 'Recovery calls are allowed only between 8 am and 7 pm.', 'sand'],
+    ['account-hacked', 'user', 'Account hacked', 'Report it in the app and on cybercrime.gov.in today.', 'sky'],
+    ['unpaid-salary', 'briefcase', 'Salary not paid', 'Keep payslips and messages — they prove what you are owed.', 'sage'],
+    ['divorce-separation', 'family', 'Divorce or separation', 'Agreeing on everything makes it faster and cheaper.', 'sage'],
+    ['ecommerce-order', 'bag', 'Online order problem', 'Complain to the National Consumer Helpline, 1915.', 'sky'],
+    ['road-accident', 'umbrella', 'Road accident', 'Get copies of the FIR and medical records now.', 'rose'],
+    ['rental-security-deposit', 'house', 'Deposit not returned', 'A written demand to the landlord is the first step.', 'sand'],
+    ['police-complaint', 'shield', 'Police won\'t file FIR', 'Send it in writing to the Superintendent of Police.', 'sage']
+  ].filter(([id]) => BY_ID[id]);
   function viewHome() {
     const saved = !S.issueId && loadSaved();
     const FEAT = [['chat', 'f1', 'Ask', 'f1s', 'In your language', 'sage'], ['file', 'f2', 'Prepare', 'f2s', 'Step by step', 'sky'], ['folder', 'f3', 'Organize', 'f3s', 'Your evidence', 'sand'], ['circlecheck', 'f4', 'Be Ready', 'f4s', 'With confidence', 'rose']];
@@ -367,12 +387,18 @@ ${JSON.stringify(map)}`;
       </div></section>
       <section class="feats"><div class="wrap featsin">${FEAT.map(([icn, k, en, ks, ens, tone]) => `<div class="feat"><span class="fic ${tone}">${ic(icn, 30)}</span><div><b>${esc(H(k, en))}</b><span>${esc(H(ks, ens))}</span></div></div>`).join('')}</div></section>
       <div class="wrap home" id="start">
+        <section class="nowstrip" aria-labelledby="nowh"><h2 id="nowh">${ic('alert', 18)} ${esc(X('Happening right now?'))}</h2>
+          <div class="nowrow">${URGENT_NOW.map(([id, hk, t, fact]) => { const h = KB.help[hk]; return `<div class="nowcard"><b>${esc(X(t))}</b><p>${esc(X(fact))}</p><div class="nowact">${h ? `<a class="btn call" href="tel:${esc(h.label.replace(/\D/g, ''))}">${ic('phone', 18)} ${esc(h.label)}</a>` : ''}<button class="btn line" data-play="${id}">${esc(X('First steps'))}</button></div></div>`; }).join('')}</div>
+        </section>
         <div class="searchbox" role="search">
           <label class="sr" for="matter">${esc(T('search'))}</label>
           ${ic('search', 22)}<input id="matter" type="search" autocomplete="off" placeholder="${esc(T('search'))}">
         </div>
         <div id="results" class="results" aria-live="polite"></div>
-        <div class="suggest" id="suggest">${SUGGEST.map((x, i) => `<button class="slipchip" data-ex="${esc(x)}">${esc(H('s' + i, x))}</button>`).join('')}</div>
+        <section class="situ" id="suggest" aria-labelledby="situh">
+          <h2 id="situh" class="lh">${esc(X('What happened to you?'))}</h2>
+          <div class="siturow" role="list">${SITU.map(([id, icn, t, fact, tone]) => `<button class="situcard" role="listitem" data-play="${id}"><span class="fic ${tone}">${ic(icn, 22)}</span><b>${esc(X(t))}</b><span>${esc(X(fact))}</span><em>${esc(X('Get my list'))} ${ic('arrow', 16)}</em></button>`).join('')}</div>
+        </section>
       ${saved && saved.issueId ? `<div class="banner info" style="margin-top:18px">${ic('folder')}<div><h3>${esc(T('listh'))}</h3><p>${esc((BY_ID[saved.issueId] || {}).short || '')}. <button class="btn text" data-act="resume">${esc(T('seelist'))}</button> <button class="btn text" data-act="forget">${esc(T('delall'))}</button></p></div></div>` : ''}
       <section aria-labelledby="areah">
         <h2 id="areah">${esc(T('area'))}</h2>
