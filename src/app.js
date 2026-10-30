@@ -346,11 +346,11 @@ ${JSON.stringify(map)}`;
       + gen.map((d) => `<button class="prob" data-play="general" data-topic="${d.idx}"><b>${esc(C(cid, 'd' + d.idx, d.title))}</b><span>${esc(T('basic'))}</span>${ic('chev', 22)}</button>`).join('');
   }
   const H = (k, en) => { if (LANG === 'en') return en; const m = RT.tr[LANG + '|home']; return (m && m[k]) || X(en); };
-  const HERO = { nav_help: 'Help', hero_h: 'Before the lawyer, Pehlo.', hero_s1: 'Answer a few simple questions.', hero_s2: 'Know exactly which papers to carry — free, in your language.', hero_go: 'Get Started', hero_f: 'Free • Simple • Multilingual', tagline: 'Samajh. Tayyari. Apna Haq.', f1: 'Ask', f1s: 'In your language', f2: 'Prepare', f2s: 'Step by step', f3: 'Organize', f3s: 'Your evidence', f4: 'Be Ready', f4s: 'With confidence' };
+  const HERO = { nav_help: 'Help', hero_h: 'Walk into your lawyer’s office ready.', hero_s1: 'Answer a few simple questions.', hero_s2: 'Know exactly which papers to carry — free, in your language.', hero_go: 'Get Started', hero_f: 'Free • Simple • Multilingual', tagline: 'Samajh. Tayyari. Apna Haq.', f1: 'Ask', f1s: 'In your language', f2: 'Prepare', f2s: 'Step by step', f3: 'Organize', f3s: 'Your evidence', f4: 'Be Ready', f4s: 'With confidence' };
   function ensureHome() {
     if (LANG === 'en' || RT.tr[LANG + '|home']) return Promise.resolve(true);
     const map = {}; KB.categories.forEach((c) => { map['b_' + c.id] = c.blurb; }); SUGGEST.forEach((x, i) => { map['s' + i] = x; }); Object.assign(map, FOOT, HERO); delete map.tagline; [['f1', 'Ask'], ['f1s', 'In your language'], ['f2', 'Prepare'], ['f2s', 'Step by step'], ['f3', 'Organize'], ['f3s', 'Your evidence'], ['f4', 'Be Ready'], ['f4s', 'With confidence']].forEach(([k, v]) => { map[k] = v; });
-    return translateMap(map, 'home6', (o) => { RT.tr[LANG + '|home'] = o; });
+    return translateMap(map, 'home7', (o) => { RT.tr[LANG + '|home'] = o; });
   }
   /* Home: act-now strip and situation cards. Every fact here is taken from the guide it opens. */
   const URGENT_NOW = [

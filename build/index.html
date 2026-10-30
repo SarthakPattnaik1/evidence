@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Pehlo — Before the lawyer, Pehlo. Know which papers to carry</title>
+<title>Pehlo — Walk into your lawyer’s office ready</title>
 <meta name="theme-color" content="#04453B">
 <meta name="author" content="Sarthak Pattnaik, Subhankar Das">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Pehlo","url":"https://evidence-orpin.vercel.app/","applicationCategory":"ReferenceApplication","isAccessibleForFree":true,"inLanguage":["en","hi","bn","te","mr","ta","ur","gu","kn","or","ml","pa","as"],"creator":[{"@type":"Person","name":"Sarthak Pattnaik"},{"@type":"Person","name":"Subhankar Das"}]}</script>
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="canonical" href="https://evidence-orpin.vercel.app/">
-<meta property="og:title" content="Before the lawyer, Pehlo.">
+<meta property="og:title" content="Pehlo — Walk into your lawyer’s office ready">
 <meta property="og:description" content="Free, in 23 Indian languages. Answer a few questions, get your list of papers. 66 situations: UPI fraud, cheque bounce, divorce, salary, leaked photos and more.">
 <meta property="og:type" content="website">
 <meta name="description" content="Free preparation tool: answer a few questions and get a personal list of records to take to your advocate.">
@@ -4798,11 +4798,11 @@ ${JSON.stringify(map)}`;
       + gen.map((d) => `<button class="prob" data-play="general" data-topic="${d.idx}"><b>${esc(C(cid, 'd' + d.idx, d.title))}</b><span>${esc(T('basic'))}</span>${ic('chev', 22)}</button>`).join('');
   }
   const H = (k, en) => { if (LANG === 'en') return en; const m = RT.tr[LANG + '|home']; return (m && m[k]) || X(en); };
-  const HERO = { nav_help: 'Help', hero_h: 'Before the lawyer, Pehlo.', hero_s1: 'Answer a few simple questions.', hero_s2: 'Know exactly which papers to carry — free, in your language.', hero_go: 'Get Started', hero_f: 'Free • Simple • Multilingual', tagline: 'Samajh. Tayyari. Apna Haq.', f1: 'Ask', f1s: 'In your language', f2: 'Prepare', f2s: 'Step by step', f3: 'Organize', f3s: 'Your evidence', f4: 'Be Ready', f4s: 'With confidence' };
+  const HERO = { nav_help: 'Help', hero_h: 'Walk into your lawyer’s office ready.', hero_s1: 'Answer a few simple questions.', hero_s2: 'Know exactly which papers to carry — free, in your language.', hero_go: 'Get Started', hero_f: 'Free • Simple • Multilingual', tagline: 'Samajh. Tayyari. Apna Haq.', f1: 'Ask', f1s: 'In your language', f2: 'Prepare', f2s: 'Step by step', f3: 'Organize', f3s: 'Your evidence', f4: 'Be Ready', f4s: 'With confidence' };
   function ensureHome() {
     if (LANG === 'en' || RT.tr[LANG + '|home']) return Promise.resolve(true);
     const map = {}; KB.categories.forEach((c) => { map['b_' + c.id] = c.blurb; }); SUGGEST.forEach((x, i) => { map['s' + i] = x; }); Object.assign(map, FOOT, HERO); delete map.tagline; [['f1', 'Ask'], ['f1s', 'In your language'], ['f2', 'Prepare'], ['f2s', 'Step by step'], ['f3', 'Organize'], ['f3s', 'Your evidence'], ['f4', 'Be Ready'], ['f4s', 'With confidence']].forEach(([k, v]) => { map[k] = v; });
-    return translateMap(map, 'home6', (o) => { RT.tr[LANG + '|home'] = o; });
+    return translateMap(map, 'home7', (o) => { RT.tr[LANG + '|home'] = o; });
   }
   /* Home: act-now strip and situation cards. Every fact here is taken from the guide it opens. */
   const URGENT_NOW = [
