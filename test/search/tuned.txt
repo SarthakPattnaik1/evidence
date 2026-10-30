@@ -1,0 +1,299 @@
+# query | acceptable guide ids (comma)
+upi fraud | upi-cyber-fraud
+money deducted from account fraud | upi-cyber-fraud
+online fraud complaint | upi-cyber-fraud,job-investment-scam
+cyber crime complaint | upi-cyber-fraud,online-harassment,account-hacked
+1930 complaint | upi-cyber-fraud
+otp fraud | upi-cyber-fraud
+sim swap fraud | upi-cyber-fraud,telecom-internet
+credit card fraud | credit-card-dispute,upi-cyber-fraud
+fake customer care number fraud | upi-cyber-fraud
+paise kat gaye account se | upi-cyber-fraud
+online thagi | upi-cyber-fraud,job-investment-scam
+romance scam | job-investment-scam,upi-cyber-fraud
+matrimonial site fraud | job-investment-scam,upi-cyber-fraud
+part time job scam telegram | job-investment-scam
+task fraud | job-investment-scam
+stock market fraud whatsapp group | job-investment-scam
+crypto fraud | job-investment-scam
+digital arrest | digital-arrest-scam
+fake cbi call | digital-arrest-scam
+fedex parcel scam | digital-arrest-scam
+bank account frozen | bank-account-frozen
+account freeze by cyber cell | bank-account-frozen
+lien on bank account | bank-account-frozen
+debit freeze | bank-account-frozen
+payment failed money debited | failed-payment-debited
+upi transaction failed refund | failed-payment-debited
+atm money not dispensed | failed-payment-debited
+cheque bounce | cheque-bounce
+section 138 notice | cheque-bounce
+cheque bounce case against me | cheque-bounce
+loan recovery agent harassment | loan-recovery,loan-app-harassment
+emi not paid | loan-recovery
+loan settlement | loan-recovery
+sarfaesi notice | loan-recovery
+bank auction my house | loan-recovery
+13(2) notice | loan-recovery
+loan app harassment | loan-app-harassment
+instant loan app threatening | loan-app-harassment
+cibil score wrong | credit-report-error
+cibil correction | credit-report-error
+credit card closure | credit-card-dispute
+credit card wrong charges | credit-card-dispute
+bank charges wrong | bank-service
+bank not responding complaint ombudsman | bank-service
+locker missing items | bank-service
+nominee bank account deceased | death-claims
+guarantor loan | loan-recovery
+gave money to friend not returning | money-lent-not-returned
+recover money from relative | money-lent-not-returned
+udhaar wapas nahi kar raha | money-lent-not-returned
+money recovery suit | money-lent-not-returned,business-unpaid
+security deposit not returned | rental-security-deposit
+landlord not returning deposit | rental-security-deposit
+tenant not vacating | eviction-tenancy
+landlord forcing me to leave | eviction-tenancy
+rent agreement | eviction-tenancy
+tenant not paying rent | eviction-tenancy
+eviction notice | eviction-tenancy
+illegal possession of my land | land-encroachment
+neighbour encroached my land | land-encroachment,neighbour-dispute
+boundary dispute | land-encroachment
+pathway blocked | land-encroachment,neighbour-dispute
+kabza | land-encroachment
+zameen par kabza | land-encroachment
+neighbour illegal construction | neighbour-dispute
+neighbour noise complaint | neighbour-dispute
+neighbour water leakage | neighbour-dispute
+neighbour harassment | neighbour-dispute
+padosi jhagda | neighbour-dispute
+drain water neighbour | neighbour-dispute
+terrace dispute | neighbour-dispute,society-dispute
+parking dispute society | society-dispute
+society maintenance charges | society-dispute
+rwa dispute | society-dispute
+society not giving noc | society-dispute
+apartment association | society-dispute
+mutation | land-records
+dakhil kharij | land-records
+khata transfer | land-records
+property name transfer | land-records,death-claims,inheritance-partition
+7/12 correction | land-records
+jamabandi wrong name | land-records
+land record wrong | land-records
+patta | land-records
+registry | property-purchase
+sale deed | property-purchase
+property buying documents check | property-purchase
+fraud in property deal | property-purchase
+agreement to sell advance not returned | property-purchase
+builder delay possession | builder-delay
+rera complaint | builder-delay
+builder not giving possession | builder-delay
+flat refund from builder | builder-delay
+property dispute between brothers | inheritance-partition
+partition of property | inheritance-partition
+daughter share in father property | inheritance-partition
+ancestral property | inheritance-partition
+will challenged | inheritance-partition
+fake will | inheritance-partition
+how to make a will | will-gift
+gift deed | will-gift
+transfer property to son | will-gift
+release deed | will-gift,inheritance-partition
+relinquishment deed | will-gift,inheritance-partition
+legal heir certificate | death-claims
+succession certificate | death-claims
+death claim insurance | death-claims,insurance-claim
+pf claim after death | death-claims,pf-gratuity
+pension after husband death | death-claims,govt-service
+divorce | divorce-separation
+mutual divorce | divorce-separation
+talaq | divorce-separation
+khula | divorce-separation
+triple talaq | divorce-separation
+husband second marriage | divorce-separation
+wife left home | divorce-separation
+restitution of conjugal rights | divorce-separation
+annulment | divorce-separation
+alimony | maintenance,divorce-separation
+maintenance from husband | maintenance
+125 crpc | maintenance
+interim maintenance | maintenance
+streedhan | dowry-cruelty,divorce-separation
+dowry case | dowry-cruelty
+498a false case | dowry-cruelty
+domestic violence | domestic-violence
+husband beating me | domestic-violence
+in laws harassment | domestic-violence,dowry-cruelty
+protection order | domestic-violence
+sasural wale pareshan | domestic-violence,dowry-cruelty
+child custody | child-custody
+visitation rights | child-custody
+adoption | adoption-guardianship
+guardianship of child | adoption-guardianship
+adopt a child process | adoption-guardianship
+court marriage | court-marriage
+love marriage family threatening | court-marriage
+marriage registration | court-marriage
+inter caste marriage protection | court-marriage
+live in relationship | live-in
+parents not taking care senior citizen | parents-maintenance
+son threw parents out | parents-maintenance
+senior citizen maintenance | parents-maintenance
+salary not paid | unpaid-salary
+company not paying salary | unpaid-salary
+wages not paid labour | unpaid-salary
+maid salary | unpaid-salary
+terminated without notice | wrongful-termination
+forced resignation | wrongful-termination
+full and final settlement not done | wrongful-termination
+relieving letter not given | wrongful-termination
+experience letter | wrongful-termination
+notice period buyout | wrongful-termination
+service bond | wrongful-termination
+maternity leave denied | wrongful-termination,workplace-harassment
+pf not deposited | pf-gratuity
+pf withdrawal rejected | pf-gratuity
+gratuity not paid | pf-gratuity
+esi | pf-gratuity
+sexual harassment at work | workplace-harassment
+posh complaint | workplace-harassment
+boss harassment | workplace-harassment
+government employee suspension | govt-service
+departmental inquiry | govt-service
+transfer order government | govt-service
+promotion denied government job | govt-service
+pension not received | govt-service
+armed forces pension | govt-service
+injured at work compensation | workplace-injury,gig-worker
+employee compensation accident at factory | workplace-injury
+swiggy account blocked | gig-worker
+uber driver id blocked | gig-worker
+internship stipend not paid | internship-creator-pay
+freelance payment not received | internship-creator-pay,business-unpaid
+fir not registered | police-complaint
+how to file fir | police-complaint
+zero fir | police-complaint
+police not taking complaint | police-complaint
+someone beat me | assault-threat
+assault | assault-threat
+threat to kill | assault-threat
+maarpeet | assault-threat
+extortion | assault-threat
+blackmail money | assault-threat,intimate-images
+anticipatory bail | accused-arrest
+bail | accused-arrest
+false case against me | accused-arrest
+police arrested my son | accused-arrest
+fir against me | accused-arrest
+summons from court | accused-arrest,legal-notice-received
+police stopped me | police-stop
+police took my phone | police-stop
+police harassment | police-stop,police-complaint
+legal notice received | legal-notice-received
+reply to legal notice | legal-notice-received
+arbitration notice loan | legal-notice-received,loan-recovery
+defamation | defamation
+false allegation on social media | defamation,online-harassment
+someone spreading lies about me | defamation
+mobile phone stolen | lost-phone
+phone lost | lost-phone
+ceir block phone | lost-phone
+lost documents | lost-phone
+missing person | missing-person
+child missing | missing-person
+daughter ran away | missing-person,court-marriage
+rape | sexual-assault
+sexual assault | sexual-assault
+molestation | sexual-assault
+pocso | sexual-assault,accused-arrest
+child abuse | sexual-assault
+eve teasing | sexual-assault,online-harassment
+stalking | online-harassment,sexual-assault
+caste abuse | caste-atrocity
+sc st act | caste-atrocity
+atrocity case | caste-atrocity
+untouchability | caste-atrocity
+bonded labour | trafficking
+human trafficking | trafficking
+child labour | trafficking
+traffic challan | traffic-challan
+vehicle seized | traffic-challan
+rc transfer | vehicle-transfer
+sold bike but rc not transferred | vehicle-transfer
+second hand car fraud | vehicle-transfer
+car insurance claim rejected | insurance-claim
+road accident | road-accident
+hit and run | road-accident
+mact claim | road-accident
+dog bite | dog-bite
+stray dog bite compensation | dog-bite
+pet dog attacked | dog-bite
+medical negligence | medical-negligence
+hospital overcharging | medical-negligence
+hospital not giving records | medical-negligence
+insurance claim rejected | insurance-claim
+health insurance cashless denied | insurance-claim
+mediclaim rejected | insurance-claim
+life insurance claim | insurance-claim,death-claims
+defective product | defective-product
+warranty not honoured | defective-product
+refund not given | refund-refused,ecommerce-order
+consumer complaint | refund-refused,defective-product,ecommerce-order
+amazon refund | ecommerce-order
+flipkart wrong product | ecommerce-order
+order not delivered | ecommerce-order
+flight cancelled refund | travel-refund
+train refund | travel-refund
+hotel booking refund | travel-refund
+electricity bill high | electricity-bill
+meter faulty | electricity-bill
+water bill wrong | electricity-bill
+mobile network complaint | telecom-internet
+broadband not working | telecom-internet
+gym membership refund | refund-refused
+coaching fee refund | education-dispute
+school not giving tc | education-dispute
+college not returning documents | education-dispute
+ragging | ragging
+online harassment | online-harassment
+fake profile | online-harassment
+morphed photos | intimate-images
+sextortion | intimate-images
+deepfake | intimate-images
+instagram hacked | account-hacked
+whatsapp hacked | account-hacked
+online betting loss | gaming-betting
+trans rights | gender-identity
+name change | documents-correction
+gazette name change | documents-correction
+date of birth correction | documents-correction
+birth certificate correction | documents-correction
+aadhaar correction | documents-correction
+passport rejected police verification | documents-correction
+ration card | govt-benefits
+pension scheme not received | govt-benefits,govt-service
+government scheme denied | govt-benefits
+disability certificate | govt-benefits
+caste certificate | govt-benefits
+rti | govt-benefits
+how to file rti | govt-benefits
+complaint against government office | govt-benefits
+income tax notice | tax-notice
+gst notice | tax-notice
+tds refund | tax-notice
+land acquisition compensation | land-acquisition
+government took my land | land-acquisition
+crop insurance claim | insurance-claim,govt-benefits
+business partner cheated | partnership-dispute
+client not paying invoice | business-unpaid
+msme payment delay | business-unpaid
+contract breach | contract-breach
+trademark copied | ip-brand
+cofounder dispute | shareholder-dispute
+nri property | nri-property
+power of attorney | nri-poa
+nri divorce | nri-marriage
+husband abandoned abroad | nri-marriage

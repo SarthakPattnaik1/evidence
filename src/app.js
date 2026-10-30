@@ -414,16 +414,11 @@ ${JSON.stringify(map)}`;
     return shell(`<div class="wrap narrow busy" role="status" aria-live="polite"><div class="spinner" aria-hidden="true"></div><h1>${esc(busy.label)}</h1><p class="muted">${esc(T('auto'))}</p></div>`, { noFooter: true });
   }
   function searchAll(q) {
-    const stop = ['the', 'and', 'has', 'have', 'been', 'not', 'was', 'with', 'from', 'that', 'this', 'someone', 'what', 'about', 'my', 'me', 'is', 'are', 'did', 'got', 'for'];
-    const words = q.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, ' ').split(/\s+/).filter((w) => w.length > 2 && !stop.includes(w));
-    if (!words.length) return [];
-    const ql = q.toLowerCase();
-    const score = (t, syn) => { const toks = (t + ' ' + syn.join(' ')).toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(Boolean); const has = (w) => toks.some((k) => k.startsWith(w)); let s = 0; words.forEach((w) => { if (has(w)) s += 2; else if (w.length > 4 && has(w.slice(0, -1))) s += 1; }); syn.forEach((x) => { if (ql.includes(x)) s += 4; }); return s; };
-    const res = [];
-    BUILT.forEach((i) => { const s = score(i.title + ' ' + i.short, i.synonyms); if (s) res.push({ s: s + 1, play: i.id, title: i.short }); });
-    KB.directory.forEach((d, idx) => { const s = score(d.title, d.synonyms); if (s) res.push({ s, play: 'general', topic: idx, title: d.title }); });
-    KB.questions.forEach((x) => { const s = score(x.q, x.kw); if (s > 2) res.push({ s: s - 1, go: 'q-' + x.id, title: x.q, kind: 'Answer' }); });
-    return res.sort((a, b) => b.s - a.s).slice(0, 6);
+    const items = [];
+    BUILT.forEach((i) => items.push({ text: i.title + ' ' + i.short, syn: i.synonyms, ref: { bonus: 1, play: i.id, title: i.short } }));
+    KB.directory.forEach((d, idx) => items.push({ text: d.title, syn: d.synonyms, ref: { bonus: 0, play: 'general', topic: idx, title: d.title } }));
+    KB.questions.forEach((x) => items.push({ text: x.q, syn: x.kw, ref: { bonus: -1, min: 3, go: 'q-' + x.id, title: x.q, kind: 'Answer' } }));
+    return window.ER_ENGINE.search(items, q).filter((r) => !r.ref.min || r.s >= r.ref.min).map((r) => Object.assign({ s: r.s + r.ref.bonus }, r.ref)).sort((a, b) => b.s - a.s).filter((r, i, a) => i === 0 || r.s >= a[0].s * 0.4).slice(0, 5);
   }
   function renderResults(q) {
     const box = document.getElementById('results'); if (!box) return;

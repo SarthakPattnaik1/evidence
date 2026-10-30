@@ -76,7 +76,7 @@
     'nri-property': ['fema', 'madad'], 'nri-sale-repatriation': ['fema', 'itAct2025'], 'nri-poa': ['madad'], 'nri-marriage': ['madad', 'hindu'], 'nri-case-abroad': ['madad', 'bnss'], 'nri-bank-tax': ['fema', 'itAct2025'],
     'business-unpaid': ['msme', 'ibc'], 'shareholder-dispute': ['companies'], 'partnership-dispute': ['companies'], 'contract-breach': ['ibc'], 'ip-brand': ['companies'], general: ['nalsa']
   };
-  I.forEach((i) => { i.checked = CHECKED; i.sources = (MAP[i.id] || ['nalsa']).map((k) => SRC[k]).filter(Boolean); });
+  I.forEach((i) => { i.checked = CHECKED; i.sources = MAP[i.id] ? MAP[i.id].map((k) => SRC[k]).filter(Boolean) : (i.sources && i.sources.length ? i.sources : [SRC.nalsa]); });
 
   /* ---- UPI / online fraud: RBI 2026 directions (effective 1 Jan 2027) ---- */
   const uf = by('upi-cyber-fraud');

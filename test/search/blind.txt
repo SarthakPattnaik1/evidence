@@ -1,0 +1,50 @@
+someone used my aadhaar to take a loan | credit-report-error,upi-cyber-fraud
+qr code scan and money gone | upi-cyber-fraud
+my brother lent money to shopkeeper who ran away | money-lent-not-returned,police-complaint
+builder cancelled my booking and kept money | builder-delay
+tenant damaged my flat and left | eviction-tenancy,rental-security-deposit
+my uncle forged my grandfather's will | inheritance-partition
+husband hides his salary to avoid maintenance | maintenance
+wife not letting me see my daughter | child-custody
+my in laws took my jewellery | dowry-cruelty
+my boss withholding my experience certificate | wrongful-termination
+employer cut salary without reason | unpaid-salary
+gratuity after 5 years not given | pf-gratuity
+my supervisor touched me inappropriately at office | workplace-harassment,sexual-assault
+army pension wrongly calculated | govt-service
+he punched me in a road rage fight | assault-threat
+gangster demanding protection money from my shop | assault-threat
+police took my son for questioning without reason | police-stop,accused-arrest
+court summons in a case i don't know about | accused-arrest,legal-notice-received
+someone wrote false review on google about my clinic | defamation
+my laptop bag stolen in train | lost-phone,police-complaint
+my 16 year old daughter is not answering phone since morning | missing-person
+my child told me uncle abuses him | sexual-assault
+temple not allowing us inside because of caste | caste-atrocity
+agent took my sister to work as maid and she cannot come back | trafficking
+bought bike on olx seller gave fake papers | vehicle-transfer
+stray cow hit my scooter | dog-bite,road-accident
+change surname after marriage in passport | documents-correction
+income certificate not issued by tehsil | govt-benefits
+outstanding tax demand on portal | tax-notice
+farmland taken for expressway | land-acquisition
+hospital refused to release body until payment | medical-negligence
+life insurance company says policy lapsed | insurance-claim
+new phone has defect shop not replacing | defective-product
+swiggy order not delivered money deducted | ecommerce-order,failed-payment-debited
+bus ticket cancelled no refund | travel-refund
+dth recharge not working | telecom-internet
+electricity department cut my connection | electricity-bill
+university not giving degree | education-dispute
+classmates bullying me online | online-harassment,ragging
+someone threatening to share my morphed pics | intimate-images
+snapchat hacked | account-hacked
+lost money in fantasy cricket app | gaming-betting
+internship company not giving certificate | internship-creator-pay
+my live in partner left with my money | live-in
+nri husband not sending money | nri-marriage,maintenance
+customer not paying for my software project | business-unpaid
+director siphoning company funds | shareholder-dispute
+padosi kutta bhonkta raat bhar | neighbour-dispute
+society ke secretary ne parking chheen li | society-dispute
+khata me naam sudharna hai | land-records

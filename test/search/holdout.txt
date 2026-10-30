@@ -1,0 +1,118 @@
+someone took money from my account using my card details | upi-cyber-fraud,credit-card-dispute
+got call from police saying my aadhaar used in money laundering | digital-arrest-scam
+earned money from youtube likes then asked to deposit | job-investment-scam
+my salary account blocked by bank | bank-account-frozen
+recharge failed but amount deducted | failed-payment-debited
+person gave me cheque which returned unpaid | cheque-bounce
+bank sending recovery agents to my home | loan-recovery
+loan app sent my photos to contacts | loan-app-harassment
+cibil showing loan i never took | credit-report-error
+owner not giving back advance after i vacated | rental-security-deposit
+my tenant stopped paying and won't leave | eviction-tenancy
+relative built wall on my plot | land-encroachment
+upstairs flat water seeping into my ceiling | neighbour-dispute,society-dispute
+society charging huge transfer fee | society-dispute
+my father's name still on land record after his death | land-records,death-claims
+want to give my house to my daughter | will-gift
+brother refusing to give sister share in house | inheritance-partition
+husband wants divorce what papers | divorce-separation
+wife filed false dowry case on me | dowry-cruelty
+husband not giving money for children | maintenance
+father not allowing me to meet my kids | child-custody
+want to adopt my sister's child | adoption-guardianship
+we married against parents wishes and they threaten us | court-marriage
+son and daughter in law not caring for me | parents-maintenance
+company has not paid me for 3 months | unpaid-salary
+hr asked me to resign or be fired | wrongful-termination
+employer did not deposit my pf | pf-gratuity
+manager sends me sexual messages | workplace-harassment
+i am a teacher in government school transferred unfairly | govt-service
+worker lost finger in factory machine | workplace-injury
+police not writing my complaint | police-complaint
+my neighbour slapped my mother | assault-threat
+someone is calling and threatening to kill my family | assault-threat
+cops arrested my brother last night | accused-arrest
+received lawyer notice for recovery | legal-notice-received
+person posting lies about my business on facebook | defamation
+my iphone was snatched on the road | lost-phone
+my 14 year old son did not come back from school | missing-person
+my niece was touched wrongly by tuition teacher | sexual-assault
+upper caste people insulted me in village using caste name | caste-atrocity
+children working in nearby factory | trafficking
+my old bike is getting challans after selling | vehicle-transfer
+street dog bit my child | dog-bite
+wrong spelling of my name in 10th marksheet | documents-correction
+old age pension stopped suddenly | govt-benefits
+no reply to my rti for 2 months | govt-benefits
+received gst show cause notice | tax-notice
+my income tax refund not credited | tax-notice
+government highway taking my farm land | land-acquisition
+truck hit my scooter | road-accident
+hospital charged extra and did wrong surgery | medical-negligence
+insurance company rejected my health claim | insurance-claim
+new fridge stopped working company not repairing | defective-product
+online order came broken and seller not refunding | ecommerce-order
+airline not refunding my cancelled ticket | travel-refund
+jio charging extra on my bill | telecom-internet
+very high electricity bill this month | electricity-bill
+college not giving my certificates back | education-dispute
+seniors ragging me in hostel | ragging
+someone made fake instagram id with my photos | online-harassment
+ex threatening to leak private video | intimate-images
+my instagram got hacked | account-hacked
+lost money in online rummy | gaming-betting
+my partner and i live together can landlord evict | live-in,eviction-tenancy
+trans person need name change on documents | gender-identity,documents-correction
+police checked my phone without reason | police-stop
+zomato blocked my delivery id | gig-worker
+my nri brother's flat occupied by tenant | nri-property
+client not paying my invoice for months | business-unpaid
+my business partner took all the money | partnership-dispute
+someone copied my brand name | ip-brand
+vendor broke the contract | contract-breach
+co-founder removed me from company | shareholder-dispute
+paise wapas nahi de raha dost | money-lent-not-returned
+pati daaru peekar marta hai | domestic-violence
+zameen ka namantaran | land-records
+sarkari naukri se suspend | govt-service
+kutte ne kaat liya | dog-bite
+mobile kho gaya | lost-phone
+beti ghar se bhaag gayi | missing-person,court-marriage
+raashan card nahi ban raha | govt-benefits
+bijli ka bill zyada | electricity-bill
+jaati ke naam par gaali | caste-atrocity
+naam badalna hai | documents-correction
+gaadi ki rc transfer | vehicle-transfer
+padosi ne rasta band kar diya | neighbour-dispute,land-encroachment
+vasiyat kaise likhe | will-gift
+bachcha god lena hai | adoption-guardianship
+income tax ka notice aaya | tax-notice
+fir darj nahi ho rahi | police-complaint
+company ne salary nahi di | unpaid-salary
+builder ne flat nahi diya | builder-delay
+landlord deposit wapas nahi kar raha | rental-security-deposit
+someone stole my bike | lost-phone,police-complaint
+fake job offer took registration fee | job-investment-scam
+my mother died how to claim her bank account | death-claims
+bank auctioning my shop under sarfaesi | loan-recovery
+i was beaten by police | police-stop,assault-threat
+pension of my late husband not started | death-claims,govt-service,govt-benefits
+sold car buyer not paying | vehicle-transfer,money-lent-not-returned
+brick kiln owner not letting family leave | trafficking
+want to know status of my file in municipality | govt-benefits
+noise from temple loudspeaker at night | neighbour-dispute
+monkey attacked my child | dog-bite
+my husband is missing for 3 days | missing-person
+i want to make my will | will-gift
+aadhaar date of birth wrong | documents-correction
+passport not issued due to case | documents-correction
+tds deducted but refund not came | tax-notice
+my land acquired for railway compensation low | land-acquisition
+society not allowing me to park | society-dispute
+neighbour constructing beyond permission | neighbour-dispute
+property mutation rejected by tehsildar | land-records
+gift deed cancel by mother | will-gift
+cara registration | adoption-guardianship
+departmental enquiry charge sheet | govt-service
+esic claim for accident | workplace-injury
+defamation notice received | defamation
