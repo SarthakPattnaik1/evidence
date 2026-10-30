@@ -612,6 +612,11 @@ footer.foot .flink{color:var(--go-d);padding:6px 0;text-decoration:underline;fon
     -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14%),linear-gradient(180deg,transparent 50%,#000 66%);-webkit-mask-composite:source-over;mask-image:linear-gradient(90deg,transparent 0,#000 14%),linear-gradient(180deg,transparent 50%,#000 66%);mask-composite:add}
 }
 @media (min-width:820px) and (max-width:1023px){ .hero2{--hh:540px} .hcopy h1{font-size:clamp(30px,4vw,40px)} }
+
+/* v15 feedback + tappable helplines */
+.fbk{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:14px 0;padding:12px 14px;border:1px dashed var(--line);border-radius:12px;background:#fff}
+.fbk>span{font-weight:600;margin-right:auto}.fbk .btn.sm{padding:8px 16px;min-height:0;font-size:15px}
+a.helpnum{text-decoration:none;color:inherit}
 </style>
 </head>
 <body>
@@ -4401,7 +4406,7 @@ footer.foot .flink{color:var(--go-d);padding:6px 0;text-decoration:underline;fon
     if (pending[lk]) return pending[lk];
     if (!sampler) {
       pending[lk] = viaApi(map).then((out) => out || viaDevice(map)).then((out) => {
-        if (out && Object.keys(out).length) { lsSet(lk, out); store(out); trFailed[LANG] = false; return true; } trFailed[LANG] = true; return false;
+        if (out && Object.keys(out).length) { lsSet(lk, out); store(out); trFailed[LANG] = false; TRACK.once('tr', { x: LANG, ok: 1 }); return true; } trFailed[LANG] = true; TRACK.once('tr', { x: LANG, ok: 0 }); return false;
       }).catch(() => { trFailed[LANG] = true; return false; }).finally(() => { delete pending[lk]; });
       return pending[lk];
     }
@@ -4454,7 +4459,7 @@ ${JSON.stringify(map)}`;
     busy = null; then();
   }
   function setLang(code) {
-    LANG = code; lsSet('er_lang', code); applyLangDom();
+    LANG = code; lsSet('er_lang', code); applyLangDom(); TRACK.ev('lang', { x: code });
     if (!uiReady(code)) withTranslation([ensureUI], () => render()); else render();
   }
   function trNote() { return translated() ? `<p class="trnote">${ic('globe', 16)} ${esc(trFailed[LANG] ? T('enonly') : T('auto'))} <button class="btn text" data-act="toen">${esc(T('en'))}</button></p>` : ''; }
@@ -4512,6 +4517,7 @@ ${JSON.stringify(map)}`;
     app.innerHTML = busy ? viewBusy() : (map[view] || (() => viewHome()))();
     const h = app.querySelector('h1');
     if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+    try { trackRender(); } catch (e) { /* never break the app for analytics */ }
     if (view === 'q') document.getElementById('qa-' + arg)?.scrollIntoView();
     else window.scrollTo(0, 0);
     afterRender(view);
@@ -4588,7 +4594,7 @@ ${JSON.stringify(map)}`;
     const words = q.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, ' ').split(/\s+/).filter((w) => w.length > 2 && !stop.includes(w));
     if (!words.length) return [];
     const ql = q.toLowerCase();
-    const score = (t, syn) => { const hay = (t + ' | ' + syn.join(' | ')).toLowerCase(); let s = 0; words.forEach((w) => { if (hay.includes(w)) s += 2; else if (w.length > 4 && hay.includes(w.slice(0, -1))) s += 1; }); syn.forEach((x) => { if (ql.includes(x)) s += 4; }); return s; };
+    const score = (t, syn) => { const toks = (t + ' ' + syn.join(' ')).toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(Boolean); const has = (w) => toks.some((k) => k.startsWith(w)); let s = 0; words.forEach((w) => { if (has(w)) s += 2; else if (w.length > 4 && has(w.slice(0, -1))) s += 1; }); syn.forEach((x) => { if (ql.includes(x)) s += 4; }); return s; };
     const res = [];
     BUILT.forEach((i) => { const s = score(i.title + ' ' + i.short, i.synonyms); if (s) res.push({ s: s + 1, play: i.id, title: i.short }); });
     KB.directory.forEach((d, idx) => { const s = score(d.title, d.synonyms); if (s) res.push({ s, play: 'general', topic: idx, title: d.title }); });
@@ -4695,7 +4701,7 @@ ${JSON.stringify(map)}`;
     </div>`, { inJourney: true });
   }
   function helpCard(h) {
-    return `<div class="helpcard"><span class="helpnum">${esc(h.label)}</span><div><h3>${esc(h.name)}</h3><p class="small muted" style="margin:2px 0 0">${esc(h.detail)}</p>${h.href ? `<a class="small" href="${esc(h.href)}" target="_blank" rel="noopener">${esc(h.href.replace('https://', ''))}</a>` : ''}</div></div>`;
+    return `<div class="helpcard">${/^\d{3,6}$/.test(h.label) ? `<a class="helpnum" href="tel:${esc(h.label)}" aria-label="Call ${esc(h.label)}">${esc(h.label)}</a>` : `<span class="helpnum">${esc(h.label)}</span>`}<div><h3>${esc(h.name)}</h3><p class="small muted" style="margin:2px 0 0">${esc(h.detail)}</p>${h.href ? `<a class="small" href="${esc(h.href)}" target="_blank" rel="noopener">${esc(h.href.replace('https://', ''))}</a>` : ''}</div></div>`;
   }
 
   /* ============ THE LIST: papers to carry ============ */
@@ -4728,6 +4734,7 @@ ${JSON.stringify(map)}`;
       ${infos.map((x) => `<div class="banner info">${ic('info')}<div><p>${esc(G(iss, 'info' + iss.info.indexOf(x), x.text))}</p></div></div>`).join('')}
       ${standCard(iss, papers, have)}
       ${srcBlock(iss)}
+      <div class="fbk noprint" id="fbk">${UI.fb && UI.fb[iss.id] ? `<p class="small muted">${ic('check', 16)} Thanks — that helps us improve this guide.</p>` : `<span>Was this list useful?</span><button class="btn line sm" data-act="fb" data-v="y">Yes</button><button class="btn line sm" data-act="fb" data-v="n">Not really</button>`}</div>
       ${deepLeft ? `<button class="deeper noprint" data-act="deep"><span><b>${esc(T('better'))}</b>${esc(T('more', { n: deepN }))}</span>${ic('chev', 24)}</button>` : ''}
       <div class="panel noprint">
         <div class="row"><button class="btn go big" data-act="print">${ic('file', 20)} ${esc(T('print'))}</button><button class="btn line" data-go="report">${esc(T('makepage'))}</button></div>
@@ -4928,7 +4935,7 @@ ${JSON.stringify(map)}`;
       <div class="banner now" style="margin-top:16px">${ic('alert')}<div><h3>In immediate danger?</h3><p>Call <b>112</b>. You don't need this tool first.</p></div></div>
       <p class="muted">Free legal aid is available to many people, including women, children, people with disabilities, people in custody, and those below the income limit. Call <b>15100</b> to ask.</p>
       <div class="grid">${order.filter((k) => KB.help[k]).map((k) => helpCard(KB.help[k])).join('')}</div>
-      <p class="small muted" style="margin-top:16px">Phone links may not open from this page; dial the number shown. Checked October 2026.</p>
+      <p class="small muted" style="margin-top:16px">Tap a number to call. If it doesn't open, dial it yourself. Checked October 2026.</p>
     </div>`);
   }
   function viewAbout() {
@@ -4938,7 +4945,7 @@ ${JSON.stringify(map)}`;
       <div class="panel"><h2>What it does</h2><p>Pick your problem and answer a few one-tap questions. Each answer changes which papers you need. The rules come from a written, tested set of guides — not from a chatbot making things up.</p><p style="margin:0">At the end you get one list: what to do first, the papers to take to your advocate, and where you stand. You can print it, or make a page for your advocate with your answers and a dated timeline.</p></div>
       <div class="panel"><h2>What it doesn't do</h2><ul style="margin:0;padding-left:20px"><li>Give legal advice or predict results.</li><li>Say a record is legally required or admissible.</li><li>Prepare court filings.</li><li>Ask you to upload documents.</li></ul></div>
       <div class="panel"><h2>Why these problems</h2><p style="margin:0">Guides are chosen from what most often reaches Indian courts and Lok Adalats (cheque bounce, family, motor accident, traffic challans, property), the National Consumer Helpline (e-commerce, banking, telecom, travel), the RBI Ombudsman (loans and credit cards lead) and police cyber-crime data (online fraud and fake-police "digital arrest" calls). Guides by area — ${esc(counts)}.</p></div>
-      <div class="panel"><h2>Privacy</h2><p>Your answers stay in this browser tab. Nothing is sent to us. If you switch on "Keep my file on this device", it is saved only in this browser. Advocate links contain only the guide choice and the advocate's note.</p><p style="margin:0">Exit clears the page and opens a neutral website. It does not erase browser history.</p></div>
+      <div class="panel"><h2>Privacy</h2><p>Your answers stay in this browser tab — they are never sent to us. On the public website, the app counts anonymous events (for example, "a list was made for the cheque-bounce guide", or which language was used) to improve the guides; no cookies, no IP addresses, nothing you typed into a question. If you switch on "Keep my file on this device", it is saved only in this browser. Advocate links contain only the guide choice and the advocate's note.</p><p style="margin:0">Exit clears the page and opens a neutral website. It does not erase browser history.</p></div>
       <div class="panel"><h2>Review status</h2><p style="margin:0">All guides are <b>drafts</b>, not yet reviewed by a practising advocate. Each guide will show its reviewer and date once reviewed. Languages: all 22 scheduled languages of India plus English. 16 have a hand-written interface; Santali, Kashmiri, Sindhi, Manipuri, Bodo and Sanskrit, and all guide content in every language, are machine-translated on the fly and labelled so. Translations need native-speaker and advocate review. The page for your lawyer always stays in English. Content v${esc(KB.version)}: ${BUILT.length} guided problems, ${KB.questions.length} answered questions, ${KB.myths.length} myth cards.</p></div>
       ${S.issueId || loadSaved() ? '<button class="btn line" data-act="clear" style="margin-top:16px">Clear everything on this device</button>' : ''}
     </div>`);
@@ -4973,7 +4980,7 @@ ${JSON.stringify(map)}`;
     announce(names.length + ' record' + (names.length > 1 ? 's' : '') + ' added to your file');
   }
   function afterRender(view) {
-    const m = document.getElementById('matter'); if (m) m.addEventListener('input', () => renderResults(m.value));
+    const m = document.getElementById('matter'); if (m) m.addEventListener('input', () => { renderResults(m.value); trackSearch(m.value); });
     const qs = document.getElementById('qsearch'); if (qs) qs.addEventListener('input', () => { UI.qsearch = qs.value; const pos = qs.selectionStart; render(); const n = document.getElementById('qsearch'); n.focus(); n.setSelectionRange(pos, pos); });
     const form = document.getElementById('qform');
     if (form) {
@@ -5014,9 +5021,11 @@ ${JSON.stringify(map)}`;
     const a = document.getElementById(anchor); if (a) { const b = a.querySelector(sel) || a.querySelector('[aria-pressed=true]'); if (b) b.focus({ preventScroll: true }); }
   }
   function enterGuide() {
-    const iss = issue(); if (translated() && canTranslate() && !trFailed[LANG]) { withTranslation([ensureGuide(iss, 'a')], () => { goQuiz(); ensureGuide(iss, 'b').then(() => { if (/^#(quiz|list|urgent)/.test(location.hash)) render(); }); }); } else goQuiz();
+    const iss = issue(); const h0 = location.hash;
+    if (translated() && canTranslate() && !trFailed[LANG]) { withTranslation([ensureGuide(iss, 'a')], () => { if (location.hash !== h0 || S.issueId !== iss.id) { render(); return; } goQuiz(); ensureGuide(iss, 'b').then(() => { if (/^#(quiz|list|urgent)/.test(location.hash)) render(); }); }); } else goQuiz();
   }
   document.addEventListener('click', async (e) => {
+    const sr = e.target.closest('#results [data-play], #results [data-go]'); if (sr) { const m = document.getElementById('matter'); TRACK.ev('pick', { g: sr.dataset.play === 'general' && sr.dataset.topic != null ? 'topic-' + sr.dataset.topic : (sr.dataset.play || sr.dataset.go), x: m ? m.value : '' }); }
     const pl = e.target.closest('[data-play]');
     if (pl) { e.preventDefault(); startIssue(pl.dataset.play, pl.dataset.topic != null ? KB.directory[Number(pl.dataset.topic)] : null);
       enterGuide(); return; }
@@ -5044,15 +5053,16 @@ ${JSON.stringify(map)}`;
       case 'showlist': S.pendingUrgent = null; S.chapterFound = []; go('list'); break;
       case 'ackurgent': S.ackUrgent[S.pendingUrgent] = true; S.pendingUrgent = null; persist(); if (currentQ()) goQuiz(); else { finishStage(); go('list'); } break;
       case 'resumequiz': S.stage = 'quick'; S.skipped = Object.fromEntries(Object.entries(S.skipped).filter(([k]) => iss.questions.find((q) => q.id === k && q.deep))); goQuiz(); break;
-      case 'deep': S.stage = 'deep'; S.chapterFound = []; persist(); goQuiz(); break;
+      case 'fb': UI.fb = UI.fb || {}; UI.fb[S.issueId] = t.dataset.v; TRACK.once('fb', { g: S.issueId, x: t.dataset.v }); { const f = document.getElementById('fbk'); if (f) f.innerHTML = `<p class="small muted">${ic('check', 16)} Thanks — that helps us improve this guide.</p>`; } break;
+      case 'deep': TRACK.once('deep', { g: S.issueId }); S.stage = 'deep'; S.chapterFound = []; persist(); goQuiz(); break;
       case 'change': { const q = iss.questions.find((x) => x.id === t.dataset.q); if (!q) break; S.prefill[q.id] = S.answers[q.id]; delete S.answers[q.id]; delete S.skipped[q.id]; S.stage = q.deep ? 'deep' : 'quick'; S.history = S.history.filter((h) => h.id !== q.id); if (q.deep) S.deepDone = false; else S.quickDone = false; S.chapterFound = []; persist(); goQuiz(); break; }
-      case 'savetoggle': saveOn = t.checked; if (saveOn) persist(); else clearSaved(); toast(saveOn ? 'Saved on this device' : 'Removed from this device'); break;
+      case 'savetoggle': if (t.checked) TRACK.once('save', { g: S.issueId }); saveOn = t.checked; if (saveOn) persist(); else clearSaved(); toast(saveOn ? 'Saved on this device' : 'Removed from this device'); break;
       case 'clear': S = blank(); saveOn = false; clearSaved(); toast('Cleared'); go('home'); break;
       case 'forget': clearSaved(); render(); break;
       case 'resume': { const v = loadSaved(); if (v) { S = Object.assign(blank(), v); saveOn = true; go('list'); } break; }
       case 'exit': S = blank(); saveOn = false; clearSaved(); app.innerHTML = ''; history.replaceState(null, '', '#home'); render(); break;
       case 'excl': S.excludeSensitive = t.checked; persist(); render(); break;
-      case 'print': try { window.print(); } catch (err) { /* blocked */ } document.getElementById('printhint').hidden = false; break;
+      case 'print': TRACK.once('print', { g: S.issueId }); try { window.print(); } catch (err) { /* blocked */ } document.getElementById('printhint').hidden = false; break;
       case 'copytext': try { await navigator.clipboard.writeText(reportText()); toast('Report copied as text'); } catch (err) { toast('Copy was blocked by the browser'); } break;
       case 'download': if (!downloads) break;
         try { await downloads.save({ filename: 'lawyer-preparation-pack.html', data: standaloneReport() }); toast('Saved'); }
@@ -5062,6 +5072,67 @@ ${JSON.stringify(map)}`;
       case 'mfrestart': UI.mf = { i: 0, score: 0, ans: null, order: null }; render(); break;
     }
   });
+
+  /* ============ ANONYMOUS USAGE COUNTS (live site only) ============
+     Sends counts like "a list was made for cheque-bounce" to /api/e. Never sends answers, notes, names or dates.
+     Off inside Claude, on file://, and when the browser asks not to be tracked. */
+  const TRACK = (() => {
+    const on = /^https:$/.test(location.protocol) && !/claude\.ai|anthropic|claudeusercontent|localhost$/.test(location.hostname) && navigator.doNotTrack !== '1' && window.doNotTrack !== '1';
+    const forced = /^http:$/.test(location.protocol) && /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && /pehlo_track=1/.test(document.cookie + location.search);
+    if (!on && !forced) return { ev() {}, once() {} };
+    let sid = ''; try { sid = sessionStorage.getItem('pa_s') || ''; if (!sid) { sid = Math.random().toString(36).slice(2, 12) + Date.now().toString(36).slice(-4); sessionStorage.setItem('pa_s', sid); } } catch (e) { sid = Math.random().toString(36).slice(2, 14); }
+    const seen = new Set(); let q = []; let first = true; let timer = null;
+    const ref = (() => { try { const r = document.referrer && new URL(document.referrer); return r && r.hostname !== location.hostname ? r.hostname : ''; } catch (e) { return ''; } })();
+    const utm = (() => { try { return new URLSearchParams(location.search).get('utm_source') || ''; } catch (e) { return ''; } })();
+    const dev = () => (Math.min(screen.width, innerWidth) < 640 ? 'm' : Math.min(screen.width, innerWidth) < 1024 ? 't' : 'd');
+    function flush() {
+      if (!q.length) return; clearTimeout(timer); timer = null;
+      const payload = { s: sid, l: LANG, d: dev(), e: q.splice(0, 60) };
+      if (first) { payload.first = 1; payload.r = ref; payload.u = utm; first = false; }
+      const body = JSON.stringify(payload);
+      try { if (!(navigator.sendBeacon && navigator.sendBeacon('/api/e', new Blob([body], { type: 'application/json' })))) fetch('/api/e', { method: 'POST', body, headers: { 'content-type': 'application/json' }, keepalive: true }).catch(() => {}); } catch (e) { /* ignore */ }
+      if (q.length) flush();
+    }
+    function ev(t, o) { q.push(Object.assign({ t }, o || {})); if (q.length >= 25) flush(); else if (!timer) timer = setTimeout(flush, 4000); }
+    function once(t, o) { const k = t + '|' + JSON.stringify(o || {}); if (seen.has(k)) return; seen.add(k); ev(t, o); }
+    addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); });
+    addEventListener('pagehide', flush);
+    let errs = 0;
+    addEventListener('error', (e) => { if (errs++ < 5) ev('err', { x: String((e && e.message) || 'error') + (e && e.lineno ? ' @' + e.lineno : ''), v: KB.version }); });
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest && e.target.closest('a[href]'); if (!a) return;
+      const h = a.getAttribute('href');
+      if (/^tel:/.test(h)) ev('call', { x: h.replace(/\D/g, '') });
+      else if (/^https?:/.test(h)) { try { const u = new URL(h); if (u.hostname !== location.hostname) ev('out', { x: u.hostname.replace(/^www\./, '') }); } catch (er) { /* ignore */ } }
+    }, true);
+    return { ev, once };
+  })();
+  let lastView = '';
+  function trackRender() {
+    const raw = (location.hash || '').slice(1); const view = raw.split('-')[0] || 'home';
+    if (busy) return;
+    const iss = S.issueId ? issue() : null; const id = iss && iss.id;
+    const key = raw; if (key !== lastView) { lastView = key; TRACK.ev('view', { v: view }); }
+    if (view === 'start') { const g = raw.slice(6); if (BY_ID[g]) TRACK.once('intro', { g }); }
+    if (!id) return;
+    if (view === 'quiz') {
+      if (S.history.length === 0) { TRACK.once('intro', { g: id }); TRACK.once('start', { g: id }); }
+      TRACK.once('step', { g: id, n: Math.min(S.history.length, 60) });
+    }
+    if (view === 'list' || view === 'brk') {
+      TRACK.once('list', { g: id });
+      if (S.stage === 'deep' && !currentQ()) TRACK.once('done', { g: id });
+    }
+    if (view === 'report') TRACK.once('report', { g: id });
+    if (view === 'quiz' || view === 'list' || view === 'urgent') {
+      try { E.urgent(iss, S.answers).filter((u) => u.level === 'now').forEach((u) => TRACK.once('urg', { g: id, x: u.id })); } catch (e) { /* ignore */ }
+    }
+  }
+  let searchT = null;
+  function trackSearch(qv) {
+    clearTimeout(searchT); const v = String(qv || '').trim(); if (v.length < 3) return;
+    searchT = setTimeout(() => { let n = 0; try { n = searchAll(v).length; } catch (e) { /* ignore */ } TRACK.ev('search', { n, x: v }); }, 1500);
+  }
   try { const fi = document.createElement('link'); fi.rel = 'icon'; fi.href = window.ER_BRAND.icon; document.head.appendChild(fi); } catch (e) { /* none */ }
   applyLangDom(); if (!uiReady(LANG)) setTimeout(() => withTranslation([ensureUI], render), 600);
   render();

@@ -596,3 +596,8 @@ footer.foot .flink{color:var(--go-d);padding:6px 0;text-decoration:underline;fon
     -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14%),linear-gradient(180deg,transparent 50%,#000 66%);-webkit-mask-composite:source-over;mask-image:linear-gradient(90deg,transparent 0,#000 14%),linear-gradient(180deg,transparent 50%,#000 66%);mask-composite:add}
 }
 @media (min-width:820px) and (max-width:1023px){ .hero2{--hh:540px} .hcopy h1{font-size:clamp(30px,4vw,40px)} }
+
+/* v15 feedback + tappable helplines */
+.fbk{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:14px 0;padding:12px 14px;border:1px dashed var(--line);border-radius:12px;background:#fff}
+.fbk>span{font-weight:600;margin-right:auto}.fbk .btn.sm{padding:8px 16px;min-height:0;font-size:15px}
+a.helpnum{text-decoration:none;color:inherit}

@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Pehlo · Admin analytics</title>
+<link rel="icon" href="/icon.webp">
+<style>
+.viz-root{color-scheme:light;
+  --surface-1:#fcfcfb;--surface-2:#fff;--line:#e8e4da;--grid:#eeebe3;
+  --text-primary:#0b0b0b;--text-secondary:#52514e;--text-muted:#7a786f;
+  --brand:#04453B;--brand-ink:#01312E;--manila:#EBAB47;
+  --series-1:#2a78d6;--series-2:#eb6834;
+  --good:#1b7f4b;--warn:#a86400;--crit:#b3261e;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--surface-1);color:var(--text-primary);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif}
+button,input,select{font:inherit}
+.top{position:sticky;top:0;z-index:5;background:rgba(252,252,251,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top .in{max-width:1240px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--brand-ink);text-decoration:none;font-size:18px}
+.logo img{width:28px;height:28px;border-radius:7px}
+.pill{font-size:12px;font-weight:700;background:#FBEFD9;color:#6b4200;border-radius:999px;padding:2px 9px}
+.sp{flex:1}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;background:#fff;padding:3px}
+.seg button{border:0;background:none;padding:5px 12px;border-radius:999px;cursor:pointer;color:var(--text-secondary)}
+.seg button[aria-pressed=true]{background:var(--brand);color:#fff}
+.btn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 14px;cursor:pointer;color:var(--brand-ink)}
+.btn.go{background:var(--brand);color:#fff;border-color:var(--brand)}
+main{max-width:1240px;margin:0 auto;padding:20px 20px 60px}
+h1{font-size:22px;margin:4px 0 2px}h2{font-size:16px;margin:0 0 2px}
+.sub{color:var(--text-secondary);font-size:13px;margin:0 0 12px}
+.grid{display:grid;gap:16px}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:1000px){.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.g3,.g2{grid-template-columns:1fr}}
+.card{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:16px 18px;min-width:0}
+.sec{margin-top:26px}
+.sechead{display:flex;align-items:baseline;gap:10px;margin:0 0 10px}
+.sechead h2{font-size:17px}
+.sechead p{margin:0;color:var(--text-muted);font-size:13px}
+.tile .lab{color:var(--text-secondary);font-size:13px}
+.tile .num{font-size:30px;font-weight:750;letter-spacing:-.02em;margin:2px 0;font-variant-numeric:tabular-nums}
+.tile .d{font-size:12.5px;color:var(--text-muted)}
+.tile .d b{font-weight:700}
+.up{color:var(--good)}.down{color:var(--crit)}
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.axis text{fill:var(--text-muted);font-size:11px}
+.legend{display:flex;gap:16px;font-size:13px;color:var(--text-secondary);margin:0 0 8px}
+.legend i{display:inline-block;width:12px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.tip{position:absolute;pointer-events:none;background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12.5px;box-shadow:0 8px 24px -12px rgba(0,0,0,.25);white-space:nowrap;z-index:3;display:none}
+.tip b{display:block;margin-bottom:2px}
+.tip .row{display:flex;align-items:center;gap:6px;color:var(--text-secondary)}
+.tip .row i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.tip .row span:last-child{margin-left:auto;padding-left:12px;color:var(--text-primary);font-variant-numeric:tabular-nums}
+.bars{display:grid;gap:7px}
+.bar{display:grid;grid-template-columns:minmax(90px,38%) 1fr auto;align-items:center;gap:10px;font-size:13.5px;cursor:default;border-radius:6px;padding:1px 2px}
+.bar:hover{background:#f6f4ee}
+.bar .k{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-primary)}
+.bar .t{height:10px;background:var(--grid);border-radius:0 4px 4px 0;overflow:hidden}
+.bar .t span{display:block;height:100%;background:var(--series-1);border-radius:0 4px 4px 0;min-width:2px}
+.bar .v{font-variant-numeric:tabular-nums;color:var(--text-secondary);min-width:64px;text-align:right}
+.funnel .bar{grid-template-columns:minmax(150px,30%) 1fr 140px}
+.funnel .bar .t{height:22px}
+.empty{color:var(--text-muted);font-size:13.5px;padding:10px 0}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:8px 8px;border-bottom:1px solid var(--grid);vertical-align:top}
+th{font-weight:650;color:var(--text-secondary);font-size:12.5px;white-space:nowrap;cursor:pointer;user-select:none}
+th.n,td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tbody tr:hover{background:#f8f6f1}
+.scroll{overflow:auto;max-height:460px}
+.tag{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:650;border-radius:6px;padding:1px 7px}
+.tag.good{background:#e5f3ea;color:var(--good)}.tag.warn{background:#fdf0dc;color:var(--warn)}.tag.crit{background:#fbe6e4;color:var(--crit)}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px}
+.note{background:#FBEFD9;border:1px solid #f0d9ae;color:#5a3a00;border-radius:12px;padding:12px 14px;font-size:14px}
+.note code{background:#fff6e6;padding:1px 5px;border-radius:4px}
+.login{max-width:380px;margin:12vh auto;padding:0 20px}
+.login .card{padding:26px}
+.login label{display:block;font-size:13px;color:var(--text-secondary);margin:12px 0 4px}
+.login input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.login .btn{width:100%;margin-top:18px;padding:11px;font-weight:700}
+.err{color:var(--crit);font-size:13.5px;min-height:20px;margin-top:10px}
+select{border:1px solid var(--line);border-radius:8px;padding:5px 8px;background:#fff}
+.small{font-size:12.5px;color:var(--text-muted)}
+.hide{display:none!important}
+</style>
+</head>
+<body class="viz-root">
+<div id="login" class="login hide">
+  <div class="card">
+    <div class="logo" style="margin-bottom:6px"><img src="/icon.webp" alt=""> Pehlo admin</div>
+    <p class="sub">Sign in to see how people use Pehlo. Only anonymous counts are stored.</p>
+    <form id="lf">
+      <label for="u">Username</label><input id="u" name="user" autocomplete="username" value="admin" required>
+      <label for="p">Password</label><input id="p" name="pass" type="password" autocomplete="current-password" required autofocus>
+      <button class="btn go" type="submit">Sign in</button>
+      <div class="err" id="lerr" role="alert"></div>
+    </form>
+  </div>
+</div>
+
+<div id="app" class="hide">
+  <div class="top"><div class="in">
+    <a class="logo" href="/"><img src="/icon.webp" alt=""> Pehlo</a><span class="pill">Admin</span>
+    <span class="sp"></span>
+    <div class="seg" role="group" aria-label="Date range"><button data-days="1">Today</button><button data-days="7">7 days</button><button data-days="30" aria-pressed="true">30 days</button><button data-days="90">90 days</button></div>
+    <button class="btn" id="refresh">Refresh</button>
+    <button class="btn" id="logout">Sign out</button>
+  </div></div>
+  <main>
+    <h1>Analytics</h1>
+    <p class="sub" id="range">—</p>
+    <div id="setup"></div>
+
+    <div class="grid g4" id="tiles"></div>
+
+    <div class="sec card">
+      <div class="sechead"><h2>Daily activity</h2><p>Visitors, and lists of papers made</p></div>
+      <div class="legend"><span><i style="background:var(--series-1)"></i>Visitors</span><span><i style="background:var(--series-2)"></i>Lists made</span></div>
+      <div class="chart" id="trend"></div>
+    </div>
+
+    <div class="sec grid g2">
+      <div class="card">
+        <div class="sechead"><h2>Journey</h2><p>How far people get, all guides</p></div>
+        <div class="bars funnel" id="funnel"></div>
+        <p class="small" style="margin:10px 0 0">Each step is counted once per visit per guide. % is the share of the step above.</p>
+      </div>
+      <div class="card">
+        <div class="sechead"><h2>Helplines tapped</h2><p>People who tapped a number to call</p></div>
+        <div class="bars" id="calls"></div>
+      </div>
+    </div>
+
+    <div class="sec card">
+      <div class="sechead"><h2>Guides</h2><p>Click a column to sort · click a guide to see where people stop</p></div>
+      <div class="scroll"><table id="guides"></table></div>
+    </div>
+
+    <div class="sec card">
+      <div class="sechead"><h2>Where people stop</h2><p id="dropname">Pick a guide in the table above</p></div>
+      <div class="chart" id="drop"></div>
+    </div>
+
+    <div class="sec grid g3">
+      <div class="card"><div class="sechead"><h2>Languages</h2><p>Share of page views</p></div><div class="bars" id="langs"></div></div>
+      <div class="card"><div class="sechead"><h2>Where visitors come from</h2><p>Referring site</p></div><div class="bars" id="refs"></div></div>
+      <div class="card"><div class="sechead"><h2>States</h2><p>From the visitor's network</p></div><div class="bars" id="geo"></div></div>
+    </div>
+
+    <div class="sec grid g3">
+      <div class="card"><div class="sechead"><h2>Devices</h2></div><div class="bars" id="dev"></div></div>
+      <div class="card"><div class="sechead"><h2>Translation</h2><p>Guide translations that worked vs failed</p></div><div id="tr"></div></div>
+      <div class="card"><div class="sechead"><h2>Official sites opened</h2><p>Outbound links</p></div><div class="bars" id="out"></div></div>
+    </div>
+
+    <div class="sec grid g2">
+      <div class="card">
+        <div class="sechead"><h2>Urgent warnings shown</h2><p>Situations flagged as act-now</p></div>
+        <div class="scroll" style="max-height:340px"><table id="urg"></table></div>
+      </div>
+      <div class="card">
+        <div class="sechead"><h2>Searches</h2><p id="searchrate">What people typed, and what they chose</p></div>
+        <div class="scroll" style="max-height:340px"><table id="miss"></table></div>
+      </div>
+    </div>
+
+    <div class="sec card">
+      <div class="sechead"><h2>Law freshness</h2><p>When each guide's law was last checked against official sources</p></div>
+      <div class="scroll" style="max-height:380px"><table id="fresh"></table></div>
+    </div>
+
+    <div class="sec grid g2">
+      <div class="card"><div class="sechead"><h2>App errors</h2><p>Latest browser errors</p></div><div class="scroll" style="max-height:300px"><table id="errs"></table></div></div>
+      <div class="card"><div class="sechead"><h2>System</h2></div><div id="sys"></div></div>
+    </div>
+  </main>
+</div>
+
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const fmt = (n) => (n == null ? '—' : Number(n).toLocaleString('en-IN'));
+  const pct = (a, b) => (b ? Math.round((a / b) * 1000) / 10 + '%' : '—');
+  let DAYS = 30, META = null, DATA = null, SORT = { k: 'start', d: -1 }, PICK = null;
+  const STATES = { AN: 'Andaman & Nicobar', AP: 'Andhra Pradesh', AR: 'Arunachal Pradesh', AS: 'Assam', BR: 'Bihar', CH: 'Chandigarh', CT: 'Chhattisgarh', CG: 'Chhattisgarh', DN: 'Dadra & Nagar Haveli and Daman & Diu', DH: 'Dadra & Nagar Haveli and Daman & Diu', DD: 'Daman & Diu', DL: 'Delhi', GA: 'Goa', GJ: 'Gujarat', HR: 'Haryana', HP: 'Himachal Pradesh', JK: 'Jammu & Kashmir', JH: 'Jharkhand', KA: 'Karnataka', KL: 'Kerala', LA: 'Ladakh', LD: 'Lakshadweep', MP: 'Madhya Pradesh', MH: 'Maharashtra', MN: 'Manipur', ML: 'Meghalaya', MZ: 'Mizoram', NL: 'Nagaland', OR: 'Odisha', OD: 'Odisha', PY: 'Puducherry', PB: 'Punjab', RJ: 'Rajasthan', SK: 'Sikkim', TN: 'Tamil Nadu', TG: 'Telangana', TS: 'Telangana', TR: 'Tripura', UP: 'Uttar Pradesh', UT: 'Uttarakhand', UK: 'Uttarakhand', WB: 'West Bengal' };
+  const ROUTE = { home: 'Home', cat: 'Area page', start: 'Guide intro', quiz: 'Questions', list: 'List of papers', report: 'Report', help: 'Help', myths: 'Myth or fact', questions: 'Legal questions', q: 'Legal questions', about: 'About', advocates: 'For advocates', timeline: 'Timeline', answers: 'Answers', urgent: 'Urgent', brk: 'List', topic: 'Topic', a: 'Advocate link', other: 'Other' };
+
+  async function api(a, opt) {
+    const r = await fetch('/api/admin?a=' + a + (opt && opt.q ? '&' + opt.q : ''), { method: opt && opt.body ? 'POST' : 'GET', headers: { 'content-type': 'application/json' }, body: opt && opt.body ? JSON.stringify(opt.body) : undefined, credentials: 'same-origin' });
+    let j = {}; try { j = await r.json(); } catch (e) { /* none */ }
+    return { status: r.status, j };
+  }
+  function show(id) { $('#login').classList.toggle('hide', id !== 'login'); $('#app').classList.toggle('hide', id !== 'app'); }
+
+  $('#lf').addEventListener('submit', async (e) => {
+    e.preventDefault(); $('#lerr').textContent = '';
+    const { status, j } = await api('login', { body: { user: $('#u').value, pass: $('#p').value } });
+    if (status === 200) { $('#p').value = ''; boot(); } else $('#lerr').textContent = j.message || j.error || 'Could not sign in.';
+  });
+  $('#logout').addEventListener('click', async () => { await api('logout', { body: {} }); show('login'); });
+  $('#refresh').addEventListener('click', () => load());
+  document.querySelectorAll('.seg button').forEach((b) => b.addEventListener('click', () => { DAYS = +b.dataset.days; document.querySelectorAll('.seg button').forEach((x) => x.setAttribute('aria-pressed', x === b)); load(); }));
+
+  async function boot() {
+    const { status, j } = await api('me');
+    if (status === 503) { show('login'); $('#lerr').textContent = j.message; $('#lf button').disabled = true; return; }
+    if (status !== 200) { show('login'); return; }
+    show('app');
+    if (!META) { try { META = await (await fetch('/guides.json', { cache: 'no-cache' })).json(); } catch (e) { META = { guides: [], langs: [], help: {} }; } }
+    load();
+  }
+
+  async function load() {
+    $('#range').textContent = 'Loading…';
+    const { status, j } = await api('stats', { q: 'days=' + DAYS });
+    if (status === 401) { show('login'); return; }
+    DATA = j;
+    if (!j.store) {
+      $('#setup').innerHTML = `<div class="note"><b>Analytics storage isn't connected yet.</b> In Vercel, open your project → Storage → Create Database → <b>Upstash for Redis</b> (free) → connect it to this project, then redeploy. Vercel adds <code>KV_REST_API_URL</code> and <code>KV_REST_API_TOKEN</code> automatically. Until then, nothing is counted.</div>`;
+      $('#range').textContent = ''; renderStatic(); return;
+    }
+    $('#setup').innerHTML = '';
+    const f = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    $('#range').textContent = (j.from === j.to ? f(j.to) : f(j.from) + ' – ' + f(j.to)) + ' · India time · compared with the ' + (DAYS === 1 ? 'previous day' : 'previous ' + DAYS + ' days');
+    render();
+  }
+
+  /* ---------- helpers ---------- */
+  const group = (h, prefix) => { const o = {}; for (const [k, v] of Object.entries(h || {})) if (k.startsWith(prefix)) o[k.slice(prefix.length)] = (o[k.slice(prefix.length)] || 0) + v; return o; };
+  const top = (o, n) => Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, n || 12);
+  function bars(el, rows, opts) {
+    opts = opts || {};
+    if (!rows.length) { el.innerHTML = `<div class="empty">${opts.empty || 'No data yet for this period.'}</div>`; return; }
+    const max = Math.max(...rows.map((r) => r[1]), 1); const tot = opts.total || rows.reduce((s, r) => s + r[1], 0);
+    el.innerHTML = rows.map(([k, v, label]) => `<div class="bar" title="${esc(label || k)}: ${fmt(v)}${opts.share !== false ? ' (' + pct(v, tot) + ')' : ''}"><span class="k">${esc(label || k)}</span><span class="t"><span style="width:${(v / max) * 100}%"></span></span><span class="v">${fmt(v)}${opts.share !== false ? ' · ' + pct(v, tot) : ''}</span></div>`).join('');
+  }
+  function delta(c, p) {
+    if (!p && !c) return '<span class="d">No activity in either period</span>';
+    if (!p) return '<span class="d"><b class="up">New</b> vs previous period</span>';
+    const d = ((c - p) / p) * 100; const cls = d >= 0 ? 'up' : 'down';
+    return `<span class="d"><b class="${cls}">${d >= 0 ? '▲' : '▼'} ${Math.abs(d).toFixed(d > -10 && d < 10 ? 1 : 0)}%</b> vs ${fmt(p)} before</span>`;
+  }
+  const gTitle = (id) => { const g = META.guides.find((x) => x.id === id); return g ? g.title : id; };
+
+  /* ---------- line chart with crosshair tooltip ---------- */
+  function line(el, days, series) {
+    const W = 1000, H = 260, L = 44, R = 16, T = 12, B = 30;
+    const n = days.length; const max = Math.max(1, ...series.flatMap((s) => days.map((d) => d[s.k] || 0)));
+    const nice = (m) => { const p = Math.pow(10, Math.floor(Math.log10(m))); const f = m / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * p; };
+    const ymax = max < 8 ? Math.max(4, Math.ceil(max / 4) * 4) : nice(max); const x = (i) => L + (n === 1 ? (W - L - R) / 2 : (i * (W - L - R)) / (n - 1)); const y = (v) => T + (H - T - B) * (1 - v / ymax);
+    const ticks = [...new Set([0, .25, .5, .75, 1].map((t) => Math.round(t * ymax)))];
+    const step = Math.max(1, Math.ceil(n / 8));
+    const lbl = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+    let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily visitors and lists made">`;
+    s += ticks.map((t) => `<line x1="${L}" x2="${W - R}" y1="${y(t)}" y2="${y(t)}" stroke="var(--grid)" stroke-width="1"/><text class="axis" x="${L - 8}" y="${y(t) + 4}" text-anchor="end" fill="var(--text-muted)" font-size="11">${fmt(t)}</text>`).join('');
+    s += days.map((d, i) => (i % step === 0 || i === n - 1 ? `<text x="${x(i)}" y="${H - 8}" text-anchor="middle" fill="var(--text-muted)" font-size="11">${lbl(d.d)}</text>` : '')).join('');
+    for (const se of series) {
+      const pts = days.map((d, i) => `${x(i)},${y(d[se.k] || 0)}`).join(' ');
+      s += n > 1 ? `<polyline points="${pts}" fill="none" stroke="${se.c}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>` : '';
+      s += days.map((d, i) => (n <= 31 ? `<circle cx="${x(i)}" cy="${y(d[se.k] || 0)}" r="${n === 1 ? 5 : 3}" fill="${se.c}" stroke="var(--surface-2)" stroke-width="2"/>` : '')).join('');
+      const last = days[n - 1]; s += `<text x="${x(n - 1) + 6}" y="${y(last[se.k] || 0) - 6}" font-size="11" fill="var(--text-secondary)" text-anchor="end">${fmt(last[se.k] || 0)}</text>`;
+    }
+    s += `<line id="xh" x1="0" x2="0" y1="${T}" y2="${H - B}" stroke="var(--text-muted)" stroke-dasharray="3 3" visibility="hidden"/><rect x="${L}" y="${T}" width="${W - L - R}" height="${H - T - B}" fill="transparent" id="hit"/></svg><div class="tip"></div>`;
+    el.innerHTML = s;
+    const svg = el.querySelector('svg'), tip = el.querySelector('.tip'), xh = el.querySelector('#xh');
+    const move = (ev) => {
+      const r = svg.getBoundingClientRect(); const px = ((ev.clientX - r.left) / r.width) * W;
+      const i = Math.max(0, Math.min(n - 1, Math.round(n === 1 ? 0 : ((px - L) / (W - L - R)) * (n - 1)))); const d = days[i];
+      xh.setAttribute('x1', x(i)); xh.setAttribute('x2', x(i)); xh.setAttribute('visibility', 'visible');
+      tip.innerHTML = `<b>${new Date(d.d + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}</b>` + series.map((se) => `<div class="row"><i style="background:${se.c}"></i><span>${se.n}</span><span>${fmt(d[se.k] || 0)}</span></div>`).join('') + `<div class="row"><i style="background:transparent"></i><span>Page views</span><span>${fmt(d.pv)}</span></div>`;
+      tip.style.display = 'block'; const tx = (x(i) / W) * r.width; tip.style.left = Math.min(r.width - tip.offsetWidth - 4, Math.max(0, tx + 12)) + 'px'; tip.style.top = '8px';
+    };
+    svg.addEventListener('pointermove', move); svg.addEventListener('pointerleave', () => { tip.style.display = 'none'; xh.setAttribute('visibility', 'hidden'); });
+  }
+
+  function columns(el, rows, name) {
+    if (!rows.some((r) => r[1])) { el.innerHTML = '<div class="empty">No one has started this guide in this period.</div>'; return; }
+    const W = 1000, H = 220, L = 44, R = 10, T = 14, B = 30; const n = rows.length; const max = Math.max(...rows.map((r) => r[1]), 1);
+    const bw = Math.min(42, (W - L - R) / n - 6); const x = (i) => L + ((i + 0.5) * (W - L - R)) / n; const y = (v) => T + (H - T - B) * (1 - v / max);
+    let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Visits reaching each question of ${esc(name)}">`;
+    [0, .5, 1].forEach((t) => { s += `<line x1="${L}" x2="${W - R}" y1="${y(t * max)}" y2="${y(t * max)}" stroke="var(--grid)"/><text x="${L - 8}" y="${y(t * max) + 4}" text-anchor="end" fill="var(--text-muted)" font-size="11">${fmt(Math.round(t * max))}</text>`; });
+    rows.forEach(([k, v], i) => {
+      const h = Math.max(v ? 2 : 0, H - B - y(v)); const prev = i ? rows[i - 1][1] : v; const lost = prev ? Math.round(((prev - v) / prev) * 100) : 0;
+      s += `<g><title>${esc(k)}: ${fmt(v)} visits${i ? ` (${lost}% left after the previous question)` : ''}</title><rect x="${x(i) - bw / 2}" y="${H - B - h}" width="${bw}" height="${h}" rx="4" fill="var(--series-1)"/><rect x="${x(i) - bw / 2 - 3}" y="${T}" width="${bw + 6}" height="${H - T - B}" fill="transparent"/></g>`;
+      if (n <= 24 || i % 2 === 0) s += `<text x="${x(i)}" y="${H - 10}" text-anchor="middle" fill="var(--text-muted)" font-size="11">${esc(k)}</text>`;
+    });
+    el.innerHTML = s + '</svg>';
+  }
+
+  /* ---------- table ---------- */
+  function guideRows() {
+    const c = DATA.cur || {}; const ids = new Set(META.guides.map((g) => g.id));
+    for (const k of Object.keys(c)) { const m = k.match(/^(intro|start|list|deep|done|print|report|save):(.+)$/); if (m) ids.add(m[2]); }
+    return [...ids].map((id) => {
+      const g = (t) => c[t + ':' + id] || 0; const y = g('fb') ; const fy = c['fb:' + id + ':y'] || 0, fn = c['fb:' + id + ':n'] || 0;
+      const urg = Object.entries(c).filter(([k]) => k.startsWith('urg:' + id + ':')).reduce((s, [, v]) => s + v, 0);
+      return { id, title: gTitle(id), intro: g('intro'), start: g('start'), list: g('list'), deep: g('deep'), print: g('print') + g('report'), save: g('save'), urg, fy, fn, lr: g('start') ? g('list') / g('start') : null, help: fy + fn ? fy / (fy + fn) : null };
+    }).filter((r) => r.intro || r.start || r.list);
+  }
+  function renderGuides() {
+    const rows = guideRows().sort((a, b) => { const k = SORT.k; const av = a[k] == null ? -1 : a[k], bv = b[k] == null ? -1 : b[k]; return typeof av === 'string' ? av.localeCompare(bv) * -SORT.d : (av - bv) * SORT.d; });
+    const cols = [['title', 'Guide'], ['intro', 'Opened', 1], ['start', 'Started', 1], ['list', 'Got list', 1], ['lr', 'List rate', 1], ['deep', 'Went deeper', 1], ['print', 'Printed / report', 1], ['save', 'Saved', 1], ['urg', 'Urgent shown', 1], ['help', 'Found it useful', 1]];
+    const maxS = Math.max(1, ...rows.map((r) => r.start));
+    const cell = (r, k) => {
+      if (k === 'title') return `<td><button class="btn" style="border:0;padding:0;background:none;text-align:left;color:var(--brand-ink);font-weight:600" data-g="${esc(r.id)}">${esc(r.title)}</button></td>`;
+      if (k === 'lr') return `<td class="n">${r.lr == null ? '—' : `<span class="tag ${r.lr < .4 ? 'crit' : r.lr < .65 ? 'warn' : 'good'}">${Math.round(r.lr * 100)}%</span>`}</td>`;
+      if (k === 'help') return `<td class="n">${r.help == null ? '<span class="small">no votes</span>' : `${Math.round(r.help * 100)}% <span class="small">of ${r.fy + r.fn}</span>`}</td>`;
+      if (k === 'start') return `<td class="n"><span style="display:inline-block;width:46px;height:6px;background:var(--grid);border-radius:3px;vertical-align:middle;margin-right:6px"><span style="display:block;height:100%;width:${(r.start / maxS) * 100}%;background:var(--series-1);border-radius:3px"></span></span>${fmt(r.start)}</td>`;
+      return `<td class="n">${fmt(r[k])}</td>`;
+    };
+    $('#guides').innerHTML = rows.length ? `<thead><tr>${cols.map(([k, l, n]) => `<th class="${n ? 'n' : ''}" data-k="${k}">${l}${SORT.k === k ? (SORT.d < 0 ? ' ↓' : ' ↑') : ''}</th>`).join('')}</tr></thead><tbody>${rows.map((r) => `<tr>${cols.map(([k]) => cell(r, k)).join('')}</tr>`).join('')}</tbody>` : '<tbody><tr><td class="empty">No guide has been opened in this period.</td></tr></tbody>';
+    $('#guides').querySelectorAll('th').forEach((th) => th.addEventListener('click', () => { const k = th.dataset.k; SORT = { k, d: SORT.k === k ? -SORT.d : -1 }; renderGuides(); }));
+    $('#guides').querySelectorAll('[data-g]').forEach((b) => b.addEventListener('click', () => { PICK = b.dataset.g; renderDrop(); $('#drop').scrollIntoView({ behavior: 'smooth', block: 'center' }); }));
+    if (!PICK && rows.length) { PICK = [...rows].sort((a, b) => b.start - a.start)[0].id; }
+    renderDrop();
+  }
+  function renderDrop() {
+    if (!PICK) { $('#drop').innerHTML = '<div class="empty">No data yet.</div>'; return; }
+    const c = DATA.cur || {}; const steps = group(c, 'step:' + PICK + ':'); const max = Math.max(-1, ...Object.keys(steps).map(Number));
+    const rows = []; for (let i = 0; i <= Math.max(max, 0); i++) rows.push([i === 0 ? 'Q1' : 'Q' + (i + 1), steps[i] || 0]);
+    const lst = c['list:' + PICK] || 0; if (max >= 0) rows.push(['List', lst]);
+    $('#dropname').textContent = gTitle(PICK) + ' — visits that reached each question (answers are never recorded)';
+    columns($('#drop'), rows, gTitle(PICK));
+  }
+
+  function render() {
+    const c = DATA.cur || {}, p = DATA.prev || {};
+    const tiles = [
+      ['Visitors (unique each day)', DATA.uniq.cur, DATA.uniq.prev],
+      ['Guides started', c['all:start'] || 0, p['all:start'] || 0],
+      ['Lists of papers made', c['all:list'] || 0, p['all:list'] || 0],
+      ['Helpline taps', Object.entries(c).filter(([k]) => k.startsWith('call:')).reduce((s, [, v]) => s + v, 0), Object.entries(p).filter(([k]) => k.startsWith('call:')).reduce((s, [, v]) => s + v, 0)]
+    ];
+    const visits = DATA.sessions.cur; const conv = visits ? DATA.listSessions.cur / visits : 0; const convP = DATA.sessions.prev ? DATA.listSessions.prev / DATA.sessions.prev : 0;
+    $('#tiles').innerHTML = tiles.map(([l, v, pv, note]) => `<div class="card tile"><div class="lab">${l}</div><div class="num">${fmt(v)}</div>${delta(v, pv)}</div>`).join('') +
+      `<div class="card tile"><div class="lab">Visits</div><div class="num">${fmt(visits)}</div>${delta(visits, DATA.sessions.prev)}</div>` +
+      `<div class="card tile"><div class="lab">Visits that ended with a list</div><div class="num">${visits ? (conv * 100).toFixed(1) + '%' : '—'}</div><span class="d">${convP ? 'was ' + (convP * 100).toFixed(1) + '%' : 'No earlier data'}</span></div>` +
+      `<div class="card tile"><div class="lab">Page views</div><div class="num">${fmt(c.pv || 0)}</div>${delta(c.pv || 0, p.pv || 0)}</div>` +
+      `<div class="card tile"><div class="lab">Found the list useful</div><div class="num">${(() => { const y = Object.entries(c).filter(([k]) => /^fb:.+:y$/.test(k)).reduce((s, [, v]) => s + v, 0); const n = Object.entries(c).filter(([k]) => /^fb:.+:n$/.test(k)).reduce((s, [, v]) => s + v, 0); return y + n ? Math.round((y / (y + n)) * 100) + '%' : '—'; })()}</div><span class="d">${(() => { const t = Object.entries(c).filter(([k]) => /^fb:/.test(k)).reduce((s, [, v]) => s + v, 0); return t ? 'from ' + fmt(t) + ' votes' : 'No votes yet'; })()}</span></div>`;
+
+    line($('#trend'), DATA.days, [{ k: 'u', n: 'Visitors', c: 'var(--series-1)' }, { k: 'list', n: 'Lists made', c: 'var(--series-2)' }]);
+
+    const steps = [['Opened a guide', c['all:intro'] || 0], ['Started the questions', c['all:start'] || 0], ['Got their list', c['all:list'] || 0], ['Went deeper', c['all:deep'] || 0], ['Printed or made a report', (c['all:print'] || 0) + (c['all:report'] || 0)]];
+    const fm = Math.max(1, ...steps.map((s) => s[1]));
+    $('#funnel').innerHTML = steps.map(([k, v], i) => `<div class="bar" title="${k}: ${fmt(v)}"><span class="k">${k}</span><span class="t"><span style="width:${(v / fm) * 100}%"></span></span><span class="v">${fmt(v)}${i ? ' · ' + pct(v, steps[i - 1][1]) : ''}</span></div>`).join('');
+
+    bars($('#calls'), top(group(c, 'call:'), 10).map(([k, v]) => [k, v, (META.help[k] ? META.help[k] + ' (' + k + ')' : k)]), { empty: 'No helpline numbers tapped in this period.' });
+    const LN = Object.fromEntries((META.langs || []).map((l) => [l.code, l.name + (l.native && l.code !== 'en' ? ' · ' + l.native : '')]));
+    bars($('#langs'), top(group(c, 'pvl:'), 23).map(([k, v]) => [k, v, LN[k] || k]));
+    bars($('#refs'), top(group(c, 'ref:'), 10).map(([k, v]) => [k, v, k === 'direct' ? 'Direct / app / WhatsApp' : k]));
+    bars($('#geo'), top(group(c, 'geo:'), 12).map(([k, v]) => { const [cc, rg] = k.split('-'); return [k, v, cc === 'IN' ? (STATES[rg] || (rg ? 'India · ' + rg : 'India')) : cc + (rg ? ' · ' + rg : '')]; }));
+    bars($('#dev'), top(group(c, 'dev:')).map(([k, v]) => [k, v, { m: 'Phone', t: 'Tablet', d: 'Computer' }[k] || k]));
+    bars($('#out'), top(group(c, 'out:'), 10), { empty: 'No official links opened yet.' });
+
+    const tr = {}; for (const [k, v] of Object.entries(c)) { const m = k.match(/^tr:(ok|fail):(.+)$/); if (m) { tr[m[2]] = tr[m[2]] || { ok: 0, fail: 0 }; tr[m[2]][m[1]] += v; } }
+    const trr = Object.entries(tr).sort((a, b) => (b[1].ok + b[1].fail) - (a[1].ok + a[1].fail));
+    $('#tr').innerHTML = trr.length ? `<table><thead><tr><th>Language</th><th class="n">Worked</th><th class="n">Failed</th></tr></thead><tbody>${trr.map(([l, o]) => `<tr><td>${esc(LN[l] || l)}</td><td class="n">${fmt(o.ok)}</td><td class="n">${o.fail ? `<span class="tag ${o.fail > o.ok ? 'crit' : 'warn'}">${fmt(o.fail)}</span>` : '0'}</td></tr>`).join('')}</tbody></table>` : '<div class="empty">No guide translations requested in this period.</div>';
+
+    const urg = top(group(c, 'urg:'), 40);
+    const uTitle = (k) => { const [gid, uid] = [k.slice(0, k.lastIndexOf(':')), k.slice(k.lastIndexOf(':') + 1)]; const g = META.guides.find((x) => x.id === gid); const u = g && g.urgent.find((x) => x.id === uid); return [g ? g.title : gid, u ? u.title : uid]; };
+    $('#urg').innerHTML = urg.length ? `<thead><tr><th>Warning</th><th>Guide</th><th class="n">Shown</th></tr></thead><tbody>${urg.map(([k, v]) => { const [gt, ut] = uTitle(k); return `<tr><td>${esc(ut)}</td><td class="small">${esc(gt)}</td><td class="n">${fmt(v)}</td></tr>`; }).join('')}</tbody>` : '<tbody><tr><td class="empty">No urgent warnings shown in this period.</td></tr></tbody>';
+
+    const hit = c['search:hit'] || 0, miss = c['search:miss'] || 0, picks = c['search:pick'] || 0;
+    $('#searchrate').textContent = hit + miss ? `${fmt(hit + miss)} searches · ${pct(miss, hit + miss)} found nothing · ${fmt(picks)} led to a guide` : 'What people typed, and what they chose';
+    const since = DATA.days && DATA.days.length ? new Date(DATA.from + 'T00:00:00').getTime() - 330 * 60000 : 0;
+    const Q = {}; (DATA.nomatch || []).filter((x) => x.t >= since).forEach((x) => { const o = Q[x.q] || (Q[x.q] = { q: x.q, times: 0, n: null, picks: {}, l: x.l, t: x.t }); if (x.g) o.picks[x.g] = (o.picks[x.g] || 0) + 1; else { o.times++; o.n = o.n == null ? x.n : Math.max(o.n, x.n || 0); } o.t = Math.max(o.t, x.t); });
+    const pickName = (g) => g.startsWith('topic-') ? 'General help' : g.startsWith('q-') ? 'A legal question answer' : gTitle(g);
+    const rank = (o) => (o.n === 0 ? 0 : !Object.keys(o.picks).length ? 1 : 2);
+    const qs = Object.values(Q).sort((a, b) => rank(a) - rank(b) || b.times - a.times || b.t - a.t);
+    $('#miss').innerHTML = qs.length ? `<thead><tr><th>Searched for</th><th class="n">Times</th><th>What happened</th><th class="n">Last</th></tr></thead><tbody>${qs.slice(0, 150).map((o) => {
+      const pk = Object.entries(o.picks).sort((a, b) => b[1] - a[1]);
+      const what = o.n === 0 ? '<span class="tag crit">✕ No guide found</span>' : pk.length ? pk.map(([g, n]) => `→ ${esc(pickName(g))}${n > 1 ? ' ×' + n : ''}`).join('<br>') : '<span class="tag warn">! Left without choosing</span>';
+      return `<tr><td>${esc(o.q)} <span class="small">${esc(o.l !== 'en' ? (LN[o.l] || o.l) : '')}</span></td><td class="n">${o.times || '—'}</td><td>${what}</td><td class="n small">${new Date(o.t).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</td></tr>`; }).join('')}</tbody>` : '<tbody><tr><td class="empty">No searches in this period.</td></tr></tbody>';
+
+    const er = DATA.errors || [];
+    $('#errs').innerHTML = er.length ? `<thead><tr><th>Error</th><th>Version</th><th class="n">When</th></tr></thead><tbody>${er.map((x) => `<tr><td class="mono">${esc(x.m)}</td><td class="small">${esc(x.v)}</td><td class="n small">${new Date(x.t).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</td></tr>`).join('')}</tbody>` : '<tbody><tr><td class="empty"><span class="tag good">✓ No errors</span> reported.</td></tr></tbody>';
+
+    renderGuides(); renderStatic();
+  }
+
+  async function renderStatic() {
+    const now = Date.now();
+    const rows = (META.guides || []).filter((g) => g.id !== 'general').map((g) => ({ ...g, age: g.checked ? Math.floor((now - new Date(g.checked + 'T00:00:00').getTime()) / 86400000) : null })).sort((a, b) => (b.age ?? 9999) - (a.age ?? 9999));
+    const stale = rows.filter((r) => r.age == null || r.age > 90).length;
+    $('#fresh').innerHTML = `<thead><tr><th>Guide</th><th>Last checked</th><th class="n">Days ago</th><th class="n">Official sources</th><th>Status</th></tr></thead><tbody>${rows.map((r) => `<tr><td>${esc(r.title)}</td><td class="small">${esc(r.checked || '—')}</td><td class="n">${r.age ?? '—'}</td><td class="n">${r.sources}</td><td>${r.age == null || r.age > 180 ? '<span class="tag crit">✕ Re-check now</span>' : r.age > 90 ? '<span class="tag warn">! Due soon</span>' : '<span class="tag good">✓ Current</span>'}</td></tr>`).join('')}</tbody>`;
+    let tp = []; try { tp = (await (await fetch('/api/translate')).json()).providers || []; } catch (e) { /* none */ }
+    const today = DATA && DATA.days ? DATA.days[DATA.days.length - 1] : null;
+    $('#sys').innerHTML = `<table><tbody>
+      <tr><td>Analytics storage</td><td>${DATA && DATA.store ? '<span class="tag good">✓ Connected</span>' : '<span class="tag crit">✕ Not connected</span>'}</td></tr>
+      <tr><td>Translation services</td><td>${tp.length ? tp.map((x) => `<span class="tag good">✓ ${esc(x)}</span>`).join(' ') : '<span class="tag warn">! None — guides show in English</span>'}</td></tr>
+      <tr><td>Content version</td><td class="mono">${esc(META.version || '—')}</td></tr>
+      <tr><td>Guides</td><td>${(META.guides || []).length} · ${stale ? `<span class="tag warn">! ${stale} need a law re-check</span>` : '<span class="tag good">✓ All law checks under 90 days</span>'}</td></tr>
+      <tr><td>Events counted in this period</td><td>${DATA && DATA.cur ? fmt(DATA.cur.ev || 0) : '—'}</td></tr>
+    </tbody></table><p class="small" style="margin:10px 0 0">Stored: daily counts only, kept 400 days. No answers, names, IP addresses or cookies on the public site.</p>`;
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>

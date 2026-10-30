@@ -68,7 +68,10 @@ def run():
 <p>Your answers stay on your own device. Pehlo has no accounts and does not send your answers to a server.</p>
 <ul><li>If you tick "save on this device", your answers are kept in your browser's local storage. "Delete all" removes them.</li>
 <li>If you choose a language other than English, the app's own text (not your answers) may be sent to a translation service so it can be shown in your language. Translations are stored on your device.</li>
-<li>We may count anonymous page visits to improve the app. We do not track you across sites or sell data.</li>
+<li>To improve the guides, the app counts anonymous events such as "a list was made for the cheque-bounce guide", which language was used, and which helpline number was tapped. It never sends your answers, notes, names, dates or documents. It uses no cookies and stores no IP address; unique visitors are counted with a code that changes every day, so no one can be followed over time.</li>
+<li>What you type into the search box is kept, with numbers, emails and links removed, along with which guide you then chose. Only the latest 1,000 searches are kept. This shows us which guides are missing or hard to find. Don't type names or personal details into search.</li>
+<li>If your browser sends "Do Not Track", nothing is counted.</li>
+<li>We do not sell data or track you across other sites.</li>
 <li>Documents you print or save are created in your browser.</li></ul>
 <p class="muted">Contact: through the GitHub project page.</p>""", '/privacy', icon))
     (OUT / 'terms.html').write_text(page('Terms | Pehlo', 'Terms of use for Pehlo.', """<h1>Terms of use</h1>
@@ -78,9 +81,12 @@ def run():
 <li>In an emergency call 112. For free legal aid call 15100 (NALSA). For cyber fraud call 1930.</li></ul>""", '/terms', icon))
     urls += [('/privacy', '0.3'), ('/terms', '0.3')]
 
+    (OUT / 'guides.json').write_text(json.dumps({'checked': data.get('checked'), 'version': data.get('version'), 'langs': data['langs'], 'cats': data['cats'],
+        'help': {re.sub(r'\D', '', h['label']): h['name'] for h in data['help'].values() if re.sub(r'\D', '', h.get('label') or '')},
+        'guides': [{'id': i['id'], 'title': i['title'], 'cat': i['cat'], 'checked': i.get('checked'), 'sources': len(i.get('sources') or []), 'nq': i['nq'], 'urgent': i['urgent']} for i in data['issues']]}, ensure_ascii=False))
     lastmod = data.get('checked') or ''
     (OUT / 'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + ''.join(f'<url><loc>{BASE}{u}</loc><lastmod>{lastmod}</lastmod><priority>{p}</priority></url>' for u, p in urls) + '</urlset>\n')
-    (OUT / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: {BASE}/sitemap.xml\n')
+    (OUT / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /admin\nSitemap: {BASE}/sitemap.xml\n')
     (OUT / 'manifest.webmanifest').write_text(json.dumps({
         'name': 'Pehlo — papers for your advocate', 'short_name': 'Pehlo', 'start_url': '/', 'display': 'standalone',
         'background_color': '#FCFAF4', 'theme_color': '#04453B', 'lang': 'en',

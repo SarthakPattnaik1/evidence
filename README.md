@@ -93,3 +93,16 @@ With no keys set, the app uses Chrome's on-device translator where available, an
 ## Static pages
 
 `build.py` also writes `/guide/<id>` pages (indexable by search engines), `/guide`, `/privacy`, `/terms`, `sitemap.xml`, `robots.txt`, a web app manifest and a network-first service worker.
+
+## Admin analytics (`/admin`)
+
+A private dashboard at `/admin` behind a password. It shows visitors, visits, the journey from opening a guide to printing a list, per-guide list rate and "where people stop" by question, languages, translation failures, helpline taps, urgent warnings shown, searches (no match / left without choosing / what they picked), traffic sources, states, devices, outbound official links, law freshness per guide, and browser errors.
+
+Set up once in Vercel:
+1. **Storage** → Create Database → **Upstash for Redis** (free) → connect to this project. Vercel adds `KV_REST_API_URL` and `KV_REST_API_TOKEN`.
+2. **Settings → Environment Variables**: `ADMIN_PASSWORD` (long and unique), optionally `ADMIN_USER` (default `admin`) and `ADMIN_SECRET` (any long random string; signs the login session).
+3. Redeploy, then open `/admin`.
+
+Privacy by design: answers, notes, names and dates are never sent. No cookies on the public site, no IP stored; unique visitors use a hash with a daily-rotating salt. Search text is scrubbed of numbers, emails and links and only the latest 1,000 are kept. Do Not Track is honoured. Daily counters expire after 400 days.
+
+Local test: `node test/devserver.js` (fake Redis, password `test-pass-123`), then `node test/analytics.js`.
