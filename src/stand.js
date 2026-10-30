@@ -14,7 +14,7 @@
     ],
     'upi-cyber-fraud': [
       { k: 'good', when: W('uf_reported', 'h1930', 'bank'), text: 'You reported it — that starts the freeze and the bank\'s liability clock.' },
-      { k: 'good', when: ALL(W('uf_how', 'unauth', 'otp', 'remote'), W('uf_when', 'today', '3days')), text: 'Reported within 3 working days, RBI rules can limit your loss for unauthorised transactions.' },
+      { k: 'good', when: ALL(W('uf_how', 'unauth', 'otp', 'remote'), W('uf_when', 'today', '3days')), text: 'Reported within 3 working days (5 calendar days for transactions from 1 Jan 2027), RBI rules can limit your loss for unauthorised transactions.' },
       { k: 'risk', when: W('uf_how', 'tricked'), text: 'When you were tricked into paying, banks often refuse — RBI rules on this change from 1 January 2027.' },
       { k: 'risk', when: W('uf_when', 'older'), text: 'Older frauds are harder; money has usually moved on.' },
       { k: 'next', when: W('uf_bankresp', 'rejected', 'silent'), text: 'After 30 days or a rejection, go to the RBI Ombudsman (cms.rbi.org.in).' }
@@ -136,7 +136,7 @@
       { k: 'next', text: 'The National Consumer Helpline, then the District Consumer Commission.' }
     ],
     'credit-card-dispute': [
-      { k: 'good', when: ALL(W('cc_issue', 'fraud'), W('cc_when', 'd3')), text: 'Reported within 3 working days — RBI rules limit your liability for unauthorised use.' },
+      { k: 'good', when: ALL(W('cc_issue', 'fraud'), W('cc_when', 'd3')), text: 'Reported quickly — RBI rules limit your liability for unauthorised use (3 working days until 31 Dec 2026, 5 calendar days from 1 Jan 2027).' },
       { k: 'next', when: W('cc_reply', 'rejected', 'none'), text: 'Go to the RBI Ombudsman after 30 days or a rejection.' }
     ],
     'credit-report-error': [

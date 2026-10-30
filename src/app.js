@@ -96,12 +96,46 @@
   }
   const SCRIPT_NOTE = { sat: 'Ol Chiki script', mni: 'Meitei Mayek script', ks: 'Perso-Arabic script', sd: 'Perso-Arabic script', brx: 'Devanagari script', sa: 'Devanagari script', ur: 'Urdu (Nastaliq/Naskh) script' };
   const pending = {};
+  let apiOff = false; const trFailed = {};
+  async function viaApi(map) {
+    if (apiOff || !/^https?:$/.test(location.protocol)) return null;
+    try {
+      const r = await fetch('/api/translate', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ lang: LANG, map }) });
+      if (r.status === 501 || r.status === 404 || r.status === 405) { apiOff = true; return null; }
+      if (!r.ok) return null;
+      const j = await r.json(); const out = {};
+      Object.keys(map).forEach((k) => { if (typeof j[k] === 'string' && j[k].trim()) out[k] = j[k]; });
+      return Object.keys(out).length ? out : null;
+    } catch (e) { return null; }
+  }
+  const devT = {};
+  async function viaDevice(map) {
+    // Chrome's built-in on-device translator, where available.
+    try {
+      const Tr = window.Translator; if (!Tr || !Tr.create) return null;
+      const lim = (pr, ms) => Promise.race([pr, new Promise((_, rj) => setTimeout(() => rj(new Error('timeout')), ms))]);
+      const av = await lim(Tr.availability({ sourceLanguage: 'en', targetLanguage: LANG }), 3000);
+      if (av === 'unavailable') return null;
+      const t = devT[LANG] || (devT[LANG] = await lim(Tr.create({ sourceLanguage: 'en', targetLanguage: LANG }), 20000));
+      const out = {};
+      for (const [k, v] of Object.entries(map)) {
+        const parts = String(v).split(/(\{[^}]*\})/);
+        out[k] = (await lim(Promise.all(parts.map((p) => (/^\{[^}]*\}$/.test(p) || !p.trim() ? p : t.translate(p)))), 15000)).join('');
+      }
+      return out;
+    } catch (e) { return null; }
+  }
   async function translateMap(map, cacheKey, store) {
     if (LANG === 'en') return true;
     const lk = 'er_tr_' + LANG + '_' + KB.version + '_' + cacheKey;
     const cached = lsGet(lk); if (cached) { store(cached); return true; }
-    if (!sampler) return false;
     if (pending[lk]) return pending[lk];
+    if (!sampler) {
+      pending[lk] = viaApi(map).then((out) => out || viaDevice(map)).then((out) => {
+        if (out && Object.keys(out).length) { lsSet(lk, out); store(out); trFailed[LANG] = false; return true; } trFailed[LANG] = true; return false;
+      }).catch(() => { trFailed[LANG] = true; return false; }).finally(() => { delete pending[lk]; });
+      return pending[lk];
+    }
     const m = LMETA[LANG];
     const prompt = `You are translating a free legal-help app for ordinary people in India into ${m.name} (${m.native}${SCRIPT_NOTE[LANG] ? ', ' + SCRIPT_NOTE[LANG] : ''}).
 Rules:
@@ -142,7 +176,7 @@ ${JSON.stringify(map)}`;
   }
   const C = (cid, key, en) => trGet('c:' + cid, key, en);
   const translated = () => LANG !== 'en';
-  const canTranslate = () => LANG === 'en' || !!sampler;
+  const canTranslate = () => LANG === 'en' || !!sampler || !apiOff || !!(window.Translator && !trFailed[LANG]);
   let busy = null;  // { label } while a translation is loading
   async function withTranslation(promises, then) {
     if (LANG === 'en') { then(); return; }
@@ -154,7 +188,7 @@ ${JSON.stringify(map)}`;
     LANG = code; lsSet('er_lang', code); applyLangDom();
     if (!uiReady(code)) withTranslation([ensureUI], () => render()); else render();
   }
-  function trNote() { return translated() ? `<p class="trnote">${ic('globe', 16)} ${esc(sampler || I18N.STRINGS[LANG] ? T('auto') : T('enonly'))} <button class="btn text" data-act="toen">${esc(T('en'))}</button></p>` : ''; }
+  function trNote() { return translated() ? `<p class="trnote">${ic('globe', 16)} ${esc(trFailed[LANG] ? T('enonly') : T('auto'))} <button class="btn text" data-act="toen">${esc(T('en'))}</button></p>` : ''; }
 
   /* ---------- routing ---------- */
   function go(v) { if (location.hash === '#' + v) render(); else location.hash = v; }
@@ -189,7 +223,8 @@ ${JSON.stringify(map)}`;
       <img class="flogo" src="${window.ER_BRAND.logoFull}" alt="Pehlo — Samajh. Tayyari. Apna Haq." width="210" height="96">
       <p><span class="tag draft">${esc(T('draft'))}</span></p>
       <p style="max-width:62em">${f('f_disc')} v${esc(KB.version)}.</p>
-      <div class="row"><button data-go="about">${f('f_about')}</button><button data-go="advocates">${f('f_adv')}</button><button data-go="myths">${f('f_myth')}</button><button data-go="help">${f('f_help')}</button>${S.issueId ? `<button data-act="clear">${f('f_clear')}</button>` : ''}</div>
+      <div class="row"><button data-go="about">${f('f_about')}</button><button data-go="advocates">${f('f_adv')}</button><button data-go="myths">${f('f_myth')}</button><button data-go="help">${f('f_help')}</button>${S.issueId ? `<button data-act="clear">${f('f_clear')}</button>` : ''}${/^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname) ? `<a class="flink" href="/guide">All guides</a><a class="flink" href="/privacy">Privacy</a><a class="flink" href="/terms">Terms</a>` : ''}</div>
+      <p class="small muted" style="margin:8px 0 0">Law last checked ${esc(new Date((KB.lawChecked || '2026-10-30') + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }))} against official sources.</p>
     </div></footer>`;
   }
 
@@ -231,7 +266,7 @@ ${JSON.stringify(map)}`;
     return translateMap(map, 'home4', (o) => { RT.tr[LANG + '|home'] = o; });
   }
   function viewHome() {
-    if (translated() && sampler && !RT.tr[LANG + '|home']) setTimeout(() => ensureHome().then((ok) => { if (ok && /^#?(home)?$/.test(location.hash.replace('#', '')) ) render(); }), 0);
+    if (translated() && canTranslate() && !trFailed[LANG] && !RT.tr[LANG + '|home']) setTimeout(() => ensureHome().then((ok) => { if (ok && /^#?(home)?$/.test(location.hash.replace('#', '')) ) render(); }), 0);
     const saved = !S.issueId && loadSaved();
     const FEAT = [['chat', 'f1', 'Ask', 'f1s', 'In your language', 'sage'], ['file', 'f2', 'Prepare', 'f2s', 'Step by step', 'sky'], ['folder', 'f3', 'Organize', 'f3s', 'Your evidence', 'sand'], ['circlecheck', 'f4', 'Be Ready', 'f4s', 'With confidence', 'rose']];
     return shell(`<section class="hero2"><div class="wrap hero2in">
@@ -267,7 +302,7 @@ ${JSON.stringify(map)}`;
   }
   function viewCat(cid) {
     const c = CAT[cid]; if (!c) return viewHome();
-    if (translated() && sampler && !RT.tr[LANG + '|c:' + cid] && !busy) { setTimeout(() => withTranslation([ensureCat(cid)], render), 0); }
+    if (translated() && canTranslate() && !trFailed[LANG] && !RT.tr[LANG + '|c:' + cid] && !busy) { setTimeout(() => withTranslation([ensureCat(cid)], render), 0); }
     return shell(`<div class="wrap narrow" style="padding-top:18px;padding-bottom:40px">
       <button class="btn text" data-go="home">${ic('back', 20)} ${esc(T('home'))}</button>
       <h1 class="pageh"><span class="tic big">${ic(c.icon, 30)}</span>${esc(catTitle(c))}</h1>
@@ -319,6 +354,7 @@ ${JSON.stringify(map)}`;
         <p class="small" style="margin:10px 0 0">Your first list appears after the quick round. You can go deeper after that, or stop.</p>
       </div>
       <p class="small muted" style="margin-top:14px"><span class="tag draft">${esc(KB.reviewed.label)}</span> ${esc(iss.juris)}</p>
+      ${srcBlock(iss)}
       <div class="row" style="margin-top:18px"><button class="btn go" data-act="begin" data-id="${iss.id}" ${topic ? `data-topic="${KB.directory.indexOf(topic)}"` : ''}>Open my file</button><span class="small muted">${ic('lock', 14)} Skip any question. Stop any time.</span></div>
     </section></div>`);
   }
@@ -422,6 +458,7 @@ ${JSON.stringify(map)}`;
       <p class="muted small" style="margin-top:10px">${esc(T('worry'))}</p>
       ${infos.map((x) => `<div class="banner info">${ic('info')}<div><p>${esc(G(iss, 'info' + iss.info.indexOf(x), x.text))}</p></div></div>`).join('')}
       ${standCard(iss, papers, have)}
+      ${srcBlock(iss)}
       ${deepLeft ? `<button class="deeper noprint" data-act="deep"><span><b>${esc(T('better'))}</b>${esc(T('more', { n: deepN }))}</span>${ic('chev', 24)}</button>` : ''}
       <div class="panel noprint">
         <div class="row"><button class="btn go big" data-act="print">${ic('file', 20)} ${esc(T('print'))}</button><button class="btn line" data-go="report">${esc(T('makepage'))}</button></div>
@@ -471,6 +508,11 @@ ${JSON.stringify(map)}`;
   }
 
 
+  function srcBlock(iss) {
+    if (!iss || !iss.sources || !iss.sources.length) return '';
+    const d = iss.checked ? new Date(iss.checked + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+    return `<details class="srcs"><summary>${ic('file', 14)} Law checked ${esc(d)} · ${iss.sources.length} official source${iss.sources.length > 1 ? 's' : ''}</summary><ul>${iss.sources.map((x) => `<li><a href="${esc(x.u)}" target="_blank" rel="noopener">${esc(x.t)}</a></li>`).join('')}</ul><p class="small muted">Law changes. Confirm the current position with an advocate before you act.</p></details>`;
+  }
   function standCard(iss, items, have) {
     const st = E.stand(iss, S.answers);
     const rows = { good: [], risk: [], next: [] };
@@ -702,10 +744,13 @@ ${JSON.stringify(map)}`;
     const y = window.scrollY; app.innerHTML = viewList(); afterRender('list'); window.scrollTo(0, y);
     const a = document.getElementById(anchor); if (a) { const b = a.querySelector(sel) || a.querySelector('[aria-pressed=true]'); if (b) b.focus({ preventScroll: true }); }
   }
+  function enterGuide() {
+    const iss = issue(); if (translated() && canTranslate() && !trFailed[LANG]) { withTranslation([ensureGuide(iss, 'a')], () => { goQuiz(); ensureGuide(iss, 'b').then(() => { if (/^#(quiz|list|urgent)/.test(location.hash)) render(); }); }); } else goQuiz();
+  }
   document.addEventListener('click', async (e) => {
     const pl = e.target.closest('[data-play]');
     if (pl) { e.preventDefault(); startIssue(pl.dataset.play, pl.dataset.topic != null ? KB.directory[Number(pl.dataset.topic)] : null);
-      const iss = issue(); if (translated() && sampler) { withTranslation([ensureGuide(iss, 'a')], () => { goQuiz(); ensureGuide(iss, 'b').then(() => { if (/^#(quiz|list|urgent)/.test(location.hash)) render(); }); }); } else goQuiz(); return; }
+      enterGuide(); return; }
     const lc = e.target.closest('[data-lang]'); if (lc) { setLang(lc.dataset.lang); document.querySelector('.overlay')?.remove(); return; }
     const t = e.target.closest('[data-go],[data-act],[data-status],[data-delrec],[data-delchrono],[data-ex],[data-copy],[data-club],[data-qcat],[data-mf]'); if (!t) return;
     if (t.dataset.go) { e.preventDefault(); go(t.dataset.go); return; }
@@ -721,7 +766,7 @@ ${JSON.stringify(map)}`;
     switch (t.dataset.act) {
       case 'toshelf': document.getElementById('shelf').scrollIntoView({ behavior: 'smooth' }); break;
       case 'lang': showLang(); break;
-      case 'begin': startIssue(t.dataset.id, t.dataset.topic != null ? KB.directory[Number(t.dataset.topic)] : null); goQuiz(); break;
+      case 'begin': startIssue(t.dataset.id, t.dataset.topic != null ? KB.directory[Number(t.dataset.topic)] : null); enterGuide(); break;
       case 'skip': { const q = currentQ(); if (q) { S.skipped[q.id] = true; S.history.push({ id: q.id, stage: S.stage, skip: true }); persist(); nextAfter(q); } break; }
       case 'qback': { if (!S.history.length) break; syncQuiz(String(S.history.length - 1)); history.replaceState(null, '', '#quiz-' + S.history.length); render(); break; }
       case 'toen': setLang('en'); break;

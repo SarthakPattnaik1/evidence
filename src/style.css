@@ -572,3 +572,13 @@ html[dir=rtl] .hero2::before{inset:0 0 0 auto;border-radius:0 0 0 56% / 0 0 0 30
   .home .searchbox input{font-size:16px}
 }
 @media (max-width:760px){ .hart{justify-self:stretch;align-self:stretch;display:block} }
+
+/* v13 sources */
+.srcs{margin:14px 0;border:1px solid var(--line);border-radius:12px;padding:10px 14px;background:#fff;font-size:14px}
+.srcs summary{cursor:pointer;font-weight:600;color:var(--go);display:flex;gap:6px;align-items:center;list-style:none}
+.srcs summary::-webkit-details-marker{display:none}
+.srcs ul{margin:8px 0 6px;padding-left:18px}.srcs li{margin:4px 0}
+.srcs a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--manila);word-break:break-word}
+@media print{.srcs{display:block}.srcs ul{display:block}}
+
+footer.foot .flink{color:var(--go-d);padding:6px 0;text-decoration:underline;font-size:14px}
