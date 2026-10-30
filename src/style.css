@@ -768,3 +768,5 @@ footer.foot .wrap{position:relative}
   .nowact .btn.line{display:none}
   .nowact .btn.call{padding:8px 12px}
 }
+.plink{color:var(--go-d);font-weight:700;text-decoration:underline;text-decoration-color:var(--manila);text-underline-offset:2px}
+.plink:hover{color:var(--go)}

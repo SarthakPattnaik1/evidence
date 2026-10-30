@@ -296,17 +296,16 @@ ${JSON.stringify(map)}`;
       ${opt.tray ? trayHTML() : ''}
       ${opt.noFooter ? '' : opt.inJourney ? slimFooter() : footer()}`;
   }
-  const FOOT = {"f_disc": "Pehlo helps you prepare for a meeting with an advocate. It is not legal advice, does not replace an advocate, and cannot tell you whether a court will accept any document.", "f_about": "How this works & privacy", "f_adv": "For advocates", "f_myth": "Myth or fact", "f_help": "Legal aid & urgent help", "f_clear": "Clear my answers"};
+  const FOOT = {"f_disc": "Pehlo helps you prepare for a meeting with an advocate.", "f_about": "How this works & privacy", "f_adv": "For advocates", "f_myth": "Myth or fact", "f_help": "Legal aid & urgent help", "f_clear": "Clear my answers"};
   function slimFooter() {
-    return `<footer class="foot slim"><div class="wrap"><span class="small muted">${esc(T('draft'))} · ${esc(X('Not legal advice'))}</span><span class="row"><button data-go="help">${esc(H('nav_help', 'Help'))}</button><button data-go="about">${esc(H('f_about', FOOT.f_about))}</button>${S.issueId ? `<button data-act="clear">${esc(H('f_clear', FOOT.f_clear))}</button>` : ''}</span></div></footer>`;
+    return `<footer class="foot slim"><div class="wrap"><span class="small muted">Pehlo</span><span class="row"><button data-go="help">${esc(H('nav_help', 'Help'))}</button><button data-go="about">${esc(H('f_about', FOOT.f_about))}</button>${S.issueId ? `<button data-act="clear">${esc(H('f_clear', FOOT.f_clear))}</button>` : ''}</span></div></footer>`;
   }
   function footer() {
     const f = (k) => esc(H(k, FOOT[k]));
     return `<footer class="foot"><div class="wrap">
       <img class="flogo" src="${window.ER_BRAND.logoFull}" alt="Pehlo — Samajh. Tayyari. Apna Haq." width="210" height="96">
-      <p><span class="tag draft">${esc(T('draft'))}</span></p>
-      <p style="max-width:62em">${f('f_disc')} v${esc(KB.version)}.</p>
-      <p class="small muted madeby">${esc(X('Made by'))} <b>Sarthak Pattnaik</b> ${esc(X('and'))} <b>Subhankar Das</b>. ${esc(X('Pehlo does not take cases, referrals or fees.'))}</p>
+      <p style="max-width:62em">${f('f_disc')}</p>
+      <p class="small muted madeby">${esc(X('Made by'))} <a class="plink" href="https://www.linkedin.com/in/sarthakad" target="_blank" rel="noopener">Sarthak Pattnaik</a> ${esc(X('and'))} <a class="plink" href="https://www.linkedin.com/in/subhankar-das-311030b1/" target="_blank" rel="noopener">Subhankar Das</a>. ${esc(X('Pehlo does not take cases, referrals or fees.'))}</p>
       <div class="row"><button data-go="about">${f('f_about')}</button><button data-go="advocates">${f('f_adv')}</button><button data-go="myths">${f('f_myth')}</button><button data-go="help">${f('f_help')}</button><button data-act="reportissue">${esc(X('Report a problem'))}</button>${S.issueId ? `<button data-act="clear">${f('f_clear')}</button>` : ''}${/^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname) ? `<a class="flink" href="/guide">${esc(X('All guides'))}</a><a class="flink" href="/privacy">${esc(X('Privacy'))}</a><a class="flink" href="/terms">${esc(X('Terms'))}</a>` : ''}</div>
       <p class="small muted" style="margin:8px 0 0">${esc(X('Law last checked {d} against official sources.').replace('{d}', new Date((KB.lawChecked || '2026-10-30') + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })))}</p>
       ${/^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname) && /^#?(home)?$/.test(location.hash) ? '<a class="adminlink" href="/admin" rel="nofollow">Admin</a>' : ''}
@@ -350,7 +349,7 @@ ${JSON.stringify(map)}`;
   function ensureHome() {
     if (LANG === 'en' || RT.tr[LANG + '|home']) return Promise.resolve(true);
     const map = {}; KB.categories.forEach((c) => { map['b_' + c.id] = c.blurb; }); SUGGEST.forEach((x, i) => { map['s' + i] = x; }); Object.assign(map, FOOT, HERO); delete map.tagline; [['f1', 'Ask'], ['f1s', 'In your language'], ['f2', 'Prepare'], ['f2s', 'Step by step'], ['f3', 'Organize'], ['f3s', 'Your evidence'], ['f4', 'Be Ready'], ['f4s', 'With confidence']].forEach(([k, v]) => { map[k] = v; });
-    return translateMap(map, 'home7', (o) => { RT.tr[LANG + '|home'] = o; });
+    return translateMap(map, 'home8', (o) => { RT.tr[LANG + '|home'] = o; });
   }
   /* Home: act-now strip and situation cards. Every fact here is taken from the guide it opens. */
   const URGENT_NOW = [
@@ -806,7 +805,7 @@ ${JSON.stringify(map)}`;
     const counts = KB.categories.map((c) => `${c.title}: ${BUILT.filter((i) => i.cat === c.id).length}`).join(', ');
     return shell(`<div class="wrap narrow" style="padding:26px 0 40px">
       <h1 style="font-size:clamp(30px,5vw,46px)">${esc(X('How this works'))}</h1>
-      <details class="panel accp" open><summary><h2>${esc(X('Who made Pehlo'))}</h2>${ic('down', 18)}</summary><div class="accb"><p>${esc(X('Pehlo is made by Sarthak Pattnaik and Subhankar Das, in Bhubaneswar.'))}</p><p style="margin:0">${esc(X('Pehlo is a free preparation tool. It does not recommend, refer you to, or advertise any advocate — including us. We do not take cases, referrals or fees through Pehlo. Choose any advocate you trust, or call 15100 for free legal aid.'))}</p></div></details>
+      <details class="panel accp" open><summary><h2>${esc(X('Who made Pehlo'))}</h2>${ic('down', 18)}</summary><div class="accb"><p>${esc(X('Made by'))} <a class="plink" href="https://www.linkedin.com/in/sarthakad" target="_blank" rel="noopener">Sarthak Pattnaik</a> ${esc(X('and'))} <a class="plink" href="https://www.linkedin.com/in/subhankar-das-311030b1/" target="_blank" rel="noopener">Subhankar Das</a>, ${esc(X('in Bhubaneswar.'))}</p><p style="margin:0">${esc(X('Pehlo is a free preparation tool. It does not recommend, refer you to, or advertise any advocate — including us. We do not take cases, referrals or fees through Pehlo. Choose any advocate you trust, or call 15100 for free legal aid.'))}</p></div></details>
       <details class="panel accp"><summary><h2>${esc(X('What it does'))}</h2>${ic('down', 18)}</summary><div class="accb"><p>Pick your problem and answer a few one-tap questions. Each answer changes which papers you need. The rules come from a written, tested set of guides — not from a chatbot making things up.</p><p style="margin:0">At the end you get one list: what to do first, the papers to take to your advocate, and where you stand. You can print it, or make a page for your advocate with your answers and a dated timeline.</p></div></details>
       <details class="panel accp"><summary><h2>${esc(X('What it doesn\'t do'))}</h2>${ic('down', 18)}</summary><div class="accb"><ul style="margin:0;padding-left:20px"><li>Give legal advice or predict results.</li><li>Say a record is legally required or admissible.</li><li>Prepare court filings.</li><li>Ask you to upload documents.</li></ul></div></details>
       <details class="panel accp"><summary><h2>${esc(X('Why these problems'))}</h2>${ic('down', 18)}</summary><div class="accb"><p style="margin:0">Guides are chosen from what most often reaches Indian courts and Lok Adalats (cheque bounce, family, motor accident, traffic challans, property), the National Consumer Helpline (e-commerce, banking, telecom, travel), the RBI Ombudsman (loans and credit cards lead) and police cyber-crime data (online fraud and fake-police "digital arrest" calls). Guides by area — ${esc(counts)}.</p></div></details>
