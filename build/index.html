@@ -549,6 +549,40 @@ html[dir=rtl] .hero2::before{inset:0 0 0 auto;border-radius:0 0 0 56% / 0 0 0 30
   .hart{align-self:center;padding:28px 0}
   .hart img{border-radius:32px;-webkit-mask-image:none;mask-image:none;box-shadow:0 24px 50px -28px rgba(1,49,46,.45);height:clamp(480px,40vw,600px)}
 }
+
+/* v12: audit fixes */
+#start{scroll-margin-top:84px}
+@media (max-width:640px){
+  .navq{padding:8px}
+  .navq .lbl-long{display:none}
+  .nav .lbl-short{display:inline}
+}
+@media (max-width:760px){
+  .hart{width:100%;overflow:hidden;max-height:250px;border-radius:0}
+  .hart img{width:100vw;height:250px;object-fit:cover;object-position:50% 72%;margin-inline:calc(50% - 50vw)}
+  .hero2{background:#ECF0E8}
+  .hcopy{background:var(--paper);margin:0 -20px;padding:22px 20px 26px;border-radius:24px 24px 0 0;position:relative;margin-top:-22px}
+  .hcopy h1{font-size:clamp(28px,8vw,36px)}
+  .feats{padding-top:18px}
+  .featsin{grid-template-columns:1fr 1fr;gap:12px;text-align:start}
+  .feat{flex-direction:row;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px}
+  .feat b{margin:0;font-size:16px;display:block}
+  .feat span:last-child{font-size:13px}
+  .feat > div{display:flex;flex-direction:column}
+  .fic{width:44px;height:44px;flex:none}
+  .fic svg{width:22px;height:22px}
+  .flogo{height:64px}
+}
+.check input[type=checkbox]{width:20px;height:20px;flex:none}
+.feat > div{display:flex;flex-direction:column;align-items:center;gap:4px}
+.feat > div span{color:#4A4A4A;font-size:15px}
+@media (max-width:760px){.feat > div{align-items:flex-start;gap:0}.feat > div span{font-size:13px}}
+@media (max-width:760px){
+  .hart{width:auto;margin-inline:-20px;max-height:260px}
+  .hart img{width:100%;height:260px;margin:0;object-position:50% 38%}
+  .home .searchbox input{font-size:16px}
+}
+@media (max-width:760px){ .hart{justify-self:stretch;align-self:stretch;display:block} }
 </style>
 </head>
 <body>
@@ -3907,6 +3941,14 @@ ${JSON.stringify(map)}`;
 
   /* ---------- routing ---------- */
   function go(v) { if (location.hash === '#' + v) render(); else location.hash = v; }
+  const goQuiz = () => go('quiz-' + S.history.length);
+  /* Browser/phone Back inside the questions: '#quiz-k' means "k answers given"; going back undoes later answers. */
+  function syncQuiz(arg) {
+    const k = Number(arg); if (arg === '' || Number.isNaN(k) || !S.issueId) return;
+    let changed = false;
+    while (S.history.length > k) { const last = S.history.pop(); S.prefill[last.id] = S.answers[last.id]; delete S.answers[last.id]; delete S.skipped[last.id]; S.stage = last.stage; changed = true; }
+    if (changed) { if (S.stage === 'quick') S.quickDone = false; else S.deepDone = false; E.prune(issue(), S.answers); persist(); }
+  }
   window.addEventListener('hashchange', render);
 
   function shell(inner, opt = {}) {
@@ -3914,8 +3956,8 @@ ${JSON.stringify(map)}`;
     document.body.classList.toggle('calm', sensitive);
     return `<header class="top"><div class="wrap">
         <button class="brand" data-go="home" aria-label="Pehlo home"><img class="blogo" src="${window.ER_BRAND.logo}" alt="Pehlo" width="132" height="49"></button>
-        <button class="nav" data-go="questions">${ic('q', 18)}<span class="lbl-long">${esc(T('q').replace(/\?$/, ''))}</span><span class="lbl-short">?</span></button>
-        <button class="nav" data-go="help">${ic('phone', 18)}<span class="lbl-long">${esc(T('help').replace(/\?$/, ''))}</span><span class="lbl-short">SOS</span></button>
+        <button class="nav navq" data-go="questions" aria-label="${esc(T('q'))}">${ic('q', 18)}<span class="lbl-long">${esc(T('q').replace(/\?$/, ''))}</span></button>
+        <button class="nav" data-go="help">${ic('phone', 18)}<span class="lbl-long">${esc(T('help').replace(/\?$/, ''))}</span><span class="lbl-short">${esc(H('nav_help', 'Help'))}</span></button>
         <button class="nav lang" data-act="lang" aria-label="Language: ${esc(LMETA[LANG].name)}. Change language">${ic('globe', 18)}<span>${esc(LMETA[LANG].native)}</span></button>
         ${sensitive ? `<a class="nav exit" data-act="exit" href="https://www.google.com" target="_blank" rel="noopener noreferrer" title="Clears this page and opens a neutral website">${ic('x', 18)}<span>Exit</span></a>` : ''}
       </div></header>
@@ -3942,7 +3984,7 @@ ${JSON.stringify(map)}`;
     const map = {
       cat: () => viewCat(arg),
       start: () => viewIntro(arg), topic: () => viewIntro('general', KB.directory[Number(arg)]),
-      quiz: () => need(viewQuiz), brk: () => need(viewList), urgent: () => need(viewUrgent), list: () => need(viewList),
+      quiz: () => need(() => { syncQuiz(arg); return viewQuiz(); }), brk: () => need(viewList), urgent: () => need(viewUrgent), list: () => need(viewList),
       answers: () => need(viewAnswers), timeline: () => need(viewTimeline), report: () => need(viewReport),
       questions: () => viewQuestions(), q: () => viewQuestions(arg), myths: () => viewMyths(), advocates: () => viewAdvocates(), help: () => viewHelp(), about: () => viewAbout()
     };
@@ -3965,7 +4007,7 @@ ${JSON.stringify(map)}`;
       + gen.map((d) => `<button class="prob" data-play="general" data-topic="${d.idx}"><b>${esc(C(cid, 'd' + d.idx, d.title))}</b><span>${esc(T('basic'))}</span>${ic('chev', 22)}</button>`).join('');
   }
   const H = (k, en) => trGet('home', k, en);
-  const HERO = { hero_h: 'Legal preparation made simple for every Indian', hero_s1: 'Ask. Understand. Prepare.', hero_s2: 'All in your language.', hero_go: 'Get Started', hero_f: 'Free • Simple • Multilingual', tagline: 'Samajh. Tayyari. Apna Haq.', f1: 'Ask', f1s: 'In your language', f2: 'Prepare', f2s: 'Step by step', f3: 'Organize', f3s: 'Your evidence', f4: 'Be Ready', f4s: 'With confidence' };
+  const HERO = { nav_help: 'Help', hero_h: 'Legal preparation made simple for every Indian', hero_s1: 'Ask. Understand. Prepare.', hero_s2: 'All in your language.', hero_go: 'Get Started', hero_f: 'Free • Simple • Multilingual', tagline: 'Samajh. Tayyari. Apna Haq.', f1: 'Ask', f1s: 'In your language', f2: 'Prepare', f2s: 'Step by step', f3: 'Organize', f3s: 'Your evidence', f4: 'Be Ready', f4s: 'With confidence' };
   function ensureHome() {
     if (LANG === 'en' || RT.tr[LANG + '|home']) return Promise.resolve(true);
     const map = {}; KB.categories.forEach((c) => { map['b_' + c.id] = c.blurb; }); SUGGEST.forEach((x, i) => { map['s' + i] = x; }); Object.assign(map, FOOT, HERO); delete map.tagline;
@@ -3985,7 +4027,7 @@ ${JSON.stringify(map)}`;
         </div>
         <div class="hart"><img src="${window.ER_BRAND.hero}" alt="" width="436" height="660"></div>
       </div></section>
-      <section class="feats"><div class="wrap featsin">${FEAT.map(([icn, k, en, ks, ens, tone]) => `<div class="feat"><span class="fic ${tone}">${ic(icn, 30)}</span><b>${esc(H(k, en))}</b><span>${esc(H(ks, ens))}</span></div>`).join('')}</div></section>
+      <section class="feats"><div class="wrap featsin">${FEAT.map(([icn, k, en, ks, ens, tone]) => `<div class="feat"><span class="fic ${tone}">${ic(icn, 30)}</span><div><b>${esc(H(k, en))}</b><span>${esc(H(ks, ens))}</span></div></div>`).join('')}</div></section>
       <div class="wrap home" id="start">
         <div class="searchbox" role="search">
           <label class="sr" for="matter">${esc(T('search'))}</label>
@@ -4088,7 +4130,7 @@ ${JSON.stringify(map)}`;
       ${urg.map((u) => urgentBanner(u, iss)).join('')}
       <form id="qform" data-q="${q.id}">
         <fieldset><legend><h1 class="qtext">${esc(G(iss, q.id + '.t', q.text))}</h1></legend>
-          <div class="opts">${q.options.map((o) => `<label class="opt"><input type="radio" name="a" value="${o.id}" ${cur === o.id ? 'checked' : ''}><span class="dot" aria-hidden="true"></span><span>${esc(G(iss, q.id + '.' + o.id, o.label))}</span></label>`).join('')}</div>
+          <div class="opts">${q.options.map((o) => `<label class="opt"><input type="radio" name="a" value="${o.id}" ${cur === o.id ? 'checked data-pre="1"' : ''}><span class="dot" aria-hidden="true"></span><span>${esc(G(iss, q.id + '.' + o.id, o.label))}</span></label>`).join('')}</div>
         </fieldset>
       </form>
       <details class="why"><summary>${esc(T('why'))}</summary><p>${esc(G(iss, q.id + '.w', q.why))}</p></details>
@@ -4115,7 +4157,7 @@ ${JSON.stringify(map)}`;
   }
   function nextAfter() {
     if (!currentQ()) { finishStage(); go('list'); return; }
-    render();
+    goQuiz();
   }
   function finishStage() { if (S.stage === 'quick') S.quickDone = true; else S.deepDone = true; persist(); }
 
@@ -4185,6 +4227,32 @@ ${JSON.stringify(map)}`;
       </div></div>`;
   }
   function evCard(e, flagged, iss) { return checkRow(e, iss || issue(), flagged); }
+  function viewAnswers() {
+    const iss = issue(); const qs = iss.questions.filter((q) => S.answers[q.id] != null || S.skipped[q.id]);
+    return shell(`<div class="wrap narrow" style="padding:20px 0 40px"><button class="btn text" data-go="list">${ic('back', 18)} ${esc(T('listh'))}</button>
+      <h1 style="font-size:clamp(28px,5vw,42px);margin:8px 0 10px">Your answers</h1>
+      <p class="muted">Change any answer. Questions that depend on it will be asked again. Documents you named are kept.</p>
+      <div class="grid">${qs.map((q) => `<div class="helpcard" style="justify-content:space-between;align-items:center"><div><p class="small muted" style="margin:0">${esc(q.text)}</p><p style="margin:2px 0 0;font-weight:700">${S.skipped[q.id] ? '<span class="muted">Skipped</span>' : esc(answerText(q, S.answers[q.id]))}</p></div><button class="btn line" data-act="change" data-q="${q.id}">Change</button></div>`).join('') || '<p class="muted">No answers yet.</p>'}</div>
+    </div>`, { inJourney: true });
+  }
+
+  function viewTimeline() {
+    const items = [...S.chrono].sort((a, b) => (a.date || '9999').localeCompare(b.date || '9999'));
+    return shell(`<div class="wrap narrow" style="padding:20px 0 40px"><button class="btn text" data-go="list">${ic('back', 18)} ${esc(T('listh'))}</button>
+      <h1 style="font-size:clamp(28px,5vw,42px);margin:8px 0 10px">Your timeline</h1>
+      <p class="muted">List the main events in your own words. Approximate dates are fine — mark them.</p>
+      ${items.length ? `<ol class="tl">${items.map((t) => `<li><div class="d">${t.date ? esc(fmtDate(t.date)) + (t.approx ? ' (approx.)' : '') : 'Date unknown'}</div><div>${esc(t.text)}</div><button class="btn text small" data-delchrono="${t.id}">Remove</button></li>`).join('')}</ol>` : '<p class="panel muted">No events yet. Add the first one below.</p>'}
+      <form class="panel" id="chronoform">
+        <h2>Add an event</h2>
+        <div class="grid" style="grid-template-columns:1fr 1fr;align-items:end"><label class="f">Date<input class="t" type="date" name="date" max="${today()}"></label><label class="check"><input type="checkbox" name="approx"> Approximate</label></div>
+        <label class="f" style="margin-top:10px">What happened?<textarea class="t" name="text" rows="2" maxlength="300" required placeholder="e.g. Paid ₹40,000 deposit by UPI"></textarea></label>
+        <p class="small muted">Stick to what happened. Leave out private details you don't need.</p>
+        <button class="btn go" type="submit">Add to timeline</button>
+      </form>
+      <div class="row" style="margin-top:18px"><button class="btn go" data-go="report">${ic('file', 18)} Make my lawyer page</button></div>
+    </div>`, { inJourney: true });
+  }
+
 
   function standCard(iss, items, have) {
     const st = E.stand(iss, S.answers);
@@ -4236,7 +4304,7 @@ ${JSON.stringify(map)}`;
   }
   function viewReport() {
     return shell(`<div class="wrap narrow" style="padding-bottom:30px">
-      <div class="toolbar noprint"><button class="btn text" data-go="list">${ic('back', 18)} Your file</button><button class="btn go" data-act="print">${ic('file', 18)} Print or save as PDF</button>${downloads ? '<button class="btn line" data-act="download">Download</button>' : ''}<button class="btn line" data-act="copytext">Copy as text</button></div>
+      <div class="toolbar noprint"><button class="btn text" data-go="list">${ic('back', 18)} ${esc(T('listh'))}</button><button class="btn go" data-act="print">${ic('file', 18)} Print or save as PDF</button>${downloads ? '<button class="btn line" data-act="download">Download</button>' : ''}<button class="btn line" data-act="copytext">Copy as text</button></div>
       <div class="panel noprint" style="margin:0 0 16px">
         <label class="check"><input type="checkbox" data-act="excl" ${S.excludeSensitive ? 'checked' : ''}> Leave out my answers to sensitive questions</label>
         <label class="f" style="margin-top:12px">Anything else your advocate should know? (optional)<textarea class="t" id="notes" rows="2" maxlength="500">${esc(S.notes)}</textarea></label>
@@ -4339,9 +4407,9 @@ ${JSON.stringify(map)}`;
     const counts = KB.categories.map((c) => `${c.title}: ${BUILT.filter((i) => i.cat === c.id).length}`).join(', ');
     return shell(`<div class="wrap narrow" style="padding:26px 0 40px">
       <h1 style="font-size:clamp(30px,5vw,46px)">How this works</h1>
-      <div class="panel"><h2>What it does</h2><p>You pick a problem and answer short questions in chapters. Each answer changes which records we suggest. The rules live in a structured, tested knowledge base — not generated on the fly by a chatbot.</p><p style="margin:0">You end with a preparation pack: your answers, a timeline, records you have and need, questions for your advocate, and a provisional annexure index built only from documents you named.</p></div>
+      <div class="panel"><h2>What it does</h2><p>Pick your problem and answer a few one-tap questions. Each answer changes which papers you need. The rules come from a written, tested set of guides — not from a chatbot making things up.</p><p style="margin:0">At the end you get one list: what to do first, the papers to take to your advocate, and where you stand. You can print it, or make a page for your advocate with your answers and a dated timeline.</p></div>
       <div class="panel"><h2>What it doesn't do</h2><ul style="margin:0;padding-left:20px"><li>Give legal advice or predict results.</li><li>Say a record is legally required or admissible.</li><li>Prepare court filings.</li><li>Ask you to upload documents.</li></ul></div>
-      <div class="panel"><h2>Why these problems</h2><p style="margin:0">Guides are chosen from what most often reaches Indian courts (cheque bounce, matrimonial, motor accident, rent and property cases), the National Consumer Helpline (e-commerce, durables, banking, telecom, travel) and the RBI Ombudsman (loans and credit cards lead). Guides by area — ${esc(counts)}.</p></div>
+      <div class="panel"><h2>Why these problems</h2><p style="margin:0">Guides are chosen from what most often reaches Indian courts and Lok Adalats (cheque bounce, family, motor accident, traffic challans, property), the National Consumer Helpline (e-commerce, banking, telecom, travel), the RBI Ombudsman (loans and credit cards lead) and police cyber-crime data (online fraud and fake-police "digital arrest" calls). Guides by area — ${esc(counts)}.</p></div>
       <div class="panel"><h2>Privacy</h2><p>Your answers stay in this browser tab. Nothing is sent to us. If you switch on "Keep my file on this device", it is saved only in this browser. Advocate links contain only the guide choice and the advocate's note.</p><p style="margin:0">Exit clears the page and opens a neutral website. It does not erase browser history.</p></div>
       <div class="panel"><h2>Review status</h2><p style="margin:0">All guides are <b>drafts</b>, not yet reviewed by a practising advocate. Each guide will show its reviewer and date once reviewed. Languages: all 22 scheduled languages of India plus English. 16 have a hand-written interface; Santali, Kashmiri, Sindhi, Manipuri, Bodo and Sanskrit, and all guide content in every language, are machine-translated on the fly and labelled so. Translations need native-speaker and advocate review. The page for your lawyer always stays in English. Content v${esc(KB.version)}: ${BUILT.length} guided problems, ${KB.questions.length} answered questions, ${KB.myths.length} myth cards.</p></div>
       ${S.issueId || loadSaved() ? '<button class="btn line" data-act="clear" style="margin-top:16px">Clear everything on this device</button>' : ''}
@@ -4382,7 +4450,9 @@ ${JSON.stringify(map)}`;
     const form = document.getElementById('qform');
     if (form) {
       const qq = issue().questions.find((x) => x.id === form.dataset.q);
-      form.addEventListener('change', (e) => { if (e.target.name === 'a') { form.classList.add('picked'); setTimeout(() => answer(qq, e.target.value), 220); } });
+      let done = false; const pick = (v) => { if (done) return; done = true; form.classList.add('picked'); setTimeout(() => answer(qq, v), 220); };
+      form.addEventListener('change', (e) => { if (e.target.name === 'a') pick(e.target.value); });
+      form.addEventListener('click', (e) => { const i = e.target.closest('input[name=a]'); if (i && i.dataset.pre) pick(i.value); });
       form.addEventListener('submit', (e) => e.preventDefault());
     }
     const cf = document.getElementById('chronoform');
@@ -4418,7 +4488,7 @@ ${JSON.stringify(map)}`;
   document.addEventListener('click', async (e) => {
     const pl = e.target.closest('[data-play]');
     if (pl) { e.preventDefault(); startIssue(pl.dataset.play, pl.dataset.topic != null ? KB.directory[Number(pl.dataset.topic)] : null);
-      const iss = issue(); if (translated() && sampler) { withTranslation([ensureGuide(iss, 'a')], () => { go('quiz'); ensureGuide(iss, 'b').then(() => { if (/^#(quiz|list|urgent)/.test(location.hash)) render(); }); }); } else go('quiz'); return; }
+      const iss = issue(); if (translated() && sampler) { withTranslation([ensureGuide(iss, 'a')], () => { goQuiz(); ensureGuide(iss, 'b').then(() => { if (/^#(quiz|list|urgent)/.test(location.hash)) render(); }); }); } else goQuiz(); return; }
     const lc = e.target.closest('[data-lang]'); if (lc) { setLang(lc.dataset.lang); document.querySelector('.overlay')?.remove(); return; }
     const t = e.target.closest('[data-go],[data-act],[data-status],[data-delrec],[data-delchrono],[data-ex],[data-copy],[data-club],[data-qcat],[data-mf]'); if (!t) return;
     if (t.dataset.go) { e.preventDefault(); go(t.dataset.go); return; }
@@ -4434,17 +4504,17 @@ ${JSON.stringify(map)}`;
     switch (t.dataset.act) {
       case 'toshelf': document.getElementById('shelf').scrollIntoView({ behavior: 'smooth' }); break;
       case 'lang': showLang(); break;
-      case 'begin': startIssue(t.dataset.id, t.dataset.topic != null ? KB.directory[Number(t.dataset.topic)] : null); go('quiz'); break;
+      case 'begin': startIssue(t.dataset.id, t.dataset.topic != null ? KB.directory[Number(t.dataset.topic)] : null); goQuiz(); break;
       case 'skip': { const q = currentQ(); if (q) { S.skipped[q.id] = true; S.history.push({ id: q.id, stage: S.stage, skip: true }); persist(); nextAfter(q); } break; }
-      case 'qback': { const last = S.history.pop(); if (!last) break; S.prefill[last.id] = S.answers[last.id]; delete S.answers[last.id]; delete S.skipped[last.id]; S.stage = last.stage; E.prune(iss, S.answers); persist(); go('quiz'); break; }
+      case 'qback': { if (!S.history.length) break; syncQuiz(String(S.history.length - 1)); history.replaceState(null, '', '#quiz-' + S.history.length); render(); break; }
       case 'toen': setLang('en'); break;
       case 'getstarted': { const st = document.getElementById('start'); if (st) st.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); setTimeout(() => document.getElementById('matter')?.focus({ preventScroll: true }), 400); break; }
       case 'quit': go(S.topic ? 'cat-' + S.topic.cat : 'cat-' + issue().cat); break;
       case 'showlist': S.pendingUrgent = null; S.chapterFound = []; go('list'); break;
-      case 'ackurgent': S.ackUrgent[S.pendingUrgent] = true; S.pendingUrgent = null; persist(); if (currentQ()) go('quiz'); else { finishStage(); go('list'); } break;
-      case 'resumequiz': S.stage = 'quick'; S.skipped = Object.fromEntries(Object.entries(S.skipped).filter(([k]) => iss.questions.find((q) => q.id === k && q.deep))); go('quiz'); break;
-      case 'deep': S.stage = 'deep'; S.chapterFound = []; persist(); go('quiz'); break;
-      case 'change': { const q = iss.questions.find((x) => x.id === t.dataset.q); if (!q) break; S.prefill[q.id] = S.answers[q.id]; delete S.answers[q.id]; delete S.skipped[q.id]; S.stage = q.deep ? 'deep' : 'quick'; S.history = S.history.filter((h) => h.id !== q.id); if (q.deep) S.deepDone = false; else S.quickDone = false; S.chapterFound = []; persist(); go('quiz'); break; }
+      case 'ackurgent': S.ackUrgent[S.pendingUrgent] = true; S.pendingUrgent = null; persist(); if (currentQ()) goQuiz(); else { finishStage(); go('list'); } break;
+      case 'resumequiz': S.stage = 'quick'; S.skipped = Object.fromEntries(Object.entries(S.skipped).filter(([k]) => iss.questions.find((q) => q.id === k && q.deep))); goQuiz(); break;
+      case 'deep': S.stage = 'deep'; S.chapterFound = []; persist(); goQuiz(); break;
+      case 'change': { const q = iss.questions.find((x) => x.id === t.dataset.q); if (!q) break; S.prefill[q.id] = S.answers[q.id]; delete S.answers[q.id]; delete S.skipped[q.id]; S.stage = q.deep ? 'deep' : 'quick'; S.history = S.history.filter((h) => h.id !== q.id); if (q.deep) S.deepDone = false; else S.quickDone = false; S.chapterFound = []; persist(); goQuiz(); break; }
       case 'savetoggle': saveOn = t.checked; if (saveOn) persist(); else clearSaved(); toast(saveOn ? 'Saved on this device' : 'Removed from this device'); break;
       case 'clear': S = blank(); saveOn = false; clearSaved(); toast('Cleared'); go('home'); break;
       case 'forget': clearSaved(); render(); break;

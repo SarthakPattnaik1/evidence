@@ -538,3 +538,37 @@ html[dir=rtl] .hero2::before{inset:0 0 0 auto;border-radius:0 0 0 56% / 0 0 0 30
   .hart{align-self:center;padding:28px 0}
   .hart img{border-radius:32px;-webkit-mask-image:none;mask-image:none;box-shadow:0 24px 50px -28px rgba(1,49,46,.45);height:clamp(480px,40vw,600px)}
 }
+
+/* v12: audit fixes */
+#start{scroll-margin-top:84px}
+@media (max-width:640px){
+  .navq{padding:8px}
+  .navq .lbl-long{display:none}
+  .nav .lbl-short{display:inline}
+}
+@media (max-width:760px){
+  .hart{width:100%;overflow:hidden;max-height:250px;border-radius:0}
+  .hart img{width:100vw;height:250px;object-fit:cover;object-position:50% 72%;margin-inline:calc(50% - 50vw)}
+  .hero2{background:#ECF0E8}
+  .hcopy{background:var(--paper);margin:0 -20px;padding:22px 20px 26px;border-radius:24px 24px 0 0;position:relative;margin-top:-22px}
+  .hcopy h1{font-size:clamp(28px,8vw,36px)}
+  .feats{padding-top:18px}
+  .featsin{grid-template-columns:1fr 1fr;gap:12px;text-align:start}
+  .feat{flex-direction:row;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px}
+  .feat b{margin:0;font-size:16px;display:block}
+  .feat span:last-child{font-size:13px}
+  .feat > div{display:flex;flex-direction:column}
+  .fic{width:44px;height:44px;flex:none}
+  .fic svg{width:22px;height:22px}
+  .flogo{height:64px}
+}
+.check input[type=checkbox]{width:20px;height:20px;flex:none}
+.feat > div{display:flex;flex-direction:column;align-items:center;gap:4px}
+.feat > div span{color:#4A4A4A;font-size:15px}
+@media (max-width:760px){.feat > div{align-items:flex-start;gap:0}.feat > div span{font-size:13px}}
+@media (max-width:760px){
+  .hart{width:auto;margin-inline:-20px;max-height:260px}
+  .hart img{width:100%;height:260px;margin:0;object-position:50% 38%}
+  .home .searchbox input{font-size:16px}
+}
+@media (max-width:760px){ .hart{justify-self:stretch;align-self:stretch;display:block} }
