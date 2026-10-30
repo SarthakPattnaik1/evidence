@@ -286,7 +286,7 @@ ${JSON.stringify(map)}`;
     const sensitive = !!(issue() && issue().sensitive && opt.inJourney);
     document.body.classList.toggle('calm', sensitive);
     return `<header class="top"><div class="wrap">
-        <button class="brand" data-go="home" aria-label="Saboot home"><img class="bicon" src="${window.ER_BRAND.icon}" alt="" width="31" height="38"><span class="bword">Saboot</span></button>
+        <button class="brand" data-go="home" aria-label="Saboot home"><img class="bicon" src="${window.ER_BRAND.icon}" alt="" width="28" height="34"><img class="bwordimg" src="${window.ER_BRAND.word}" alt="Saboot" width="103" height="24"></button>
         <button class="nav navq" data-go="questions" aria-label="${esc(T('q'))}">${ic('q', 18)}<span class="lbl-long">${esc(T('q').replace(/\?$/, ''))}</span></button>
         <button class="nav" data-go="help">${ic('phone', 18)}<span class="lbl-long">${esc(T('help').replace(/\?$/, ''))}</span><span class="lbl-short">${esc(H('nav_help', 'Help'))}</span></button>
         <button class="nav lang" data-act="lang" aria-label="Language: ${esc(LMETA[LANG].name)}. Change language">${ic('globe', 18)}<span>${esc(LMETA[LANG].native)}</span></button>
@@ -303,7 +303,7 @@ ${JSON.stringify(map)}`;
   function footer() {
     const f = (k) => esc(H(k, FOOT[k]));
     return `<footer class="foot"><div class="wrap">
-      <div class="fmark"><img src="${window.ER_BRAND.icon}" alt="" width="40" height="49"><div><b>Saboot</b><span>${esc(X('Know what to bring. Meet your lawyer prepared.'))}</span></div></div>
+      <div class="fmark"><img class="fm" src="${window.ER_BRAND.icon}" alt="" width="38" height="46"><div><img class="fw" src="${window.ER_BRAND.word}" alt="Saboot" width="120" height="28"><b>Saboot</b><span>${esc(X('Know what to bring. Meet your lawyer prepared.'))}</span></div></div>
       <p style="max-width:62em">${f('f_disc')}</p>
       <p class="small muted madeby">${esc(X('Made by'))} <a class="plink" href="https://www.linkedin.com/in/sarthakad" target="_blank" rel="noopener">Sarthak Pattnaik</a> ${esc(X('and'))} <a class="plink" href="https://www.linkedin.com/in/subhankar-das-311030b1/" target="_blank" rel="noopener">Subhankar Das</a>.</p>
       <div class="row"><button data-go="about">${f('f_about')}</button><button data-go="advocates">${f('f_adv')}</button><button data-go="myths">${f('f_myth')}</button><button data-go="help">${f('f_help')}</button><button data-act="reportissue">${esc(X('Report a problem'))}</button>${S.issueId ? `<button data-act="clear">${f('f_clear')}</button>` : ''}${/^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname) ? `<a class="flink" href="/guide">${esc(X('All guides'))}</a><a class="flink" href="/privacy">${esc(X('Privacy'))}</a><a class="flink" href="/terms">${esc(X('Terms'))}</a>` : ''}</div>
@@ -398,7 +398,7 @@ ${JSON.stringify(map)}`;
         </section>
         <section aria-labelledby="areah" class="areas">
           <h2 id="areah" class="lh">${esc(T('area'))}</h2>
-          <div class="arealist">${KB.categories.map((c) => `<button class="arow" data-go="cat-${c.id}"><span class="tic">${ic(c.icon, 20)}</span><b>${esc(catTitle(c))}</b>${ic('chev', 18)}</button>`).join('')}<button class="arow" data-play="general"><span class="tic">${ic('q', 20)}</span><b>${esc(T('notsure'))}</b>${ic('chev', 18)}</button></div>
+          <div class="arealist">${KB.categories.map((c, ci) => `<button class="arow pc${ci % 6}" data-go="cat-${c.id}"><span class="tic">${ic(c.icon, 20)}</span><b>${esc(catTitle(c))}</b>${ic('chev', 18)}</button>`).join('')}<button class="arow pc5" data-play="general"><span class="tic">${ic('q', 20)}</span><b>${esc(T('notsure'))}</b>${ic('chev', 18)}</button></div>
         </section>
     </div>`);
   }

@@ -7,34 +7,34 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / 'build'
 e = lambda s: html.escape(str(s or ''), quote=True)
 
-CSS = """body{margin:0;font:17px/1.6 'Noto Sans',system-ui,sans-serif;color:#01312E;background:#FCFAF4}
-main{max-width:760px;margin:0 auto;padding:28px 20px 60px}main:has(.legal){max-width:none;padding:0}a{color:#04453B}
-header{display:flex;align-items:center;gap:10px;padding:14px max(20px,calc(50% - 480px));border-bottom:1px solid #e6e1d3;background:#FCFAF4;position:sticky;top:0;z-index:2}
-header .back{margin-left:auto;font-size:15px;font-weight:700;text-decoration:none;background:#04453B;color:#fff;padding:8px 16px;border-radius:999px}
+CSS = """body{margin:0;font:17px/1.6 'Noto Sans',system-ui,sans-serif;color:#0B1F36;background:#FBF8F3}
+main{max-width:760px;margin:0 auto;padding:28px 20px 60px}main:has(.legal){max-width:none;padding:0}a{color:#1B3A5C}
+header{display:flex;align-items:center;gap:10px;padding:14px max(20px,calc(50% - 480px));border-bottom:1px solid #e6e1d3;background:#FBF8F3;position:sticky;top:0;z-index:2}
+header .back{margin-left:auto;font-size:15px;font-weight:700;text-decoration:none;background:#1B3A5C;color:#fff;padding:8px 16px;border-radius:999px}
 header img{height:34px}h1{font:800 34px/1.15 'Bricolage Grotesque',system-ui,sans-serif;margin:18px 0 10px}
 h2{font:700 22px/1.25 'Bricolage Grotesque',system-ui,sans-serif;margin:28px 0 8px}
-.cta{display:inline-block;background:#04453B;color:#fff;padding:14px 22px;border-radius:999px;text-decoration:none;font-weight:700;margin:14px 0}
-.muted{color:#4f6662;font-size:15px}.box{background:#fff;border:1px solid #e6e1d3;border-radius:14px;padding:14px 18px;margin:12px 0}
-li{margin:6px 0}.tag{display:inline-block;background:#EBAB47;color:#01312E;border-radius:6px;padding:1px 8px;font-size:13px;font-weight:700}
-footer{max-width:960px;margin:0 auto;padding:20px;color:#4f6662;font-size:14px}
+.cta{display:inline-block;background:#1B3A5C;color:#fff;padding:14px 22px;border-radius:999px;text-decoration:none;font-weight:700;margin:14px 0}
+.muted{color:#566476;font-size:15px}.box{background:#fff;border:1px solid #e6e1d3;border-radius:14px;padding:14px 18px;margin:12px 0}
+li{margin:6px 0}.tag{display:inline-block;background:#D7A455;color:#0B1F36;border-radius:6px;padding:1px 8px;font-size:13px;font-weight:700}
+footer{max-width:960px;margin:0 auto;padding:20px;color:#566476;font-size:14px}
 .legal{max-width:960px;margin:0 auto;padding:0 20px 40px}
 .lhead{padding:34px 0 18px}
-.lhead .kicker{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#04453B;margin:0}
+.lhead .kicker{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#1B3A5C;margin:0}
 .lhead h1{font-size:clamp(32px,5vw,46px);margin:6px 0 8px}
-.lhead p{margin:0;color:#4f6662}
-.short{background:#E9F0E6;border:1px solid #D4E2D3;border-radius:18px;padding:18px 20px;margin:8px 0 26px}
+.lhead p{margin:0;color:#566476}
+.short{background:#E3F4EC;border:1px solid #CDE6D8;border-radius:18px;padding:18px 20px;margin:8px 0 26px}
 .short h2{margin:0 0 10px;font-size:19px}
 .short ul{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .short li{display:flex;gap:10px;align-items:flex-start;margin:0;background:#fff;border-radius:12px;padding:12px 14px;font-size:15.5px;line-height:1.45}
-.short li span{flex:none;width:28px;height:28px;border-radius:8px;background:#04453B;color:#EBAB47;display:grid;place-items:center;font-size:15px}
+.short li span{flex:none;width:28px;height:28px;border-radius:8px;background:#1B3A5C;color:#D7A455;display:grid;place-items:center;font-size:15px}
 .lgrid{display:grid;grid-template-columns:220px minmax(0,1fr);gap:34px;align-items:start}
 .toc{position:sticky;top:84px;font-size:14.5px;border-left:2px solid #e6e1d3;padding-left:14px}
-.toc b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#4f6662;margin-bottom:8px}
-.toc a{display:block;color:#3C524C;text-decoration:none;padding:5px 0}
-.toc a:hover{color:#04453B;text-decoration:underline}
+.toc b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#566476;margin-bottom:8px}
+.toc a{display:block;color:#46566A;text-decoration:none;padding:5px 0}
+.toc a:hover{color:#1B3A5C;text-decoration:underline}
 .sec{background:#fff;border:1px solid #e6e1d3;border-radius:16px;padding:18px 22px;margin:0 0 14px;scroll-margin-top:84px}
 .sec h2{margin:0 0 8px;font-size:21px;display:flex;gap:10px;align-items:baseline}
-.sec h2 i{font-style:normal;font-size:13px;font-weight:800;color:#04453B;background:#E9F0E6;border-radius:999px;padding:2px 9px}
+.sec h2 i{font-style:normal;font-size:13px;font-weight:800;color:#1B3A5C;background:#E3F4EC;border-radius:999px;padding:2px 9px}
 .sec p{margin:6px 0}.sec ul{margin:6px 0;padding-left:20px}.sec li{margin:5px 0}
 .sos{background:#FDF3F1;border:1px solid #EFC9C2;border-radius:16px;padding:16px 20px;margin:4px 0 14px;color:#7A2418}
 .sos b{display:block;font-size:17px;margin-bottom:6px}
@@ -47,9 +47,9 @@ def page(title, desc, body, path, icon):
     return f"""<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(title)}</title><meta name="description" content="{e(desc)}"><link rel="canonical" href="{BASE}{path}">
 <meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:type" content="article">
-<meta name="theme-color" content="#04453B"><meta name="author" content="Sarthak Pattnaik, Subhankar Das"><link rel="icon" href="/icon.svg"><link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#1B3A5C"><meta name="author" content="Sarthak Pattnaik, Subhankar Das"><link rel="icon" href="/icon-64.png" type="image/png"><link rel="manifest" href="/manifest.webmanifest">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
-<style>{CSS}</style></head><body><header><a href="/"><img src="/mark.svg" alt="" width="28" height="35"></a><a href="/" style="font:800 22px/1 \'Bricolage Grotesque\',system-ui;letter-spacing:-.03em;text-decoration:none;color:#01312E">Saboot</a><a class="back" href="/">Open Saboot</a></header>
+<style>{CSS}</style></head><body><header><a href="/" style="display:flex;align-items:center;gap:8px;text-decoration:none"><img src="/mark.png" alt="" style="height:32px;width:auto"><img src="/wordmark.png" alt="Saboot" style="height:22px;width:auto"></a><a class="back" href="/">Open Saboot</a></header>
 <main>{body}</main><footer>Saboot is a free preparation tool, not a law firm, and does not give legal advice. Made by <a href="https://www.linkedin.com/in/sarthakad" rel="noopener">Sarthak Pattnaik</a> and <a href="https://www.linkedin.com/in/subhankar-das-311030b1/" rel="noopener">Subhankar Das</a>. Emergency: 112 · Free legal aid: 15100 · Cyber fraud: 1930.<br><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="/">Open Saboot</a></footer></body></html>"""
 
 
@@ -137,8 +137,8 @@ def run():
     (OUT / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nDisallow: /admin\nSitemap: {BASE}/sitemap.xml\n')
     (OUT / 'manifest.webmanifest').write_text(json.dumps({
         'name': 'Saboot — papers for your advocate', 'short_name': 'Saboot', 'start_url': '/', 'display': 'standalone',
-        'background_color': '#FCFAF4', 'theme_color': '#04453B', 'lang': 'en',
-        'icons': [{'src': '/icon.svg', 'sizes': 'any', 'type': 'image/svg+xml'}, {'src': '/icon-192.png', 'sizes': '192x192', 'type': 'image/png'}, {'src': '/icon-512.png', 'sizes': '512x512', 'type': 'image/png'}]}, ensure_ascii=False))
+        'background_color': '#FBF8F3', 'theme_color': '#1B3A5C', 'lang': 'en',
+        'icons': [{'src': '/icon-192.png', 'sizes': '192x192', 'type': 'image/png'}, {'src': '/icon-512.png', 'sizes': '512x512', 'type': 'image/png'}]}, ensure_ascii=False))
     # Network-first so law updates reach people immediately; cache only as an offline fallback.
     (OUT / 'sw.js').write_text("""const C='saboot-v1';
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(['/'])))});
