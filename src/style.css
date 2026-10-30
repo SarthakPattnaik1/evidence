@@ -688,3 +688,8 @@ a.helpnum{text-decoration:none;color:inherit}
   .dupact + p + hr{display:none}
 }
 .callbtn{min-width:0}.callbtn.long b{font-size:14px;white-space:normal;letter-spacing:-.01em}
+
+footer.foot .wrap{position:relative}
+.adminlink{position:absolute;right:18px;bottom:0;font-size:11px;color:var(--ink2);opacity:.55;text-decoration:none;padding:4px 2px}
+.adminlink:hover,.adminlink:focus-visible{opacity:1;text-decoration:underline}
+@media (max-width:760px){.adminlink{right:16px}}

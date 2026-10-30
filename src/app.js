@@ -228,6 +228,7 @@ ${JSON.stringify(map)}`;
       <p style="max-width:62em">${f('f_disc')} v${esc(KB.version)}.</p>
       <div class="row"><button data-go="about">${f('f_about')}</button><button data-go="advocates">${f('f_adv')}</button><button data-go="myths">${f('f_myth')}</button><button data-go="help">${f('f_help')}</button>${S.issueId ? `<button data-act="clear">${f('f_clear')}</button>` : ''}${/^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname) ? `<a class="flink" href="/guide">All guides</a><a class="flink" href="/privacy">Privacy</a><a class="flink" href="/terms">Terms</a>` : ''}</div>
       <p class="small muted" style="margin:8px 0 0">Law last checked ${esc(new Date((KB.lawChecked || '2026-10-30') + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }))} against official sources.</p>
+      ${/^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname) && /^#?(home)?$/.test(location.hash) ? '<a class="adminlink" href="/admin" rel="nofollow">Admin</a>' : ''}
     </div></footer>`;
   }
 

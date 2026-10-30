@@ -704,6 +704,11 @@ a.helpnum{text-decoration:none;color:inherit}
   .dupact + p + hr{display:none}
 }
 .callbtn{min-width:0}.callbtn.long b{font-size:14px;white-space:normal;letter-spacing:-.01em}
+
+footer.foot .wrap{position:relative}
+.adminlink{position:absolute;right:18px;bottom:0;font-size:11px;color:var(--ink2);opacity:.55;text-decoration:none;padding:4px 2px}
+.adminlink:hover,.adminlink:focus-visible{opacity:1;text-decoration:underline}
+@media (max-width:760px){.adminlink{right:16px}}
 </style>
 </head>
 <body>
@@ -4589,6 +4594,7 @@ ${JSON.stringify(map)}`;
       <p style="max-width:62em">${f('f_disc')} v${esc(KB.version)}.</p>
       <div class="row"><button data-go="about">${f('f_about')}</button><button data-go="advocates">${f('f_adv')}</button><button data-go="myths">${f('f_myth')}</button><button data-go="help">${f('f_help')}</button>${S.issueId ? `<button data-act="clear">${f('f_clear')}</button>` : ''}${/^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname) ? `<a class="flink" href="/guide">All guides</a><a class="flink" href="/privacy">Privacy</a><a class="flink" href="/terms">Terms</a>` : ''}</div>
       <p class="small muted" style="margin:8px 0 0">Law last checked ${esc(new Date((KB.lawChecked || '2026-10-30') + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }))} against official sources.</p>
+      ${/^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname) && /^#?(home)?$/.test(location.hash) ? '<a class="adminlink" href="/admin" rel="nofollow">Admin</a>' : ''}
     </div></footer>`;
   }
 
