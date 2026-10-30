@@ -63,7 +63,7 @@ const url = 'file://' + require('path').resolve(__dirname, '../build/index.html'
     await lp.click('.langopt[data-lang=sat]'); await lp.waitForTimeout(700);
     if (!(await lp.textContent('#areah')).includes('᱕')) errs.push('sat: runtime UI not translated');
     await lp.click('.langsel'); await lp.click('.langopt[data-lang=en]'); await lp.waitForTimeout(150);
-    if (!/Legal preparation/.test(await lp.textContent('.hcopy'))) errs.push('en: did not return');
+    if (!/lawyer’s office ready/.test(await lp.textContent('.hcopy'))) errs.push('en: did not return');
     await lp.close(); }
   // every journey: open, answer first option till first list, ensure no errors and no overflow on mobile
   const p = await page({ width: 360, height: 760 });
