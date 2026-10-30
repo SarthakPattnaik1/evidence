@@ -63,6 +63,93 @@
   let downloads = null;
   try { if (window.claude && window.claude.use) window.claude.use('downloads').then((d) => { downloads = d; if (location.hash === '#report') render(); }).catch(() => {}); } catch (e) { /* none */ }
 
+  /* ============ LANGUAGE ============ */
+  const I18N = window.ER_I18N; const LMETA = Object.fromEntries(I18N.LANGS.map((l) => [l.code, l]));
+  const lsGet = (k) => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } };
+  const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } };
+  let LANG = lsGet('er_lang') || 'en'; if (!LMETA[LANG]) LANG = 'en';
+  const RT = { ui: {}, tr: {} };   // runtime translations: ui[lang] = {key:str}; tr[lang|chunk] = {key:str}
+  let sampler = null;
+  try { if (window.claude && window.claude.use) window.claude.use('sample').then((s) => { sampler = s; }).catch(() => {}); } catch (e) { /* none */ }
+  function T(key, vars) {
+    const i = I18N.KEYS.indexOf(key);
+    let s = (I18N.STRINGS[LANG] || [])[i] || (RT.ui[LANG] || {})[key] || I18N.STRINGS.en[i] || key;
+    if (vars) Object.keys(vars).forEach((k) => { s = s.replace('{' + k + '}', vars[k]); });
+    return s;
+  }
+  const uiReady = (l) => l === 'en' || !!I18N.STRINGS[l] || !!RT.ui[l];
+  function trGet(chunk, key, en) { if (LANG === 'en') return en; const m = RT.tr[LANG + '|' + chunk]; return (m && m[key]) || en; }
+  const G = (iss, key, en) => trGet('g:' + iss.id + ':' + (/^[a-z]+_e_|^lq|^info/.test(key) || /_u_/.test(key) ? 'b' : 'a'), key, en);
+  function applyLangDom() {
+    const m = LMETA[LANG]; const root = document.documentElement;
+    root.lang = LANG; root.dir = m.rtl ? 'rtl' : 'ltr';
+    if (m.font) {
+      const id = 'font-' + m.font.replace(/\W/g, '');
+      if (!document.getElementById(id)) { const l = document.createElement('link'); l.id = id; l.rel = 'stylesheet'; l.href = 'https://fonts.googleapis.com/css2?family=' + encodeURIComponent(m.font) + ':wght@400;600;700&display=swap'; document.head.appendChild(l); }
+      root.style.setProperty('--lfont', '"' + m.font + '"'); root.dataset.script = '1';
+    } else { root.style.removeProperty('--lfont'); delete root.dataset.script; }
+  }
+  const SCRIPT_NOTE = { sat: 'Ol Chiki script', mni: 'Meitei Mayek script', ks: 'Perso-Arabic script', sd: 'Perso-Arabic script', brx: 'Devanagari script', sa: 'Devanagari script', ur: 'Urdu (Nastaliq/Naskh) script' };
+  const pending = {};
+  async function translateMap(map, cacheKey, store) {
+    if (LANG === 'en') return true;
+    const lk = 'er_tr_' + LANG + '_' + KB.version + '_' + cacheKey;
+    const cached = lsGet(lk); if (cached) { store(cached); return true; }
+    if (!sampler) return false;
+    if (pending[lk]) return pending[lk];
+    const m = LMETA[LANG];
+    const prompt = `You are translating a free legal-help app for ordinary people in India into ${m.name} (${m.native}${SCRIPT_NOTE[LANG] ? ', ' + SCRIPT_NOTE[LANG] : ''}).
+Rules:
+- Use very simple, everyday words that a person with little schooling, or an elderly person, understands. Short sentences. Respectful tone.
+- Keep unchanged: anything in {curly braces}, numbers, ₹ amounts, phone numbers, website addresses, names of Acts and sections, and common terms like FIR, UPI, RBI, PAN, NRI, OCI, PoA, KYC, GST, CIBIL, OTP, EMI, RERA, NCLT, MSME.
+- Do not add, drop or soften any meaning, warning or deadline.
+Return ONLY a JSON object with exactly the same keys and the translated strings as values.
+
+${JSON.stringify(map)}`;
+    pending[lk] = sampler.json(prompt, { modelTier: 'default', cache: { gcTime: 86400000 } }).then((res) => {
+      const out = {}; if (res && typeof res === 'object') Object.keys(map).forEach((k) => { if (typeof res[k] === 'string' && res[k].trim()) out[k] = res[k]; });
+      if (Object.keys(out).length) { lsSet(lk, out); store(out); return true; } return false;
+    }).catch(() => false).finally(() => { delete pending[lk]; });
+    return pending[lk];
+  }
+  const ensureUI = () => (uiReady(LANG) ? Promise.resolve(true) : translateMap(Object.fromEntries(I18N.KEYS.map((k, i) => [k, I18N.STRINGS.en[i]])), 'ui', (o) => { RT.ui[LANG] = o; }));
+  function guideChunks(iss) {
+    const a = { s: iss.short, t: iss.title, i: iss.intro };
+    iss.questions.forEach((q) => { a[q.id + '.t'] = q.text; a[q.id + '.w'] = q.why; q.options.forEach((o) => { a[q.id + '.' + o.id] = o.label; }); });
+    const b = {};
+    iss.evidence.forEach((e) => { b[e.id + '.n'] = e.name; b[e.id + '.y'] = e.why; if (e.where) b[e.id + '.wh'] = e.where; if (e.preserve) b[e.id + '.p'] = e.preserve; if (e.time) b[e.id + '.tm'] = e.time; if (e.limit) b[e.id + '.l'] = e.limit; });
+    (iss.urgent || []).forEach((u) => { b[u.id + '.t'] = u.title; b[u.id + '.x'] = u.text; });
+    (iss.info || []).forEach((x, i) => { b['info' + i] = x.text; });
+    return { a, b };
+  }
+  function ensureGuide(iss, part) {
+    if (LANG === 'en') return Promise.resolve(true);
+    const key = 'g:' + iss.id + ':' + part; if (RT.tr[LANG + '|' + key]) return Promise.resolve(true);
+    return translateMap(guideChunks(iss)[part], key, (o) => { RT.tr[LANG + '|' + key] = o; });
+  }
+  function ensureCat(cid) {
+    if (LANG === 'en') return Promise.resolve(true);
+    const key = 'c:' + cid; if (RT.tr[LANG + '|' + key]) return Promise.resolve(true);
+    const map = {}; BUILT.filter((i) => i.cat === cid).forEach((i) => { map[i.id + '.s'] = i.short; map[i.id + '.t'] = i.title; });
+    KB.directory.forEach((d, idx) => { if (d.cat === cid) map['d' + idx] = d.title; });
+    return translateMap(map, key, (o) => { RT.tr[LANG + '|' + key] = o; });
+  }
+  const C = (cid, key, en) => trGet('c:' + cid, key, en);
+  const translated = () => LANG !== 'en';
+  const canTranslate = () => LANG === 'en' || !!sampler;
+  let busy = null;  // { label } while a translation is loading
+  async function withTranslation(promises, then) {
+    if (LANG === 'en') { then(); return; }
+    busy = { label: T('trans', { l: LMETA[LANG].native }) }; render();
+    await Promise.all(promises.map((p) => (typeof p === 'function' ? p() : p)));
+    busy = null; then();
+  }
+  function setLang(code) {
+    LANG = code; lsSet('er_lang', code); applyLangDom();
+    if (!uiReady(code)) withTranslation([ensureUI], () => render()); else render();
+  }
+  function trNote() { return translated() ? `<p class="trnote">${ic('globe', 16)} ${esc(sampler || I18N.STRINGS[LANG] ? T('auto') : T('enonly'))} <button class="btn text" data-act="toen">${esc(T('en'))}</button></p>` : ''; }
+
   /* ---------- routing ---------- */
   function go(v) { if (location.hash === '#' + v) render(); else location.hash = v; }
   window.addEventListener('hashchange', render);
@@ -72,9 +159,9 @@
     document.body.classList.toggle('calm', sensitive);
     return `<header class="top"><div class="wrap">
         <button class="brand" data-go="home" aria-label="EvidenceReady home">${LOGO}<span>EvidenceReady</span></button>
-        <button class="nav" data-go="questions">${ic('q', 18)}<span class="lbl-long">Legal questions</span><span class="lbl-short">Questions</span></button>
-        <button class="nav" data-go="help">${ic('phone', 18)}<span class="lbl-long">Help now</span><span class="lbl-short">Help</span></button>
-        <button class="nav lang" data-act="lang" aria-label="Language: English. Change language">${ic('globe', 18)}<span class="lbl-long">English</span><span class="lbl-short">EN</span></button>
+        <button class="nav" data-go="questions">${ic('q', 18)}<span class="lbl-long">${esc(T('q').replace(/\?$/, ''))}</span><span class="lbl-short">?</span></button>
+        <button class="nav" data-go="help">${ic('phone', 18)}<span class="lbl-long">${esc(T('help').replace(/\?$/, ''))}</span><span class="lbl-short">SOS</span></button>
+        <button class="nav lang" data-act="lang" aria-label="Language: ${esc(LMETA[LANG].name)}. Change language">${ic('globe', 18)}<span>${esc(LMETA[LANG].native)}</span></button>
         ${sensitive ? `<a class="nav exit" data-act="exit" href="https://www.google.com" target="_blank" rel="noopener noreferrer" title="Clears this page and opens a neutral website">${ic('x', 18)}<span>Exit</span></a>` : ''}
       </div></header>
       <main id="main" tabindex="-1">${inner}</main>
@@ -83,7 +170,7 @@
   }
   function footer() {
     return `<footer class="foot"><div class="wrap">
-      <p><span class="tag draft">${esc(KB.reviewed.label)}</span></p>
+      <p><span class="tag draft">${esc(T('draft'))}</span></p>
       <p style="max-width:62em">EvidenceReady helps you prepare for a meeting with an advocate. It is not legal advice, does not replace an advocate, and cannot tell you whether a court will accept any document. Content v${esc(KB.version)}.</p>
       <div class="row"><button data-go="about">How this works &amp; privacy</button><button data-go="advocates">For advocates</button><button data-go="myths">Myth or fact</button><button data-go="help">Legal aid &amp; urgent help</button>${S.issueId ? '<button data-act="clear">Clear my answers</button>' : ''}</div>
     </div></footer>`;
@@ -101,7 +188,7 @@
       answers: () => need(viewAnswers), timeline: () => need(viewTimeline), report: () => need(viewReport),
       questions: () => viewQuestions(), q: () => viewQuestions(arg), myths: () => viewMyths(), advocates: () => viewAdvocates(), help: () => viewHelp(), about: () => viewAbout()
     };
-    app.innerHTML = (map[view] || (() => viewHome()))();
+    app.innerHTML = busy ? viewBusy() : (map[view] || (() => viewHome()))();
     const h = app.querySelector('h1');
     if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
     if (view === 'q') document.getElementById('qa-' + arg)?.scrollIntoView();
@@ -111,46 +198,54 @@
 
   /* ============ HOME ============ */
   const SUGGEST = ['Cheque bounced', 'Money stolen online', 'Divorce', 'Property in India (NRI)', 'Client not paying', 'Rent deposit not returned'];
+  const TOP_LANGS = ['en', 'hi', 'bn', 'te', 'mr', 'ta', 'ur', 'gu', 'kn', 'or', 'ml', 'pa'];
+  const catTitle = (c) => T('c_' + c.id) || c.title;
   function problemRows(cid) {
     const deep = BUILT.filter((i) => i.cat === cid);
     const gen = KB.directory.map((d, idx) => ({ ...d, idx })).filter((d) => d.cat === cid);
-    return deep.map((i) => `<button class="prob" data-play="${i.id}"><b>${esc(i.short)}</b><span>${esc(i.title)}</span>${ic('chev', 22)}</button>`).join('')
-      + gen.map((d) => `<button class="prob" data-play="general" data-topic="${d.idx}"><b>${esc(d.title)}</b><span>Basic checklist</span>${ic('chev', 22)}</button>`).join('');
+    return deep.map((i) => `<button class="prob" data-play="${i.id}"><b>${esc(C(cid, i.id + '.s', i.short))}</b><span>${esc(C(cid, i.id + '.t', i.title))}</span>${ic('chev', 22)}</button>`).join('')
+      + gen.map((d) => `<button class="prob" data-play="general" data-topic="${d.idx}"><b>${esc(C(cid, 'd' + d.idx, d.title))}</b><span>${esc(T('basic'))}</span>${ic('chev', 22)}</button>`).join('');
   }
   function viewHome() {
     const saved = !S.issueId && loadSaved();
-    return shell(`<div class="wrap home">
-      ${saved && saved.issueId ? `<div class="banner info" style="margin-top:18px">${ic('folder')}<div><h3>You have a saved list</h3><p>${esc((BY_ID[saved.issueId] || {}).short || '')}. <button class="btn text" data-act="resume">Open it</button> <button class="btn text" data-act="forget">Delete it</button></p></div></div>` : ''}
-      <section class="hero1">
-        <h1>Going to a lawyer?<br>Know what papers to take.</h1>
-        <p class="lead">Tap your problem. Answer a few easy questions. Get a simple list of papers to take to your lawyer. Free. No sign-up.</p>
+    return shell(`<section class="band"><div class="wrap">
+        <div class="langbar" role="group" aria-label="Language">${TOP_LANGS.map((c) => `<button class="lchip" lang="${c}" data-lang="${c}" aria-pressed="${LANG === c}">${esc(LMETA[c].native)}</button>`).join('')}<button class="lchip more" data-act="lang">${ic('globe', 16)} ${I18N.LANGS.length}</button></div>
+        <h1>${esc(T('h1a'))}<br>${esc(T('h1b'))}</h1>
+        <p class="lead">${esc(T('lead'))}</p>
         <div class="searchbox" role="search">
-          <label class="sr" for="matter">Type your problem</label>
-          ${ic('search', 22)}<input id="matter" type="search" autocomplete="off" placeholder="Type your problem, e.g. cheque bounced">
+          <label class="sr" for="matter">${esc(T('search'))}</label>
+          ${ic('search', 22)}<input id="matter" type="search" autocomplete="off" placeholder="${esc(T('search'))}">
         </div>
         <div id="results" class="results" aria-live="polite"></div>
-        <div class="suggest" id="suggest">${SUGGEST.map((x) => `<button class="slipchip" data-ex="${esc(x)}">${esc(x)}</button>`).join('')}</div>
-      </section>
+        ${LANG === 'en' ? `<div class="suggest" id="suggest">${SUGGEST.map((x) => `<button class="slipchip" data-ex="${esc(x)}">${esc(x)}</button>`).join('')}</div>` : '<div id="suggest"></div>'}
+      </div></section>
+      <div class="wrap home">
+      ${saved && saved.issueId ? `<div class="banner info" style="margin-top:18px">${ic('folder')}<div><h3>${esc(T('listh'))}</h3><p>${esc((BY_ID[saved.issueId] || {}).short || '')}. <button class="btn text" data-act="resume">${esc(T('seelist'))}</button> <button class="btn text" data-act="forget">${esc(T('delall'))}</button></p></div></div>` : ''}
       <section aria-labelledby="areah">
-        <h2 id="areah">Or choose your area</h2>
-        <div class="tiles">${KB.categories.map((c) => `<button class="tile" data-go="cat-${c.id}"><span class="tic">${ic(c.icon, 28)}</span><b>${esc(c.title)}</b><span>${esc(c.blurb)}</span></button>`).join('')}
-          <button class="tile" data-play="general"><span class="tic">${ic('q', 28)}</span><b>Not sure</b><span>Answer a few simple questions</span></button></div>
+        <h2 id="areah">${esc(T('area'))}</h2>
+        <div class="tiles">${KB.categories.map((c) => `<button class="tile" data-go="cat-${c.id}"><span class="tic">${ic(c.icon, 26)}</span><b>${esc(catTitle(c))}</b>${LANG === 'en' ? `<span>${esc(c.blurb)}</span>` : ''}</button>`).join('')}
+          <button class="tile" data-play="general"><span class="tic">${ic('q', 26)}</span><b>${esc(T('notsure'))}</b><span>${esc(T('notsure_s'))}</span></button></div>
       </section>
       <section class="minirow">
-        <button class="mini" data-go="questions">${ic('q', 22)}<span><b>Have a legal question?</b>Read short, simple answers</span></button>
-        <button class="mini" data-go="myths">${ic('check', 22)}<span><b>Myth or fact?</b>A 2-minute quiz on your rights</span></button>
-        <button class="mini" data-go="help">${ic('phone', 22)}<span><b>Need help now?</b>Emergency and free legal aid numbers</span></button>
+        <button class="mini" data-go="questions">${ic('q', 22)}<span><b>${esc(T('q'))}</b>${esc(T('q_s'))}</span></button>
+        <button class="mini" data-go="myths">${ic('check', 22)}<span><b>${esc(T('myth'))}</b>${esc(T('myth_s'))}</span></button>
+        <button class="mini" data-go="help">${ic('phone', 22)}<span><b>${esc(T('help'))}</b>${esc(T('help_s'))}</span></button>
       </section>
     </div>`);
   }
   function viewCat(cid) {
     const c = CAT[cid]; if (!c) return viewHome();
-    return shell(`<div class="wrap narrow" style="padding:18px 0 40px">
-      <button class="btn text" data-go="home">${ic('back', 20)} Home</button>
-      <h1 class="pageh"><span class="tic big">${ic(c.icon, 30)}</span>${esc(c.title)}</h1>
-      <p class="lead" style="margin:6px 0 16px">What happened? Tap the closest one.</p>
-      <div class="probs">${problemRows(cid)}<button class="prob" data-play="general"><b>Something else</b><span>Basic checklist</span>${ic('chev', 22)}</button></div>
+    if (translated() && sampler && !RT.tr[LANG + '|c:' + cid] && !busy) { setTimeout(() => withTranslation([ensureCat(cid)], render), 0); }
+    return shell(`<div class="wrap narrow" style="padding-top:18px;padding-bottom:40px">
+      <button class="btn text" data-go="home">${ic('back', 20)} ${esc(T('home'))}</button>
+      <h1 class="pageh"><span class="tic big">${ic(c.icon, 30)}</span>${esc(catTitle(c))}</h1>
+      <p class="lead" style="margin:6px 0 16px">${esc(T('whathap'))}</p>
+      ${trNote()}
+      <div class="probs">${problemRows(cid)}<button class="prob" data-play="general"><b>${esc(T('else'))}</b><span>${esc(T('basic'))}</span>${ic('chev', 22)}</button></div>
     </div>`);
+  }
+  function viewBusy() {
+    return shell(`<div class="wrap narrow busy" role="status" aria-live="polite"><div class="spinner" aria-hidden="true"></div><h1>${esc(busy.label)}</h1><p class="muted">${esc(T('auto'))}</p></div>`, { noFooter: true });
   }
   function searchAll(q) {
     const stop = ['the', 'and', 'has', 'have', 'been', 'not', 'was', 'with', 'from', 'that', 'this', 'someone', 'what', 'about', 'my', 'me', 'is', 'are', 'did', 'got', 'for'];
@@ -203,7 +298,7 @@
   const currentQ = () => E.nextQuestion(issue(), S.answers, S.stage, S.skipped);
   function trayHTML() {
     const n = E.evidence(issue(), S.answers).length;
-    return `<div class="tray noprint"><div class="wrap"><div class="trayin" id="tray"><span class="count" id="traycount">${n}</span><span class="lbl">papers on<br>your list</span><button class="btn" data-act="showlist">See my list</button></div></div></div>`;
+    return `<div class="tray noprint"><div class="wrap"><div class="trayin" id="tray"><span class="count" id="traycount">${n}</span><span class="lbl">${esc(T('onlist'))}</span><button class="btn" data-act="showlist">${esc(T('seelist'))}</button></div></div></div>`;
   }
   function viewQuiz() {
     const iss = issue(); const q = currentQ();
@@ -214,23 +309,23 @@
     const urg = E.urgent(iss, S.answers).filter((u) => u.level !== 'info');
     const first = S.stage === 'quick' && pr.done === 0;
     return shell(`<div class="wrap narrow qwrap">
-      <div class="qtop"><button class="btn text" data-act="${S.history.length ? 'qback' : 'quit'}">${ic('back', 20)} Back</button><span class="ptitle">${esc(S.topic ? S.topic.title : iss.short)}</span></div>
+      <div class="qtop"><button class="btn text" data-act="${S.history.length ? 'qback' : 'quit'}">${ic('back', 20)} ${esc(T('back'))}</button><span class="ptitle">${esc(S.topic ? S.topic.title : G(iss, 's', iss.short))}</span></div>
       <div class="bar" role="progressbar" aria-label="Progress" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><span style="width:${Math.max(pct, 4)}%"></span></div>
-      ${first ? `<p class="opener">${esc(iss.intro)}</p>${S.topic && S.topic.urgentNote ? `<div class="banner soon">${ic('alert')}<div><p>${esc(S.topic.urgentNote)}</p></div></div>` : ''}${S.adv && S.adv.issueId === iss.id ? advBanner(S.adv) : ''}` : ''}
-      ${S.stage === 'deep' && !S.history.some((h) => h.stage === 'deep') ? '<p class="opener">A few more questions to make your list better.</p>' : ''}
-      ${urg.map(urgentBanner).join('')}
+      ${first ? `${trNote()}<p class="opener">${esc(G(iss, 'i', iss.intro))}</p>${S.topic && S.topic.urgentNote ? `<div class="banner soon">${ic('alert')}<div><p>${esc(S.topic.urgentNote)}</p></div></div>` : ''}${S.adv && S.adv.issueId === iss.id ? advBanner(S.adv) : ''}` : ''}
+      ${urg.map((u) => urgentBanner(u, iss)).join('')}
       <form id="qform" data-q="${q.id}">
-        <fieldset><legend><h1 class="qtext">${esc(q.text)}</h1></legend>
-          <div class="opts">${q.options.map((o) => `<label class="opt"><input type="radio" name="a" value="${o.id}" ${cur === o.id ? 'checked' : ''}><span class="dot" aria-hidden="true"></span><span>${esc(o.label)}</span></label>`).join('')}</div>
+        <fieldset><legend><h1 class="qtext">${esc(G(iss, q.id + '.t', q.text))}</h1></legend>
+          <div class="opts">${q.options.map((o) => `<label class="opt"><input type="radio" name="a" value="${o.id}" ${cur === o.id ? 'checked' : ''}><span class="dot" aria-hidden="true"></span><span>${esc(G(iss, q.id + '.' + o.id, o.label))}</span></label>`).join('')}</div>
         </fieldset>
       </form>
-      <details class="why"><summary>Why are we asking this?</summary><p>${esc(q.why)}</p></details>
-      <p style="margin-top:14px"><button class="btn text" data-act="skip">Skip this question</button></p>
+      <details class="why"><summary>${esc(T('why'))}</summary><p>${esc(G(iss, q.id + '.w', q.why))}</p></details>
+      <p style="margin-top:14px"><button class="btn text" data-act="skip">${esc(T('skip'))}</button></p>
     </div>`, { tray: true, inJourney: true });
   }
-  function urgentBanner(u) {
+  function urgentBanner(u, iss) {
+    iss = iss || issue();
     const help = (u.help || []).map((h) => KB.help[h]).filter(Boolean);
-    return `<div class="banner ${u.level}" role="${u.level === 'now' ? 'alert' : 'note'}">${ic(u.level === 'info' ? 'info' : 'alert')}<div><h3>${esc(u.title)}</h3><p>${esc(u.text)}</p>${help.length ? `<p class="small" style="margin-top:6px">${help.map((h) => `<b>${esc(h.label)}</b> ${esc(h.name)}`).join(' | ')}</p>` : ''}</div></div>`;
+    return `<div class="banner ${u.level}" role="${u.level === 'now' ? 'alert' : 'note'}">${ic(u.level === 'info' ? 'info' : 'alert')}<div><h3>${esc(G(iss, u.id + '.t', u.title))}</h3><p>${esc(G(iss, u.id + '.x', u.text))}</p>${help.length ? `<p class="small" style="margin-top:6px">${help.map((h) => `<b>${esc(h.label)}</b> ${esc(h.name)}`).join(' | ')}</p>` : ''}</div></div>`;
   }
   function answer(q, val) {
     const iss = issue();
@@ -243,7 +338,7 @@
     persist();
     const newNow = E.urgent(iss, S.answers).find((u) => u.level === 'now' && !beforeUrg.has(u.id) && !S.ackUrgent[u.id]);
     if (newNow) { S.pendingUrgent = newNow.id; go('urgent'); return; }
-    S._fly = added.map((e) => e.name);
+    S._fly = added.map((e) => G(iss, e.id + '.n', e.name));
     nextAfter(q);
   }
   function nextAfter() {
@@ -268,8 +363,8 @@
   }
 
   /* ============ YOUR LIST ============ */
-  const STATUSES = [['have', 'I have it'], ['find', 'I need to find it'], ['others', 'Someone else has it'], ['na', 'Not for me']];
-  const ACTION_ST = [['have', 'Done'], ['find', 'Not done yet'], ['na', 'Not for me']];
+  const STATUSES = () => [['have', T('s_have')], ['find', T('s_find')], ['others', T('s_others')], ['na', T('s_na')]];
+  const ACTION_ST = () => [['have', T('s_done')], ['find', T('s_notdone')], ['na', T('s_na')]];
   function viewList() {
     const iss = issue();
     const items = E.evidence(iss, S.answers);
@@ -281,53 +376,53 @@
     const quickLeft = E.nextQuestion(iss, S.answers, 'quick', S.skipped);
     const deepLeft = E.nextQuestion(iss, S.answers, 'deep', S.skipped);
     const deepN = E.stageQuestions(iss, S.answers, 'deep').filter((q) => S.answers[q.id] == null && !S.skipped[q.id]).length;
-    return shell(`<div class="wrap narrow" style="padding:14px 0 30px">
-      <button class="btn text" data-go="home">${ic('back', 20)} Home</button>
+    return shell(`<div class="wrap narrow" style="padding-top:14px;padding-bottom:30px">
+      <button class="btn text" data-go="home">${ic('back', 20)} ${esc(T('home'))}</button>
       ${S.adv && S.adv.issueId === iss.id ? advBanner(S.adv) : ''}
-      <div class="filehead"><span class="tape" aria-hidden="true"></span><p class="typed">${esc(S.topic ? S.topic.title : iss.short)}</p><h1>Your list of papers</h1>
-        <p class="fh">You have <b>${have}</b> of <b>${items.length}</b>. Tap each paper to mark it.</p>
+      <div class="filehead"><span class="tape" aria-hidden="true"></span><p class="typed">${esc(S.topic ? S.topic.title : G(iss, 's', iss.short))}</p><h1>${esc(T('listh'))}</h1>
+        <p class="fh">${esc(T('have', { a: have, b: items.length }))} ${esc(T('tapmark'))}</p>
         <div class="stack" aria-hidden="true">${items.map((e) => `<i class="${st(e)}"></i>`).join('')}</div>
       </div>
-      <p class="muted">These papers <b>may</b> help your lawyer. Don't worry if you can't find some — still go and meet your lawyer.</p>
-      ${urg.map(urgentBanner).join('')}
-      ${infos.map((x) => `<div class="banner info">${ic('info')}<div><p>${esc(x.text)}</p></div></div>`).join('')}
-      ${quickLeft ? `<div class="banner soon">${ic('info')}<div><p>Some questions were left. <button class="btn text" data-act="resumequiz">Answer them</button></p></div></div>` : ''}
-      ${!quickLeft && deepLeft ? `<button class="deeper" data-act="deep"><span><b>Make your list better</b>Answer ${deepN} more easy question${deepN > 1 ? 's' : ''}</span>${ic('chev', 24)}</button>` : ''}
-      <div id="evlist">${items.map((e) => evCard(e, must.has(e.id))).join('')}</div>
+      ${trNote()}
+      <p class="muted">${esc(T('worry'))}</p>
+      ${urg.map((u) => urgentBanner(u, iss)).join('')}
+      ${infos.map((x, i) => `<div class="banner info">${ic('info')}<div><p>${esc(G(iss, 'info' + iss.info.indexOf(x), x.text))}</p></div></div>`).join('')}
+      ${quickLeft ? `<div class="banner soon">${ic('info')}<div><p><button class="btn text" data-act="resumequiz">${esc(T('more', { n: '' }).trim())}</button></p></div></div>` : ''}
+      ${!quickLeft && deepLeft ? `<button class="deeper" data-act="deep"><span><b>${esc(T('better'))}</b>${esc(T('more', { n: deepN }))}</span>${ic('chev', 24)}</button>` : ''}
+      <div id="evlist">${items.map((e) => evCard(e, must.has(e.id), iss)).join('')}</div>
       <div class="panel">
-        <h2>When you're ready</h2>
-        <p class="muted" style="margin-top:0">Make one neat page to print or show your lawyer.</p>
-        <div class="row"><button class="btn go big" data-go="report">${ic('file', 20)} Make my lawyer page</button><button class="btn line" data-go="timeline">${ic('cal', 20)} Add important dates</button></div>
+        <h2>${esc(T('ready'))}</h2>
+        <div class="row"><button class="btn go big" data-go="report">${ic('file', 20)} ${esc(T('makepage'))}</button><button class="btn line" data-go="timeline">${ic('cal', 20)} ${esc(T('dates'))}</button></div>
         <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
-        <label class="check"><input type="checkbox" data-act="savetoggle" ${saveOn ? 'checked' : ''}> Save my list on this phone</label>
-        <p class="small muted" style="margin:6px 0 0">If others use this phone, they may see it. You can delete it any time.</p>
-        <div class="row" style="margin-top:6px"><button class="btn text" data-go="answers">Change my answers</button><button class="btn text" data-act="clear">Delete everything</button></div>
+        <label class="check"><input type="checkbox" data-act="savetoggle" ${saveOn ? 'checked' : ''}> ${esc(T('save'))}</label>
+        <div class="row" style="margin-top:6px"><button class="btn text" data-go="answers">${esc(T('change'))}</button><button class="btn text" data-act="clear">${esc(T('delall'))}</button></div>
       </div>
     </div>`, { inJourney: true });
   }
-  function evCard(e, flagged) {
-    const st = S.status[e.id]; const opts = e.action ? ACTION_ST : STATUSES; const recs = S.records[e.id] || [];
+  function evCard(e, flagged, iss) {
+    iss = iss || issue();
+    const st = S.status[e.id]; const opts = e.action ? ACTION_ST() : STATUSES(); const recs = S.records[e.id] || [];
     const justStamped = S._stamp === e.id;
+    const g = (k, en) => G(iss, e.id + k, en);
     return `<article class="ev ${flagged ? 'flag' : ''} ${st ? 'st-' + st : ''}" id="ev-${e.id}">
-      ${st === 'have' ? `<span class="instamp ${justStamped ? 'pop' : ''}">${e.action ? 'Done' : 'Got it'}</span>` : ''}
-      <h3>${esc(e.name)}</h3>
-      <div class="tags">${flagged ? '<span class="tag adv">Your lawyer asked for this</span>' : ''}${e.action ? '<span class="tag act">Something to do</span>' : ''}${e.time ? '<span class="tag time">Urgent</span>' : ''}</div>
-      <p class="w">${esc(e.why)}</p>
-      <details><summary>Where do I get it?</summary><dl>
-        ${e.where ? `<dt>Where to look</dt><dd>${esc(e.where)}</dd>` : ''}
-        ${e.preserve ? `<dt>Keep it safe</dt><dd>${esc(e.preserve)}</dd>` : ''}
-        ${e.time ? `<dt>Time matters</dt><dd>${esc(e.time)}</dd>` : ''}
-        ${e.limit ? `<dt>Good to know</dt><dd>${esc(e.limit)}</dd>` : ''}
+      ${st === 'have' ? `<span class="instamp ${justStamped ? 'pop' : ''}">${esc(T('gotit'))}</span>` : ''}
+      <h3>${esc(g('.n', e.name))}</h3>
+      <div class="tags">${flagged ? '<span class="tag adv">★</span>' : ''}${e.time ? `<span class="tag time">${esc(T('urgent'))}</span>` : ''}</div>
+      <p class="w">${esc(g('.y', e.why))}</p>
+      <details><summary>${esc(T('where'))}</summary><dl>
+        ${e.where ? `<dd>${esc(g('.wh', e.where))}</dd>` : ''}
+        ${e.preserve ? `<dd>${esc(g('.p', e.preserve))}</dd>` : ''}
+        ${e.time ? `<dd><b>${esc(g('.tm', e.time))}</b></dd>` : ''}
+        ${e.limit ? `<dd>${esc(g('.l', e.limit))}</dd>` : ''}
       </dl></details>
-      <div class="sts" role="group" aria-label="${esc(e.name)}">${opts.map(([k, l]) => `<button class="sbtn" data-status="${k}" data-ev="${e.id}" aria-pressed="${st === k}">${esc(l)}</button>`).join('')}</div>
+      <div class="sts" role="group" aria-label="${esc(g('.n', e.name))}">${opts.map(([k, l]) => `<button class="sbtn" data-status="${k}" data-ev="${e.id}" aria-pressed="${st === k}">${esc(l)}</button>`).join('')}</div>
       ${st === 'have' && !e.action ? `<div class="records">
-        <p class="small" style="margin:0 0 8px">Optional: write the name of the paper, so it shows on your lawyer page.</p>
-        ${recs.map((r, i) => `<div class="rec"><span>${esc(r.label)}${r.date ? ', ' + esc(r.date) : ''}${r.pages ? ', ' + esc(r.pages) + ' pages' : ''}</span><button class="btn text" data-delrec="${e.id}:${i}" aria-label="Remove ${esc(r.label)}">Remove</button></div>`).join('')}
+        ${recs.map((r, i) => `<div class="rec"><span>${esc(r.label)}${r.date ? ', ' + esc(r.date) : ''}${r.pages ? ', ' + esc(r.pages) + ' p.' : ''}</span><button class="btn text" data-delrec="${e.id}:${i}" aria-label="Remove">✕</button></div>`).join('')}
         <form class="recform" data-addrec="${e.id}">
-          <label class="f full">Name of the paper<input class="t" name="label" required maxlength="120" placeholder="e.g. SBI bank statement, May 2026"></label>
-          <label class="f">Date<input class="t" name="date" maxlength="40" placeholder="12 Jan 2026"></label>
-          <label class="f">Pages<input class="t" name="pages" inputmode="numeric" maxlength="4" placeholder="3"></label>
-          <button class="btn line" type="submit">Add</button>
+          <label class="f full">✎<input class="t" name="label" required maxlength="120" placeholder="e.g. SBI bank statement, May 2026"></label>
+          <label class="f">📅<input class="t" name="date" maxlength="40" placeholder="12 Jan 2026"></label>
+          <label class="f">#<input class="t" name="pages" inputmode="numeric" maxlength="4" placeholder="3"></label>
+          <button class="btn line" type="submit">+</button>
         </form></div>` : ''}
     </article>`;
   }
@@ -505,20 +600,20 @@
       <div class="panel"><h2>What it doesn't do</h2><ul style="margin:0;padding-left:20px"><li>Give legal advice or predict results.</li><li>Say a record is legally required or admissible.</li><li>Prepare court filings.</li><li>Ask you to upload documents.</li></ul></div>
       <div class="panel"><h2>Why these problems</h2><p style="margin:0">Guides are chosen from what most often reaches Indian courts (cheque bounce, matrimonial, motor accident, rent and property cases), the National Consumer Helpline (e-commerce, durables, banking, telecom, travel) and the RBI Ombudsman (loans and credit cards lead). Guides by area — ${esc(counts)}.</p></div>
       <div class="panel"><h2>Privacy</h2><p>Your answers stay in this browser tab. Nothing is sent to us. If you switch on "Keep my file on this device", it is saved only in this browser. Advocate links contain only the guide choice and the advocate's note.</p><p style="margin:0">Exit clears the page and opens a neutral website. It does not erase browser history.</p></div>
-      <div class="panel"><h2>Review status</h2><p style="margin:0">All guides are <b>drafts</b>, not yet reviewed by a practising advocate. Each guide will show its reviewer and date once reviewed. Languages: English now; Hindi and Odia only after legal and language review. Content v${esc(KB.version)}: ${BUILT.length} guided problems, ${KB.questions.length} answered questions, ${KB.myths.length} myth cards.</p></div>
+      <div class="panel"><h2>Review status</h2><p style="margin:0">All guides are <b>drafts</b>, not yet reviewed by a practising advocate. Each guide will show its reviewer and date once reviewed. Languages: all 22 scheduled languages of India plus English. 16 have a hand-written interface; Santali, Kashmiri, Sindhi, Manipuri, Bodo and Sanskrit, and all guide content in every language, are machine-translated on the fly and labelled so. Translations need native-speaker and advocate review. The page for your lawyer always stays in English. Content v${esc(KB.version)}: ${BUILT.length} guided problems, ${KB.questions.length} answered questions, ${KB.myths.length} myth cards.</p></div>
       ${S.issueId || loadSaved() ? '<button class="btn line" data-act="clear" style="margin-top:16px">Clear everything on this device</button>' : ''}
     </div>`);
   }
   function showLang() {
     const ov = document.createElement('div'); ov.className = 'overlay'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-labelledby', 'langh');
-    ov.innerHTML = `<div class="dialog"><h2 id="langh">Choose your language</h2><p class="small muted">Languages switch on only after their guides are legally reviewed.</p>
-      <button class="langopt" aria-current="true">English <span class="tag act">Available</span></button><button class="langopt" disabled lang="hi">हिन्दी <span class="tag act">Coming</span></button><button class="langopt" disabled lang="or">ଓଡ଼ିଆ <span class="tag act">Coming</span></button>
-      <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn line" data-close>Close</button></div></div>`;
+    ov.innerHTML = `<div class="dialog wide"><h2 id="langh">${esc(T('lang'))}</h2><p class="small muted">${esc(T('auto'))}</p>
+      <div class="langgrid">${I18N.LANGS.map((l) => `<button class="langopt" lang="${l.code}" data-lang="${l.code}" aria-current="${LANG === l.code}"><b>${esc(l.native)}</b><span>${esc(l.name)}</span></button>`).join('')}</div>
+      <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn line" data-close>✕</button></div></div>`;
     document.body.appendChild(ov);
-    const close = () => { ov.remove(); document.querySelector('[data-act="lang"]')?.focus(); };
+    const close = () => { ov.remove(); };
     ov.addEventListener('click', (e) => { if (e.target === ov || e.target.closest('[data-close]')) close(); });
     ov.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
-    ov.querySelector('[data-close]').focus();
+    ov.querySelector('[aria-current="true"]')?.focus();
   }
 
   /* ============ events ============ */
@@ -580,7 +675,9 @@
   }
   document.addEventListener('click', async (e) => {
     const pl = e.target.closest('[data-play]');
-    if (pl) { e.preventDefault(); startIssue(pl.dataset.play, pl.dataset.topic != null ? KB.directory[Number(pl.dataset.topic)] : null); go('quiz'); return; }
+    if (pl) { e.preventDefault(); startIssue(pl.dataset.play, pl.dataset.topic != null ? KB.directory[Number(pl.dataset.topic)] : null);
+      const iss = issue(); if (translated() && sampler) { withTranslation([ensureGuide(iss, 'a')], () => { go('quiz'); ensureGuide(iss, 'b').then(() => { if (/^#(quiz|list|urgent)/.test(location.hash)) render(); }); }); } else go('quiz'); return; }
+    const lc = e.target.closest('[data-lang]'); if (lc) { setLang(lc.dataset.lang); document.querySelector('.overlay')?.remove(); return; }
     const t = e.target.closest('[data-go],[data-act],[data-status],[data-delrec],[data-delchrono],[data-ex],[data-copy],[data-club],[data-qcat],[data-mf]'); if (!t) return;
     if (t.dataset.go) { e.preventDefault(); go(t.dataset.go); return; }
     if (t.dataset.club) { UI.club = t.dataset.club; document.querySelectorAll('.tab').forEach((x) => x.setAttribute('aria-selected', x === t)); const d = document.getElementById('drawer'); d.setAttribute('aria-labelledby', t.id); d.innerHTML = clubRows(UI.club) + '<button class="issue gen" data-play="general"><b>Something else, or not sure</b><span>Answer a few general questions</span><em>general</em></button>'; return; }
@@ -598,6 +695,7 @@
       case 'begin': startIssue(t.dataset.id, t.dataset.topic != null ? KB.directory[Number(t.dataset.topic)] : null); go('quiz'); break;
       case 'skip': { const q = currentQ(); if (q) { S.skipped[q.id] = true; S.history.push({ id: q.id, stage: S.stage, skip: true }); persist(); nextAfter(q); } break; }
       case 'qback': { const last = S.history.pop(); if (!last) break; S.prefill[last.id] = S.answers[last.id]; delete S.answers[last.id]; delete S.skipped[last.id]; S.stage = last.stage; E.prune(iss, S.answers); persist(); go('quiz'); break; }
+      case 'toen': setLang('en'); break;
       case 'quit': go(S.topic ? 'cat-' + S.topic.cat : 'cat-' + issue().cat); break;
       case 'showlist': S.pendingUrgent = null; S.chapterFound = []; go('list'); break;
       case 'ackurgent': S.ackUrgent[S.pendingUrgent] = true; S.pendingUrgent = null; persist(); if (currentQ()) go('quiz'); else { finishStage(); go('list'); } break;
@@ -620,5 +718,6 @@
       case 'mfrestart': UI.mf = { i: 0, score: 0, ans: null, order: null }; render(); break;
     }
   });
+  applyLangDom(); if (!uiReady(LANG)) setTimeout(() => withTranslation([ensureUI], render), 600);
   render();
 })();

@@ -35,6 +35,31 @@ const url = 'file://' + require('path').resolve(__dirname, '../build/index.html'
     const ow = await p.evaluate(() => document.documentElement.scrollWidth - innerWidth); if (ow > 1) errs.push(n + ' overflow ' + ow);
     await p.close();
   }
+  // languages: static (hi), RTL (ur), runtime-translated via a mocked sampler (sat)
+  { const lp = await b.newPage({ viewport: { width: 390, height: 844 } }); lp.on('pageerror', (e) => errs.push('lang: ' + e.message));
+    await lp.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: css }));
+    await lp.addInitScript(() => { window.claude = { use: async () => ({ json: async (prompt) => { const m = JSON.parse(prompt.slice(prompt.indexOf('\n\n{') + 2)); const o = {}; for (const k in m) o[k] = '᱕ ' + m[k]; return o; } }) }; });
+    await lp.goto(url); await lp.waitForTimeout(300);
+    await lp.click('.lchip[data-lang=hi]'); await lp.waitForTimeout(200);
+    if (!/[ऀ-ॿ]/.test(await lp.textContent('.band h1'))) errs.push('hi: heading not Hindi');
+    await shot(lp, 'm-home-hi', true);
+    await lp.click('.tile >> nth=0'); await lp.waitForTimeout(600);
+    if (!(await lp.textContent('.probs')).includes('᱕')) errs.push('hi: area list not translated');
+    await lp.click('.prob >> nth=0'); await lp.waitForTimeout(700);
+    if (!(await lp.textContent('.qtext')).includes('᱕')) errs.push('hi: question not translated');
+    await shot(lp, 'm-q-hi');
+    await lp.goto(url + '#home'); await lp.click('.lchip[data-lang=ur]'); await lp.waitForTimeout(200);
+    if (await lp.evaluate(() => document.documentElement.dir) !== 'rtl') errs.push('ur: not rtl');
+    const ow = await lp.evaluate(() => document.documentElement.scrollWidth - innerWidth); if (ow > 1) errs.push('ur overflow ' + ow);
+    await shot(lp, 'm-home-ur', true);
+    await lp.click('[data-act=lang] >> nth=0'); await lp.waitForTimeout(150);
+    if ((await lp.locator('.langopt').count()) !== 23) errs.push('lang dialog count');
+    await shot(lp, 'm-langs');
+    await lp.click('.langopt[data-lang=sat]'); await lp.waitForTimeout(700);
+    if (!(await lp.textContent('.band h1')).includes('᱕')) errs.push('sat: runtime UI not translated');
+    await lp.click('.lchip[data-lang=en]'); await lp.waitForTimeout(150);
+    if (!/papers/i.test(await lp.textContent('.band'))) errs.push('en: did not return');
+    await lp.close(); }
   // every journey: open, answer first option till first list, ensure no errors and no overflow on mobile
   const p = await page({ width: 360, height: 760 });
   const ids = await (async () => { await p.goto(url); return p.evaluate(() => ER_KB.issues.map((i) => i.id)); })();
