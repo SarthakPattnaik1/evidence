@@ -36,7 +36,7 @@
     q: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17v.5"/>'
   };
   const ic = (n, s = 20) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n] || ''}</svg>`;
-  const LOGO = `<svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 8a2 2 0 0 1 2-2h7l2.5 2.5H26a2 2 0 0 1 2 2V25a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z" fill="#E7D4A2"/><rect x="8" y="5" width="3" height="23" rx="1" fill="#B02A23"/><path d="m14.5 17.5 3 3 6-6.5" fill="none" stroke="#14254A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const LOGO = `<svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><path d="M7 8.5A3.5 3.5 0 0 1 10.5 5H17a8.5 8.5 0 0 1 0 17h-3v4.5a3.5 3.5 0 0 1-7 0Z" fill="#0E3A2C"/><path d="m12.4 13.6 2.7 2.7 5.2-5.6" fill="none" stroke="#EDB14C" stroke-width="2.9" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
   /* ---------- helpers ---------- */
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -159,7 +159,7 @@ ${JSON.stringify(map)}`;
     const sensitive = !!(issue() && issue().sensitive && opt.inJourney);
     document.body.classList.toggle('calm', sensitive);
     return `<header class="top"><div class="wrap">
-        <button class="brand" data-go="home" aria-label="EvidenceReady home">${LOGO}<span>EvidenceReady</span></button>
+        <button class="brand" data-go="home" aria-label="Pehlo home">${LOGO}<span>Pehlo</span></button>
         <button class="nav" data-go="questions">${ic('q', 18)}<span class="lbl-long">${esc(T('q').replace(/\?$/, ''))}</span><span class="lbl-short">?</span></button>
         <button class="nav" data-go="help">${ic('phone', 18)}<span class="lbl-long">${esc(T('help').replace(/\?$/, ''))}</span><span class="lbl-short">SOS</span></button>
         <button class="nav lang" data-act="lang" aria-label="Language: ${esc(LMETA[LANG].name)}. Change language">${ic('globe', 18)}<span>${esc(LMETA[LANG].native)}</span></button>
@@ -169,7 +169,7 @@ ${JSON.stringify(map)}`;
       ${opt.tray ? trayHTML() : ''}
       ${opt.noFooter ? '' : footer()}`;
   }
-  const FOOT = {"f_disc": "EvidenceReady helps you prepare for a meeting with an advocate. It is not legal advice, does not replace an advocate, and cannot tell you whether a court will accept any document.", "f_about": "How this works & privacy", "f_adv": "For advocates", "f_myth": "Myth or fact", "f_help": "Legal aid & urgent help", "f_clear": "Clear my answers"};
+  const FOOT = {"f_disc": "Pehlo helps you prepare for a meeting with an advocate. It is not legal advice, does not replace an advocate, and cannot tell you whether a court will accept any document.", "f_about": "How this works & privacy", "f_adv": "For advocates", "f_myth": "Myth or fact", "f_help": "Legal aid & urgent help", "f_clear": "Clear my answers"};
   function footer() {
     const f = (k) => esc(H(k, FOOT[k]));
     return `<footer class="foot"><div class="wrap">
@@ -447,7 +447,7 @@ ${JSON.stringify(map)}`;
   }
   function reportHTML(d) {
     const iss = d.iss; const li = (arr, f) => arr.length ? `<ul>${arr.map((x) => `<li>${f(x)}</li>`).join('')}</ul>` : '<p class="muted">None recorded.</p>';
-    return `<p class="meta">EvidenceReady preparation pack. Prepared ${esc(fmtDate(today()))}. Content v${esc(KB.version)} (${esc(KB.reviewed.label)}).</p>
+    return `<p class="meta">Pehlo preparation pack. Prepared ${esc(fmtDate(today()))}. Content v${esc(KB.version)} (${esc(KB.reviewed.label)}).</p>
       <h1>Papers for my lawyer</h1><p><b>${esc(S.topic ? S.topic.title : iss.title)}</b></p>
       ${S.adv && S.adv.issueId === iss.id && S.adv.name ? `<p class="meta">Prepared at the request of ${esc(S.adv.name)}.</p>` : ''}
       ${d.urgent.length ? `<p class="instr" style="background:var(--tape-l)">Flagged for prompt attention: ${d.urgent.map((u) => esc(u.title)).join('; ')}.</p>` : ''}
@@ -469,7 +469,7 @@ ${JSON.stringify(map)}`;
         : '<p class="muted">No documents named yet. Mark a record "I have it" and name it to include it here. Missing records are never listed as annexures.</p>'}
       <p class="meta">These numbers are provisional preparation references, not final court exhibit labels.</p>
       <p class="instr">${esc(INSTRUCTION)}</p>
-      <p class="meta" style="margin-top:22px">Prepared with EvidenceReady, a free preparation tool. Not legal advice and not a court filing. It does not show that any record is admissible or legally required. Electronic records may have additional legal requirements.</p>`;
+      <p class="meta" style="margin-top:22px">Prepared with Pehlo, a free preparation tool. Not legal advice and not a court filing. It does not show that any record is admissible or legally required. Electronic records may have additional legal requirements.</p>`;
   }
   function viewReport() {
     return shell(`<div class="wrap narrow" style="padding-bottom:30px">

@@ -1,4 +1,4 @@
-# EvidenceReady
+# Pehlo (formerly EvidenceReady)
 
 **Going to a lawyer? Know what to bring.**
 
