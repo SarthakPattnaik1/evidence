@@ -214,9 +214,12 @@ ${JSON.stringify(map)}`;
       </div></header>
       <main id="main" tabindex="-1">${inner}</main>
       ${opt.tray ? trayHTML() : ''}
-      ${opt.noFooter ? '' : footer()}`;
+      ${opt.noFooter ? '' : opt.inJourney ? slimFooter() : footer()}`;
   }
   const FOOT = {"f_disc": "Pehlo helps you prepare for a meeting with an advocate. It is not legal advice, does not replace an advocate, and cannot tell you whether a court will accept any document.", "f_about": "How this works & privacy", "f_adv": "For advocates", "f_myth": "Myth or fact", "f_help": "Legal aid & urgent help", "f_clear": "Clear my answers"};
+  function slimFooter() {
+    return `<footer class="foot slim"><div class="wrap"><span class="small muted">${esc(T('draft'))} · Not legal advice</span><span class="row"><button data-go="help">${esc(H('nav_help', 'Help'))}</button><button data-go="about">${esc(H('f_about', FOOT.f_about))}</button>${S.issueId ? `<button data-act="clear">${esc(H('f_clear', FOOT.f_clear))}</button>` : ''}</span></div></footer>`;
+  }
   function footer() {
     const f = (k) => esc(H(k, FOOT[k]));
     return `<footer class="foot"><div class="wrap">
@@ -461,9 +464,10 @@ ${JSON.stringify(map)}`;
       ${standCard(iss, papers, have)}
       ${srcBlock(iss)}
       <div class="fbk noprint" id="fbk">${UI.fb && UI.fb[iss.id] ? `<p class="small muted">${ic('check', 16)} Thanks — that helps us improve this guide.</p>` : `<span>Was this list useful?</span><button class="btn line sm" data-act="fb" data-v="y">Yes</button><button class="btn line sm" data-act="fb" data-v="n">Not really</button>`}</div>
+      <div class="actbar noprint"><button class="btn go" data-act="print">${ic('file', 18)} ${esc(T('print'))}</button><button class="btn line" data-go="report">${esc(T('makepage'))}</button></div>
       ${deepLeft ? `<button class="deeper noprint" data-act="deep"><span><b>${esc(T('better'))}</b>${esc(T('more', { n: deepN }))}</span>${ic('chev', 24)}</button>` : ''}
       <div class="panel noprint">
-        <div class="row"><button class="btn go big" data-act="print">${ic('file', 20)} ${esc(T('print'))}</button><button class="btn line" data-go="report">${esc(T('makepage'))}</button></div>
+        <div class="row dupact"><button class="btn go big" data-act="print">${ic('file', 20)} ${esc(T('print'))}</button><button class="btn line" data-go="report">${esc(T('makepage'))}</button></div>
         <p class="small muted" id="printhint" hidden style="margin:6px 0 0">Browser menu → Print, or Ctrl+P.</p>
         <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
         <label class="check"><input type="checkbox" data-act="savetoggle" ${saveOn ? 'checked' : ''}> ${esc(T('save'))}</label>
@@ -479,7 +483,7 @@ ${JSON.stringify(map)}`;
       <div class="cbody"><h3>${flagged ? '★ ' : ''}${esc(g('.n', e.name))}</h3>
         <p class="w">${esc(g('.y', e.why))}</p>
         ${e.time ? `<p class="ctime">${ic('alert', 15)} ${esc(g('.tm', e.time))}</p>` : ''}
-        ${more.length ? `<details class="noprint"><summary>${esc(T('where'))}</summary>${more.map((m) => `<p>${esc(m)}</p>`).join('')}</details>` : ''}
+        <details class="noprint"><summary>${esc(T('where'))}</summary><p class="wm">${esc(g('.y', e.why))}</p>${more.map((m) => `<p>${esc(m)}</p>`).join('')}</details>
       </div></div>`;
   }
   function evCard(e, flagged, iss) { return checkRow(e, iss || issue(), flagged); }
@@ -594,11 +598,16 @@ ${JSON.stringify(map)}`;
       <label class="sr" for="qsearch">Search questions</label>
       <input id="qsearch" class="t" type="search" placeholder="Search, e.g. bail, deposit, gratuity" value="${esc(UI.qsearch)}" style="margin-top:14px">
       <div class="filters">${cats.map(([id, t]) => `<button class="fchip" data-qcat="${id}" aria-pressed="${UI.qcat === id}">${esc(t)}</button>`).join('')}</div>
-      <div id="qalist">${list.map((q) => `<details class="qa" id="qa-${q.id}" ${q.id === openId ? 'open' : ''}><summary>${esc(q.q)}</summary><div class="body">
+      <div id="qalist">${(() => {
+        const qa = (q) => `<details class="qa" id="qa-${q.id}" ${q.id === openId ? 'open' : ''}><summary>${esc(q.q)}</summary><div class="body">
         <p>${esc(q.a)}</p><p class="small" style="margin:0"><b>What can change the answer</b></p><ul>${q.depends.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
         <p class="law">Law: ${esc(q.law)}. ${esc(KB.reviewed.label)}.</p>
         ${q.journey && BY_ID[q.journey] ? `<button class="btn line" data-play="${q.journey}">Prepare for a lawyer: ${esc(BY_ID[q.journey].short)}</button>` : ''}
-      </div></details>`).join('') || '<p class="panel muted">No match. Try other words, or <button class="btn text" data-go="start-general">use general preparation</button>.</p>'}</div>
+      </div></details>`;
+        if (!list.length) return '<p class="panel muted">No match. Try other words, or <button class="btn text" data-go="start-general">use general preparation</button>.</p>';
+        if (UI.qcat !== 'all' || s) return list.map(qa).join('');
+        return `<div class="acc">${cats.filter(([id]) => id !== 'all').map(([id, t]) => { const qs = list.filter((q) => q.cat === id); const c = CAT[id]; return qs.length ? `<details class="accg" ${qs.some((q) => q.id === openId) ? 'open' : ''}><summary>${ic(c ? c.icon : 'q', 20)}<b>${esc(t)}</b><span class="cnt">${qs.length}</span>${ic('down', 18)}</summary><div class="accb">${qs.map(qa).join('')}</div></details>` : ''; }).join('')}</div>`;
+      })()}</div>
     </div>`);
   }
 
@@ -655,24 +664,39 @@ ${JSON.stringify(map)}`;
 
   /* ============ HELP / ABOUT ============ */
   function viewHelp() {
-    const order = ['e112', 'w181', 'c1098', 's14567', 'cy1930', 'l15100', 'rbi', 'nch', 'ejag', 'ins', 'cio', 'rera', 'posh', 'samadhan'];
-    return shell(`<div class="wrap narrow" style="padding:26px 0 40px">
-      <h1 style="font-size:clamp(30px,5vw,46px)">Urgent help and free legal aid</h1>
-      <div class="banner now" style="margin-top:16px">${ic('alert')}<div><h3>In immediate danger?</h3><p>Call <b>112</b>. You don't need this tool first.</p></div></div>
-      <p class="muted">Free legal aid is available to many people, including women, children, people with disabilities, people in custody, and those below the income limit. Call <b>15100</b> to ask.</p>
-      <div class="grid">${order.filter((k) => KB.help[k]).map((k) => helpCard(KB.help[k])).join('')}</div>
-      <p class="small muted" style="margin-top:16px">Tap a number to call. If it doesn't open, dial it yourself. Checked October 2026.</p>
+    const CALL = [['e112', 'Emergency'], ['w181', 'Women'], ['c1098', 'Children'], ['s14567', 'Senior citizens'], ['cy1930', 'Cyber fraud'], ['l15100', 'Free legal aid'], ['telemanas', 'Mental health'], ['ragging', 'Ragging']];
+    const GROUPS = [
+      ['Money & banking', 'bank', ['rbi', 'sachet', 'chakshu']],
+      ['Shopping, travel & services', 'bag', ['nch', 'ejag', 'airsewa']],
+      ['Insurance', 'shield', ['ins', 'cio']],
+      ['Online safety', 'lock', ['stopncii']],
+      ['Work, PF & students', 'briefcase', ['posh', 'samadhan', 'epfo', 'ugc']],
+      ['Home & property', 'house', ['rera']],
+      ['NRI & abroad', 'globe', ['madad', 'ncwnri', 'passport']],
+      ['Courts, traffic & business', 'file', ['ecourts', 'echallan', 'mca', 'msmeodr']]
+    ].map(([t, icn, ks]) => [t, icn, ks.filter((k) => KB.help[k])]).filter((g) => g[2].length);
+    const num = (h) => h.label.replace(/\D/g, '');
+    return shell(`<div class="wrap narrow" style="padding:22px 0 36px">
+      <h1 style="font-size:clamp(28px,5vw,44px)">Urgent help and free legal aid</h1>
+      <div class="banner now" style="margin-top:14px">${ic('alert')}<div><h3>In immediate danger?</h3><p>Call <b>112</b>. You don't need this tool first.</p></div></div>
+      <h2 class="lh" style="margin-top:20px">Call now</h2>
+      <div class="callgrid">${CALL.filter(([k]) => KB.help[k]).map(([k, short]) => { const h = KB.help[k]; return `<a class="callbtn${h.label.length > 6 ? ' long' : ''}" href="tel:${num(h)}" title="${esc(h.name)}">${ic('phone', 18)}<b>${esc(h.label)}</b><span>${esc(short)}</span></a>`; }).join('')}</div>
+      <p class="small muted" style="margin:8px 0 0">Free legal aid covers women, children, people with disabilities, people in custody and those below the income limit — call <b>15100</b> to ask.</p>
+      <h2 class="lh" style="margin-top:22px">Complaint portals</h2>
+      <p class="small muted" style="margin:0 0 8px">Tap an area to see the official place to complain.</p>
+      <div class="acc">${GROUPS.map(([t, icn, ks]) => `<details class="accg"><summary>${ic(icn, 20)}<b>${esc(t)}</b><span class="cnt">${ks.length}</span>${ic('down', 18)}</summary><div class="grid">${ks.map((k) => helpCard(KB.help[k])).join('')}</div></details>`).join('')}</div>
+      <p class="small muted" style="margin-top:14px">If a number doesn't open, dial it yourself. Checked October 2026.</p>
     </div>`);
   }
   function viewAbout() {
     const counts = KB.categories.map((c) => `${c.title}: ${BUILT.filter((i) => i.cat === c.id).length}`).join(', ');
     return shell(`<div class="wrap narrow" style="padding:26px 0 40px">
       <h1 style="font-size:clamp(30px,5vw,46px)">How this works</h1>
-      <div class="panel"><h2>What it does</h2><p>Pick your problem and answer a few one-tap questions. Each answer changes which papers you need. The rules come from a written, tested set of guides — not from a chatbot making things up.</p><p style="margin:0">At the end you get one list: what to do first, the papers to take to your advocate, and where you stand. You can print it, or make a page for your advocate with your answers and a dated timeline.</p></div>
-      <div class="panel"><h2>What it doesn't do</h2><ul style="margin:0;padding-left:20px"><li>Give legal advice or predict results.</li><li>Say a record is legally required or admissible.</li><li>Prepare court filings.</li><li>Ask you to upload documents.</li></ul></div>
-      <div class="panel"><h2>Why these problems</h2><p style="margin:0">Guides are chosen from what most often reaches Indian courts and Lok Adalats (cheque bounce, family, motor accident, traffic challans, property), the National Consumer Helpline (e-commerce, banking, telecom, travel), the RBI Ombudsman (loans and credit cards lead) and police cyber-crime data (online fraud and fake-police "digital arrest" calls). Guides by area — ${esc(counts)}.</p></div>
-      <div class="panel"><h2>Privacy</h2><p>Your answers stay in this browser tab — they are never sent to us. On the public website, the app counts anonymous events (for example, "a list was made for the cheque-bounce guide", or which language was used) to improve the guides; no cookies, no IP addresses, nothing you typed into a question. If you switch on "Keep my file on this device", it is saved only in this browser. Advocate links contain only the guide choice and the advocate's note.</p><p style="margin:0">Exit clears the page and opens a neutral website. It does not erase browser history.</p></div>
-      <div class="panel"><h2>Review status</h2><p style="margin:0">All guides are <b>drafts</b>, not yet reviewed by a practising advocate. Each guide will show its reviewer and date once reviewed. Languages: all 22 scheduled languages of India plus English. 16 have a hand-written interface; Santali, Kashmiri, Sindhi, Manipuri, Bodo and Sanskrit, and all guide content in every language, are machine-translated on the fly and labelled so. Translations need native-speaker and advocate review. The page for your lawyer always stays in English. Content v${esc(KB.version)}: ${BUILT.length} guided problems, ${KB.questions.length} answered questions, ${KB.myths.length} myth cards.</p></div>
+      <details class="panel accp" open><summary><h2>What it does</h2>${ic('down', 18)}</summary><div class="accb"><p>Pick your problem and answer a few one-tap questions. Each answer changes which papers you need. The rules come from a written, tested set of guides — not from a chatbot making things up.</p><p style="margin:0">At the end you get one list: what to do first, the papers to take to your advocate, and where you stand. You can print it, or make a page for your advocate with your answers and a dated timeline.</p></div></details>
+      <details class="panel accp"><summary><h2>What it doesn't do</h2>${ic('down', 18)}</summary><div class="accb"><ul style="margin:0;padding-left:20px"><li>Give legal advice or predict results.</li><li>Say a record is legally required or admissible.</li><li>Prepare court filings.</li><li>Ask you to upload documents.</li></ul></div></details>
+      <details class="panel accp"><summary><h2>Why these problems</h2>${ic('down', 18)}</summary><div class="accb"><p style="margin:0">Guides are chosen from what most often reaches Indian courts and Lok Adalats (cheque bounce, family, motor accident, traffic challans, property), the National Consumer Helpline (e-commerce, banking, telecom, travel), the RBI Ombudsman (loans and credit cards lead) and police cyber-crime data (online fraud and fake-police "digital arrest" calls). Guides by area — ${esc(counts)}.</p></div></details>
+      <details class="panel accp"><summary><h2>Privacy</h2>${ic('down', 18)}</summary><div class="accb"><p>Your answers stay in this browser tab — they are never sent to us. On the public website, the app counts anonymous events (for example, "a list was made for the cheque-bounce guide", or which language was used) to improve the guides; no cookies, no IP addresses, nothing you typed into a question. If you switch on "Keep my file on this device", it is saved only in this browser. Advocate links contain only the guide choice and the advocate's note.</p><p style="margin:0">Exit clears the page and opens a neutral website. It does not erase browser history.</p></div></details>
+      <details class="panel accp"><summary><h2>Review status</h2>${ic('down', 18)}</summary><div class="accb"><p style="margin:0">All guides are <b>drafts</b>, not yet reviewed by a practising advocate. Each guide will show its reviewer and date once reviewed. Languages: all 22 scheduled languages of India plus English. 16 have a hand-written interface; Santali, Kashmiri, Sindhi, Manipuri, Bodo and Sanskrit, and all guide content in every language, are machine-translated on the fly and labelled so. Translations need native-speaker and advocate review. The page for your lawyer always stays in English. Content v${esc(KB.version)}: ${BUILT.length} guided problems, ${KB.questions.length} answered questions, ${KB.myths.length} myth cards.</p></div></details>
       ${S.issueId || loadSaved() ? '<button class="btn line" data-act="clear" style="margin-top:16px">Clear everything on this device</button>' : ''}
     </div>`);
   }
