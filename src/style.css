@@ -461,3 +461,58 @@ html[data-script] .srow b{text-transform:none;letter-spacing:0}
 .carryhead .typed,.carryhead .fh b{color:var(--manila)}
 .mini{background:var(--ink)}
 .deeper{background:var(--ink)}
+
+/* v9: Pehlo brand board, used as supplied */
+:root{--paper:#FCFAF4;--ink:#01312E;--ink2:#3C524C;--manila:#EBAB47;--manila-l:#FBEFD9;--sage:#ABC5A8;--sage-l:#E9F0E6;--go:#04453B;--go-d:#01312E;--go-l:#E6EFE9;--line:#E9E3D6}
+header.top{background:rgba(252,250,244,.95)}
+.brand{padding:2px 0}
+.blogo{height:38px;width:auto;display:block}
+@media (max-width:420px){.blogo{height:30px}}
+.hero2{background:#ECF0E8;overflow:hidden;position:relative}
+.hero2::before{content:"";position:absolute;inset:0 auto 0 0;width:52%;background:var(--paper);border-radius:0 0 56% 0 / 0 0 30% 0}
+.hero2in{position:relative;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:20px;min-height:520px}
+.hcopy{padding:40px 0}
+.hcopy h1{font-family:var(--display);color:var(--ink);font-size:clamp(32px,4.4vw,52px);line-height:1.08;font-weight:700;letter-spacing:-.02em;max-width:12em}
+.hcopy .lead{color:#4E5E58;margin:16px 0 26px;font-size:clamp(18px,1.8vw,22px);line-height:1.45}
+.langsel{display:flex;align-items:center;gap:12px;width:min(100%,290px);background:#fff;border:1px solid var(--line);border-radius:999px;padding:13px 20px;font-size:19px;font-weight:600;color:var(--ink);cursor:pointer;box-shadow:var(--sh1)}
+.langsel span{flex:1;text-align:start}
+.getstarted{display:flex;align-items:center;justify-content:center;gap:10px;width:min(100%,290px);margin-top:16px;background:var(--go);color:#fff;border:0;border-radius:999px;padding:16px 22px;font-size:19px;font-weight:700;cursor:pointer;box-shadow:0 10px 22px -10px rgba(1,49,46,.55)}
+.getstarted:hover{background:var(--ink)}
+.fsm{margin:18px 0 0 18px;color:#5E6E68;font-size:16px;word-spacing:3px}
+.hart{align-self:end;justify-self:end;display:flex;justify-content:flex-end}
+.hart img{display:block;height:auto;width:min(100%,460px);-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 9%);mask-image:linear-gradient(90deg,transparent 0,#000 9%)}
+.feats{background:var(--paper);padding:30px 0 10px}
+.featsin{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;text-align:center}
+.feat{display:flex;flex-direction:column;align-items:center;gap:4px}
+.feat b{font-family:var(--display);font-size:20px;color:#1B1B1B;margin-top:8px}
+.feat span:last-child{color:#4A4A4A;font-size:15px}
+.fic{width:78px;height:78px;border-radius:50%;display:grid;place-items:center}
+.fic.sage{background:#DCE9DC;color:#2E6B50}.fic.sky{background:#DDE6F2;color:#22385E}.fic.sand{background:#F6E5C8;color:#A06A1A}.fic.rose{background:#F7DCD6;color:#B0453A}
+.home .searchbox{background:#fff;border:1px solid var(--line);box-shadow:var(--sh2);max-width:720px;margin-top:26px}
+.home .slipchip{background:#fff;border:1px solid var(--line);color:var(--ink)}
+.home .slipchip:hover{border-color:var(--ink)}
+.flogo{height:84px;width:auto;display:block;margin-bottom:10px}
+@media (max-width:760px){
+  .hero2::before{display:none}
+  .hero2{background:linear-gradient(180deg,#ECF0E8 0,#ECF0E8 50%,var(--paper) 50%)}
+  .hero2in{grid-template-columns:1fr;min-height:0;gap:0}
+  .hart{order:-1;justify-self:center}
+  .hart img{width:min(100%,360px);-webkit-mask-image:none;mask-image:none}
+  .hcopy{padding:22px 0 26px}
+  .hcopy .lead{margin:12px 0 18px}
+  .langsel,.getstarted{width:100%}
+  .featsin{grid-template-columns:repeat(2,1fr);row-gap:22px}
+  .fic{width:64px;height:64px}
+}
+html[dir=rtl] .hero2::before{inset:0 0 0 auto;border-radius:0 0 0 56% / 0 0 0 30%}
+@media (min-width:761px){
+  .hero2in{position:static;grid-template-columns:1fr;min-height:560px}
+  .hcopy{position:relative;z-index:1;max-width:48%}
+  .hart{position:absolute;right:0;top:0;bottom:0;width:auto}
+  .hart img{height:100%;width:auto;max-width:none}
+}
+@media (max-width:760px){
+  .hart{width:100%}
+  .hart img{width:100vw;max-width:none;margin-inline:calc(50% - 50vw)}
+}
+@media (min-width:761px){ .hero2in{min-height:600px} .hart{display:block} .hart img{height:600px;width:auto;position:absolute;right:0;bottom:0} }

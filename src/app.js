@@ -25,6 +25,10 @@
     cal: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
     file: '<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-6-6Z"/><path d="M14 3v6h6M8 13h8M8 17h5"/>',
     check: '<path d="m5 12 4.5 4.5L19 7"/>',
+    chat: '<path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5V17h0A1.5 1.5 0 0 1 4 15.5Z"/><path d="M8.5 10.5h.01M12 10.5h.01M15.5 10.5h.01"/>',
+    circlecheck: '<circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.7 2.7L16.5 9.5"/>',
+    down: '<path d="m6 9 6 6 6-6"/>',
+    arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
     alert: '<path d="M12 3 2 20h20L12 3Z"/><path d="M12 10v4M12 17.5v.5"/>',
     info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',
     lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
@@ -159,7 +163,7 @@ ${JSON.stringify(map)}`;
     const sensitive = !!(issue() && issue().sensitive && opt.inJourney);
     document.body.classList.toggle('calm', sensitive);
     return `<header class="top"><div class="wrap">
-        <button class="brand" data-go="home" aria-label="Pehlo home">${LOGO}<span>Pehlo</span></button>
+        <button class="brand" data-go="home" aria-label="Pehlo home"><img class="blogo" src="${window.ER_BRAND.logo}" alt="Pehlo" width="132" height="49"></button>
         <button class="nav" data-go="questions">${ic('q', 18)}<span class="lbl-long">${esc(T('q').replace(/\?$/, ''))}</span><span class="lbl-short">?</span></button>
         <button class="nav" data-go="help">${ic('phone', 18)}<span class="lbl-long">${esc(T('help').replace(/\?$/, ''))}</span><span class="lbl-short">SOS</span></button>
         <button class="nav lang" data-act="lang" aria-label="Language: ${esc(LMETA[LANG].name)}. Change language">${ic('globe', 18)}<span>${esc(LMETA[LANG].native)}</span></button>
@@ -173,6 +177,7 @@ ${JSON.stringify(map)}`;
   function footer() {
     const f = (k) => esc(H(k, FOOT[k]));
     return `<footer class="foot"><div class="wrap">
+      <img class="flogo" src="${window.ER_BRAND.logoFull}" alt="Pehlo — Samajh. Tayyari. Apna Haq." width="210" height="96">
       <p><span class="tag draft">${esc(T('draft'))}</span></p>
       <p style="max-width:62em">${f('f_disc')} v${esc(KB.version)}.</p>
       <div class="row"><button data-go="about">${f('f_about')}</button><button data-go="advocates">${f('f_adv')}</button><button data-go="myths">${f('f_myth')}</button><button data-go="help">${f('f_help')}</button>${S.issueId ? `<button data-act="clear">${f('f_clear')}</button>` : ''}</div>
@@ -210,26 +215,34 @@ ${JSON.stringify(map)}`;
       + gen.map((d) => `<button class="prob" data-play="general" data-topic="${d.idx}"><b>${esc(C(cid, 'd' + d.idx, d.title))}</b><span>${esc(T('basic'))}</span>${ic('chev', 22)}</button>`).join('');
   }
   const H = (k, en) => trGet('home', k, en);
+  const HERO = { hero_h: 'Legal preparation made simple for every Indian', hero_s1: 'Ask. Understand. Prepare.', hero_s2: 'All in your language.', hero_go: 'Get Started', hero_f: 'Free • Simple • Multilingual', tagline: 'Samajh. Tayyari. Apna Haq.', f1: 'Ask', f1s: 'In your language', f2: 'Prepare', f2s: 'Step by step', f3: 'Organize', f3s: 'Your evidence', f4: 'Be Ready', f4s: 'With confidence' };
   function ensureHome() {
     if (LANG === 'en' || RT.tr[LANG + '|home']) return Promise.resolve(true);
-    const map = {}; KB.categories.forEach((c) => { map['b_' + c.id] = c.blurb; }); SUGGEST.forEach((x, i) => { map['s' + i] = x; }); Object.assign(map, FOOT);
-    return translateMap(map, 'home2', (o) => { RT.tr[LANG + '|home'] = o; });
+    const map = {}; KB.categories.forEach((c) => { map['b_' + c.id] = c.blurb; }); SUGGEST.forEach((x, i) => { map['s' + i] = x; }); Object.assign(map, FOOT, HERO); delete map.tagline;
+    return translateMap(map, 'home3', (o) => { RT.tr[LANG + '|home'] = o; });
   }
   function viewHome() {
     if (translated() && sampler && !RT.tr[LANG + '|home']) setTimeout(() => ensureHome().then((ok) => { if (ok && /^#?(home)?$/.test(location.hash.replace('#', '')) ) render(); }), 0);
     const saved = !S.issueId && loadSaved();
-    return shell(`<section class="band"><div class="wrap">
-        <div class="langbar" role="group" aria-label="Language">${TOP_LANGS.map((c) => `<button class="lchip" lang="${c}" data-lang="${c}" aria-pressed="${LANG === c}">${esc(LMETA[c].native)}</button>`).join('')}<button class="lchip more" data-act="lang">${ic('globe', 16)} ${I18N.LANGS.length}</button></div>
-        <h1>${esc(T('h1a'))}<br>${esc(T('h1b'))}</h1>
-        <p class="lead">${esc(T('lead'))}</p>
+    const FEAT = [['chat', 'f1', 'Ask', 'f1s', 'In your language', 'sage'], ['file', 'f2', 'Prepare', 'f2s', 'Step by step', 'sky'], ['folder', 'f3', 'Organize', 'f3s', 'Your evidence', 'sand'], ['circlecheck', 'f4', 'Be Ready', 'f4s', 'With confidence', 'rose']];
+    return shell(`<section class="hero2"><div class="wrap hero2in">
+        <div class="hcopy">
+          <h1>${esc(H('hero_h', HERO.hero_h))}</h1>
+          <p class="lead">${esc(H('hero_s1', HERO.hero_s1))}<br>${esc(H('hero_s2', HERO.hero_s2))}</p>
+          <button class="langsel" data-act="lang">${ic('globe', 22)}<span>${esc(LMETA[LANG].native)}</span>${ic('down', 20)}</button>
+          <button class="getstarted" data-act="getstarted">${esc(H('hero_go', HERO.hero_go))} ${ic('arrow', 20)}</button>
+          <p class="fsm">${esc(H('hero_f', HERO.hero_f))}</p>
+        </div>
+        <div class="hart"><img src="${window.ER_BRAND.hero}" alt="" width="436" height="660"></div>
+      </div></section>
+      <section class="feats"><div class="wrap featsin">${FEAT.map(([icn, k, en, ks, ens, tone]) => `<div class="feat"><span class="fic ${tone}">${ic(icn, 30)}</span><b>${esc(H(k, en))}</b><span>${esc(H(ks, ens))}</span></div>`).join('')}</div></section>
+      <div class="wrap home" id="start">
         <div class="searchbox" role="search">
           <label class="sr" for="matter">${esc(T('search'))}</label>
           ${ic('search', 22)}<input id="matter" type="search" autocomplete="off" placeholder="${esc(T('search'))}">
         </div>
         <div id="results" class="results" aria-live="polite"></div>
         <div class="suggest" id="suggest">${SUGGEST.map((x, i) => `<button class="slipchip" data-ex="${esc(x)}">${esc(H('s' + i, x))}</button>`).join('')}</div>
-      </div></section>
-      <div class="wrap home">
       ${saved && saved.issueId ? `<div class="banner info" style="margin-top:18px">${ic('folder')}<div><h3>${esc(T('listh'))}</h3><p>${esc((BY_ID[saved.issueId] || {}).short || '')}. <button class="btn text" data-act="resume">${esc(T('seelist'))}</button> <button class="btn text" data-act="forget">${esc(T('delall'))}</button></p></div></div>` : ''}
       <section aria-labelledby="areah">
         <h2 id="areah">${esc(T('area'))}</h2>
@@ -675,6 +688,7 @@ ${JSON.stringify(map)}`;
       case 'skip': { const q = currentQ(); if (q) { S.skipped[q.id] = true; S.history.push({ id: q.id, stage: S.stage, skip: true }); persist(); nextAfter(q); } break; }
       case 'qback': { const last = S.history.pop(); if (!last) break; S.prefill[last.id] = S.answers[last.id]; delete S.answers[last.id]; delete S.skipped[last.id]; S.stage = last.stage; E.prune(iss, S.answers); persist(); go('quiz'); break; }
       case 'toen': setLang('en'); break;
+      case 'getstarted': { const st = document.getElementById('start'); if (st) st.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); setTimeout(() => document.getElementById('matter')?.focus({ preventScroll: true }), 400); break; }
       case 'quit': go(S.topic ? 'cat-' + S.topic.cat : 'cat-' + issue().cat); break;
       case 'showlist': S.pendingUrgent = null; S.chapterFound = []; go('list'); break;
       case 'ackurgent': S.ackUrgent[S.pendingUrgent] = true; S.pendingUrgent = null; persist(); if (currentQ()) go('quiz'); else { finishStage(); go('list'); } break;
@@ -697,6 +711,7 @@ ${JSON.stringify(map)}`;
       case 'mfrestart': UI.mf = { i: 0, score: 0, ans: null, order: null }; render(); break;
     }
   });
+  try { const fi = document.createElement('link'); fi.rel = 'icon'; fi.href = window.ER_BRAND.icon; document.head.appendChild(fi); } catch (e) { /* none */ }
   applyLangDom(); if (!uiReady(LANG)) setTimeout(() => withTranslation([ensureUI], render), 600);
   render();
 })();

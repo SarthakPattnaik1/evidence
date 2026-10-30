@@ -43,26 +43,27 @@ const url = 'file://' + require('path').resolve(__dirname, '../build/index.html'
     await lp.goto(url); await lp.waitForTimeout(300);
     const shape = () => lp.evaluate(() => [...document.querySelectorAll('.tile')].map((t) => t.children.length).join(',') + '|' + document.querySelectorAll('.slipchip').length);
     const enShape = await shape();
-    await lp.click('.lchip[data-lang=hi]'); await lp.waitForTimeout(600);
+    await lp.click('.langsel'); await lp.click('.langopt[data-lang=hi]'); await lp.waitForTimeout(600);
     if (await shape() !== enShape) errs.push('hi: home layout differs from English');
-    if (!/[ऀ-ॿ]/.test(await lp.textContent('.band h1'))) errs.push('hi: heading not Hindi');
+    if (!/[\u0900-\u097F]/.test(await lp.textContent('#areah'))) errs.push('hi: heading not Hindi');
+    if (!(await lp.textContent('.hcopy h1')).includes('᱕')) errs.push('hi: hero not translated');
     await shot(lp, 'm-home-hi', true);
     await lp.click('.tile >> nth=0'); await lp.waitForTimeout(600);
     if (!(await lp.textContent('.probs')).includes('᱕')) errs.push('hi: area list not translated');
     await lp.click('.prob >> nth=0'); await lp.waitForTimeout(700);
     if (!(await lp.textContent('.qtext')).includes('᱕')) errs.push('hi: question not translated');
     await shot(lp, 'm-q-hi');
-    await lp.goto(url + '#home'); await lp.click('.lchip[data-lang=ur]'); await lp.waitForTimeout(200);
+    await lp.goto(url + '#home'); await lp.click('.langsel'); await lp.click('.langopt[data-lang=ur]'); await lp.waitForTimeout(200);
     if (await lp.evaluate(() => document.documentElement.dir) !== 'rtl') errs.push('ur: not rtl');
     const ow = await lp.evaluate(() => document.documentElement.scrollWidth - innerWidth); if (ow > 1) errs.push('ur overflow ' + ow);
     await shot(lp, 'm-home-ur', true);
-    await lp.click('[data-act=lang] >> nth=0'); await lp.waitForTimeout(150);
+    await lp.click('.langsel'); await lp.waitForTimeout(150);
     if ((await lp.locator('.langopt').count()) !== 23) errs.push('lang dialog count');
     await shot(lp, 'm-langs');
     await lp.click('.langopt[data-lang=sat]'); await lp.waitForTimeout(700);
-    if (!(await lp.textContent('.band h1')).includes('᱕')) errs.push('sat: runtime UI not translated');
-    await lp.click('.lchip[data-lang=en]'); await lp.waitForTimeout(150);
-    if (!/papers/i.test(await lp.textContent('.band'))) errs.push('en: did not return');
+    if (!(await lp.textContent('#areah')).includes('᱕')) errs.push('sat: runtime UI not translated');
+    await lp.click('.langsel'); await lp.click('.langopt[data-lang=en]'); await lp.waitForTimeout(150);
+    if (!/Legal preparation/.test(await lp.textContent('.hcopy'))) errs.push('en: did not return');
     await lp.close(); }
   // every journey: open, answer first option till first list, ensure no errors and no overflow on mobile
   const p = await page({ width: 360, height: 760 });
