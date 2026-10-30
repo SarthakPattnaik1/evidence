@@ -13,35 +13,25 @@ const url = 'file://' + require('path').resolve(__dirname, '../build/index.html'
   const shot = (p, n, full) => p.screenshot({ path: '' + require('path').resolve(__dirname, 'shots') + '/' + n + '.png', fullPage: !!full });
   for (const [n, vp] of [['m', { width: 390, height: 844 }], ['d', { width: 1280, height: 860 }]]) {
     const p = await page(vp); await p.goto(url); await p.waitForTimeout(500);
-    await shot(p, n + '-home', n === 'd');
-    if (n === 'm') await shot(p, 'm-home-full', true);
-    await p.fill('#matter', 'my cheque bounced'); await p.waitForTimeout(150); await shot(p, n + '-search');
-    await p.click('.res >> nth=0'); await p.waitForTimeout(250); await shot(p, n + '-firstq');
-    const pick = async (t) => { await p.click(`.opt:has-text("${t}")`); await p.waitForTimeout(450); if (await p.locator('[data-act=continue]').count() && !/30-day/.test(await p.textContent('h1'))) { await p.click('[data-act=continue]'); await p.waitForTimeout(250); } };
-    await p.click('.opt:has-text("I received the cheque")'); await p.waitForTimeout(450);
-    await shot(p, n + '-break1');
-    if (await p.locator('[data-act=continue]').count()) { await p.click('[data-act=continue]'); await p.waitForTimeout(250); }
-    await shot(p, n + '-quiz');
-    await pick('Funds insufficient'); await p.waitForTimeout(100);
+    await shot(p, n + '-home', true);
+    await p.click('.tile >> nth=0'); await p.waitForTimeout(200); await shot(p, n + '-area');
+    await p.goto(url); await p.fill('#matter', 'my cheque bounced'); await p.waitForTimeout(150); await shot(p, n + '-search');
+    await p.click('#results .prob >> nth=0'); await p.waitForTimeout(250); await shot(p, n + '-q1');
+    const pick = async (t) => { await p.click(`.opt:has-text("${t}")`); await p.waitForTimeout(550); };
+    await pick('I received the cheque');
+    await pick('Funds insufficient');
+    await shot(p, n + '-q3');
     await pick('Within the last 15 days');
-    const h = await p.textContent('h1'); if (!/30-day/.test(h)) errs.push(n + ' expected cheque urgent, got ' + h);
-    await shot(p, n + '-urgent');
+    if (!/30-day/.test(await p.textContent('h1'))) errs.push(n + ' expected cheque urgent');
     await p.click('[data-act=ackurgent]'); await p.waitForTimeout(250);
-    if ((await p.textContent('h1')).includes('Chapter')) { await p.click('[data-act=continue]'); await p.waitForTimeout(250); }
-    await p.keyboard.press('B'); await p.waitForTimeout(500); // Not yet (notice sent)
-    for (let i = 0; i < 6; i++) { const t = await p.textContent('h1'); if (/Chapter done|round done/.test(t)) { const c = p.locator('[data-act=continue]'); if (await c.count()) { await c.click(); await p.waitForTimeout(250); continue; } else break; } if (!(await p.locator('#qform').count())) break; await p.keyboard.press('A'); await p.waitForTimeout(500); }
-    await shot(p, n + '-roundend');
-    await p.click('[data-act=showlist]'); await p.waitForTimeout(250);
-    await p.click('#ev-cb_e_cheque [data-status=have]'); await p.waitForTimeout(100);
-    await p.fill('#ev-cb_e_cheque input[name=label]', 'Cheque no. 004512, HDFC, ₹2,40,000'); await p.fill('#ev-cb_e_cheque input[name=date]', '2 Oct 2026'); await p.fill('#ev-cb_e_cheque input[name=pages]', '1');
-    await p.click('#ev-cb_e_cheque button[type=submit]'); await p.waitForTimeout(150);
-    await p.click('#ev-cb_e_memo [data-status=have]'); await p.waitForTimeout(500);
-    await shot(p, n + '-file', true);
+    for (let i = 0; i < 10 && await p.locator('#qform').count(); i++) { await p.keyboard.press('1'); await p.waitForTimeout(550); }
+    if (!(await p.locator('#evlist').count())) errs.push(n + ' did not land on list');
+    await p.click('#ev-cb_e_cheque [data-status=have]'); await p.waitForTimeout(150);
+    await p.fill('#ev-cb_e_cheque input[name=label]', 'Cheque no. 004512, HDFC'); await p.click('#ev-cb_e_cheque button[type=submit]'); await p.waitForTimeout(150);
+    await shot(p, n + '-list', true);
     await p.goto(url + '#report'); await p.waitForTimeout(200);
-    const rep = await p.textContent('#report'); if (!rep.includes('A-1')) errs.push(n + ' no annex');
+    if (!(await p.textContent('#report')).includes('A-1')) errs.push(n + ' no annex');
     await shot(p, n + '-report', true);
-    await p.goto(url + '#questions'); await p.waitForTimeout(200); await p.click('.qa >> nth=0'); await shot(p, n + '-questions');
-    await p.goto(url + '#myths'); await p.waitForTimeout(200); await p.click('[data-mf=fact]'); await p.waitForTimeout(150); await shot(p, n + '-myth');
     const ow = await p.evaluate(() => document.documentElement.scrollWidth - innerWidth); if (ow > 1) errs.push(n + ' overflow ' + ow);
     await p.close();
   }
@@ -49,16 +39,16 @@ const url = 'file://' + require('path').resolve(__dirname, '../build/index.html'
   const p = await page({ width: 360, height: 760 });
   const ids = await (async () => { await p.goto(url); return p.evaluate(() => ER_KB.issues.map((i) => i.id)); })();
   for (const id of ids) {
-    await p.goto(url + '#start-' + id); await p.waitForTimeout(80); await p.click('[data-act=begin]'); await p.waitForTimeout(120);
+    await p.goto(url + '#home'); await p.waitForTimeout(60);
+    await p.evaluate((id) => { const b = document.createElement('button'); b.dataset.play = id; document.body.appendChild(b); b.click(); }, id); await p.waitForTimeout(150);
     for (let i = 0; i < 25; i++) {
       if (await p.locator('[data-act=ackurgent]').count()) { await p.click('[data-act=ackurgent]'); await p.waitForTimeout(100); continue; }
-      if (await p.locator('[data-act=continue]').count()) { await p.click('[data-act=continue]'); await p.waitForTimeout(100); continue; }
       if (!(await p.locator('#qform').count())) break;
-      const multi = await p.locator('#nextbtn:not([hidden])').count();
-      await p.click('.opt >> nth=0'); await p.waitForTimeout(multi ? 60 : 280);
-      if (multi) { await p.click('#nextbtn'); await p.waitForTimeout(250); }
+      if (await p.locator('.trayin').count() === 0) errs.push(id + ' no tray');
+      await p.click('.opt >> nth=0'); await p.waitForTimeout(330);
     }
-    if (await p.locator('[data-act=showlist]').count()) { await p.click('[data-act=showlist]'); await p.waitForTimeout(120); }
+    if (await p.locator('[data-act=deep]').count()) { await p.click('[data-act=deep]'); await p.waitForTimeout(120);
+      for (let i = 0; i < 25 && await p.locator('#qform').count(); i++) { if (await p.locator('[data-act=ackurgent]').count()) { await p.click('[data-act=ackurgent]'); await p.waitForTimeout(100); continue; } await p.click('.opt >> nth=-1'); await p.waitForTimeout(330); } }
     const n = await p.locator('.ev').count(); const ow = await p.evaluate(() => document.documentElement.scrollWidth - innerWidth);
     if (n < 3 || ow > 1) errs.push(`${id}: ev=${n} overflow=${ow}`);
     await p.evaluate(() => { location.hash = 'home'; });

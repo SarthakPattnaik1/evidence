@@ -19,7 +19,7 @@
         options: o([['payee', 'I received the cheque and it bounced'], ['drawer', 'I issued the cheque and it bounced'], ['drawer_notice', 'I issued it and got a legal notice or court summons']]) },
       { id: 'cb_reason', text: 'What reason is written on the bank\'s return memo?', chapter: 'The cheque', why: '"Funds insufficient" and "exceeds arrangement" usually support a case. Signature or account-closed reasons need a closer look.',
         options: o([['funds', 'Funds insufficient / exceeds arrangement'], ['stopped', 'Payment stopped by drawer'], ['closed', 'Account closed'], ['signature', 'Signature differs / other technical reason'], ['nomemo', 'No memo yet'], NS]) },
-      { id: 'cb_memo_when', text: 'When did you learn about the bounce (memo received)?', chapter: 'The clock', when: W('cb_side', 'payee'),
+      { id: 'cb_memo_when', text: 'When did the bank tell you the cheque bounced?', chapter: 'The clock', when: W('cb_side', 'payee'),
         why: 'A written demand notice must usually be sent within 30 days of learning about the dishonour.',
         options: o([['d15', 'Within the last 15 days'], ['d30', '15 to 30 days ago'], ['over30', 'More than 30 days ago'], NS]) },
       { id: 'cb_notice_sent', text: 'Have you sent a written demand notice to the person who issued it?', chapter: 'The clock', when: W('cb_side', 'payee'),

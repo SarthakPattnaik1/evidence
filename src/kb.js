@@ -38,7 +38,7 @@
     { id: 'shopping', title: 'Shopping & services', blurb: 'Refunds, defective goods, insurance, builders', icon: 'bag' },
     { id: 'home', title: 'Home & land', blurb: 'Rent, deposits, eviction, encroachment', icon: 'house' },
     { id: 'police', title: 'Police & notices', blurb: 'FIR, arrest, summons, legal notices', icon: 'shield' },
-    { id: 'work', title: 'Work', blurb: 'Salary, termination, harassment at work', icon: 'briefcase' },
+    { id: 'work', title: 'Work', blurb: 'Salary, termination, harassment at work', icon: 'user' },
     { id: 'accidents', title: 'Accidents', blurb: 'Road accidents and injury claims', icon: 'umbrella' },
     { id: 'other', title: 'Online & other', blurb: 'Online harassment, money lent, anything else', icon: 'more' }
   ];
