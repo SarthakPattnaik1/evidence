@@ -894,3 +894,11 @@ footer.foot{background:#F6F1E8}
 .arow.pc3 .tic{background:var(--p-lav)!important}.arow.pc4 .tic{background:var(--p-butter)!important}.arow.pc5 .tic{background:var(--p-rose)!important}
 @media (max-width:560px){.arealist{grid-template-columns:1fr}.arealist .arow:nth-child(odd){border-right:0!important}.arow{min-height:54px}}
 @media (max-width:560px){.arealist{grid-template-columns:1fr 1fr}.arealist .arow:nth-child(odd){border-right:1px solid var(--line)!important}.arow{min-height:56px;padding:8px 8px!important;gap:8px!important}.arow b{font-size:13.5px}.arow>svg:last-child{display:none}}
+/* v27 — ready-folder logo */
+.brand{gap:9px!important;align-items:center}
+.bicon{height:28px!important;width:auto!important}
+.bwordimg{height:26px!important;width:auto!important;margin-top:-2px}
+.fmark img.fm{height:44px!important;width:auto!important}
+.fmark img.fw{height:32px!important;width:auto!important;margin-bottom:2px}
+@media (max-width:640px){.bicon{height:25px!important}.bwordimg{height:23px!important}}
+@media (max-width:420px){.bicon{height:23px!important}.bwordimg{height:21px!important}.brand{gap:7px!important}}

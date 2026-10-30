@@ -49,7 +49,7 @@ def page(title, desc, body, path, icon):
 <meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:type" content="article">
 <meta name="theme-color" content="#1B3A5C"><meta name="author" content="Sarthak Pattnaik, Subhankar Das"><link rel="icon" href="/icon-64.png" type="image/png"><link rel="manifest" href="/manifest.webmanifest">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
-<style>{CSS}</style></head><body><header><a href="/" style="display:flex;align-items:center;gap:8px;text-decoration:none"><img src="/mark.png" alt="" style="height:32px;width:auto"><img src="/wordmark.png" alt="Saboot" style="height:22px;width:auto"></a><a class="back" href="/">Open Saboot</a></header>
+<style>{CSS}</style></head><body><header><a href="/" style="display:flex;align-items:center;gap:8px;text-decoration:none"><img src="/mark.png" alt="" style="height:28px;width:auto"><img src="/wordmark.png" alt="Saboot" style="height:26px;width:auto"></a><a class="back" href="/">Open Saboot</a></header>
 <main>{body}</main><footer>Saboot is a free preparation tool, not a law firm, and does not give legal advice. Made by <a href="https://www.linkedin.com/in/sarthakad" rel="noopener">Sarthak Pattnaik</a> and <a href="https://www.linkedin.com/in/subhankar-das-311030b1/" rel="noopener">Subhankar Das</a>. Emergency: 112 · Free legal aid: 15100 · Cyber fraud: 1930.<br><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="/">Open Saboot</a></footer></body></html>"""
 
 
