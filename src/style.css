@@ -725,3 +725,4 @@ footer.foot .wrap{position:relative}
 .adminlink{opacity:.85;color:var(--muted)}
 .adminlink{opacity:1;font-size:12px}
 .tag.reviewed{background:#E5F3EA;color:#14653a;display:inline-flex;align-items:center;gap:4px}
+.madeby{margin:6px 0 0}

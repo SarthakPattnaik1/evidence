@@ -22,10 +22,10 @@ def page(title, desc, body, path, icon):
     return f"""<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(title)}</title><meta name="description" content="{e(desc)}"><link rel="canonical" href="{BASE}{path}">
 <meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:type" content="article">
-<meta name="theme-color" content="#04453B"><link rel="icon" href="/icon.webp"><link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#04453B"><meta name="author" content="Sarthak Pattnaik, Subhankar Das"><link rel="icon" href="/icon.webp"><link rel="manifest" href="/manifest.webmanifest">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
 <style>{CSS}</style></head><body><header><a href="/"><img src="/icon.webp" alt="" width="34" height="34"></a><a href="/" style="font-weight:800;text-decoration:none;font-size:20px">Pehlo</a></header>
-<main>{body}</main><footer>Pehlo is a free preparation tool, not a law firm, and does not give legal advice. Emergency: 112 · Free legal aid: 15100 · Cyber fraud: 1930.<br><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="/">Open Pehlo</a></footer></body></html>"""
+<main>{body}</main><footer>Pehlo is a free preparation tool, not a law firm, and does not give legal advice. Made by Sarthak Pattnaik and Subhankar Das. Pehlo does not take cases, referrals or fees. Emergency: 112 · Free legal aid: 15100 · Cyber fraud: 1930.<br><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="/">Open Pehlo</a></footer></body></html>"""
 
 
 def run():
@@ -79,6 +79,7 @@ def run():
 <p class="muted">Contact: through the GitHub project page.</p>""", '/privacy', icon))
     (OUT / 'terms.html').write_text(page('Terms | Pehlo', 'Terms of use for Pehlo.', """<h1>Terms of use</h1>
 <p>Pehlo is a free tool that helps you organise facts and papers before meeting an advocate. It is not a law firm and does not give legal advice. Using it does not create an advocate–client relationship.</p>
+<p>Pehlo is made by Sarthak Pattnaik and Subhankar Das. It does not recommend, refer to or advertise any advocate, including its makers, and no cases, referrals or fees are taken through it.</p>
 <ul><li>The content is a draft prepared from official sources and has not yet been reviewed by a named advocate. Laws, deadlines and fees change; check with an advocate before acting.</li>
 <li>Pehlo does not recommend or rank advocates. Any directory is for convenience only.</li>
 <li>In an emergency call 112. For free legal aid call 15100 (NALSA). For cyber fraud call 1930.</li></ul>""", '/terms', icon))
