@@ -1,4 +1,4 @@
-/* EvidenceReady deterministic interview engine. Pure functions; no DOM. */
+/* Saboot deterministic interview engine. Pure functions; no DOM. */
 (function (root) {
   function asArr(v) { return v == null ? [] : Array.isArray(v) ? v : [v]; }
 

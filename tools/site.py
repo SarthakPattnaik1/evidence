@@ -46,10 +46,10 @@ footer{max-width:960px;margin:0 auto;padding:20px;color:#566476;font-size:14px}
 def page(title, desc, body, path, icon):
     return f"""<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(title)}</title><meta name="description" content="{e(desc)}"><link rel="canonical" href="{BASE}{path}">
-<meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:type" content="article">
+<meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:type" content="article"><meta property="og:url" content="{BASE}{path}"><meta property="og:site_name" content="Saboot"><meta property="og:locale" content="en_IN"><meta property="og:image" content="{BASE}/og.jpg?v=3"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Saboot: Walk into your lawyer’s office ready."><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="{BASE}/og.jpg?v=3"><link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2">
 <meta name="theme-color" content="#1B3A5C"><meta name="author" content="Sarthak Pattnaik, Subhankar Das"><link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml"><link rel="icon" href="/icon-64.png?v=2" type="image/png"><link rel="manifest" href="/manifest.webmanifest">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
-<style>{CSS}</style></head><body><header><a href="/" style="display:flex;align-items:center;gap:8px;text-decoration:none"><img src="/mark.png?v=2" alt="" style="height:28px;width:auto"><img src="/wordmark.png" alt="Saboot" style="height:26px;width:auto"></a><a class="back" href="/">Open Saboot</a></header>
+<style>{CSS}</style></head><body><header><a href="/" style="display:flex;align-items:center;gap:8px;text-decoration:none"><img src="/mark.png?v=2" alt="" style="height:28px;width:auto"><img src="/wordmark.png?v=2" alt="Saboot" style="height:26px;width:auto"></a><a class="back" href="/">Open Saboot</a></header>
 <main>{body}</main><footer>Saboot is a free preparation tool, not a law firm, and does not give legal advice. Made by <a href="https://www.linkedin.com/in/sarthakad" rel="noopener">Sarthak Pattnaik</a> and <a href="https://www.linkedin.com/in/subhankar-das-311030b1/" rel="noopener">Subhankar Das</a>. Emergency: 112 · Free legal aid: 15100 · Cyber fraud: 1930.<br><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="/">Open Saboot</a></footer></body></html>"""
 
 
@@ -133,12 +133,13 @@ def run():
         'help': {re.sub(r'\D', '', h['label']): h['name'] for h in data['help'].values() if re.sub(r'\D', '', h.get('label') or '')},
         'guides': [{'id': i['id'], 'title': i['title'], 'cat': i['cat'], 'checked': i.get('checked'), 'sources': len(i.get('sources') or []), 'review': i.get('review'), 'nq': i['nq'], 'urgent': i['urgent']} for i in data['issues']]}, ensure_ascii=False))
     lastmod = data.get('checked') or ''
+    (OUT / '404.html').write_text(page('Page not found | Saboot', 'This page does not exist. Start again from the Saboot home page.', '<h1>We could not find that page</h1><p class="muted">The link may be old or mistyped.</p><a class="cta" href="/">Go to Saboot home</a><p class="muted">Need help now? Call <a href="tel:112">112</a> for emergencies, <a href="tel:1930">1930</a> for cyber fraud, <a href="tel:15100">15100</a> for free legal aid.</p>', '/404', None).replace('<link rel="canonical" href="' + BASE + '/404">', '<meta name="robots" content="noindex">'), encoding='utf-8')
     (OUT / 'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + ''.join(f'<url><loc>{BASE}{u}</loc><lastmod>{lastmod}</lastmod><priority>{p}</priority></url>' for u, p in urls) + '</urlset>\n')
     (OUT / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nDisallow: /admin\nSitemap: {BASE}/sitemap.xml\n')
     (OUT / 'manifest.webmanifest').write_text(json.dumps({
         'name': 'Saboot — papers for your advocate', 'short_name': 'Saboot', 'start_url': '/', 'display': 'standalone',
         'background_color': '#FBF8F3', 'theme_color': '#1B3A5C', 'lang': 'en',
-        'icons': [{'src': '/icon-192.png?v=2', 'sizes': '192x192', 'type': 'image/png'}, {'src': '/icon-512.png?v=2', 'sizes': '512x512', 'type': 'image/png'}]}, ensure_ascii=False))
+        'id': '/', 'scope': '/', 'description': 'Answer a few questions and get the list of papers to take to your advocate. Free, in English and 22 Indian languages.', 'categories': ['utilities', 'education'], 'icons': [{'src': '/icon-192.png?v=2', 'sizes': '192x192', 'type': 'image/png', 'purpose': 'any'}, {'src': '/icon-512.png?v=2', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'any'}, {'src': '/icon-maskable-512.png?v=2', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'maskable'}]}, ensure_ascii=False))
     # Network-first so law updates reach people immediately; cache only as an offline fallback.
     (OUT / 'sw.js').write_text("""const C='saboot-v2';
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(['/'])))});

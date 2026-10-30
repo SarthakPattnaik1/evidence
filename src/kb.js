@@ -1,4 +1,4 @@
-/* EvidenceReady knowledge base — Phase 1 (English).
+/* Saboot knowledge base — Phase 1 (English).
    Status: DRAFT authored content. Not yet reviewed by a practising advocate.
    Stable IDs only: conditions reference question/option IDs, never display text. */
 (function (root) {

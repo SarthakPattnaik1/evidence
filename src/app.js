@@ -1,4 +1,4 @@
-/* EvidenceReady — UI. Answers stay in this tab unless the user opts in to saving on this device. */
+/* Saboot — UI. Answers stay in this tab unless the user opts in to saving on this device. */
 (function () {
   'use strict';
   const KB = window.ER_KB, E = window.ER_ENGINE;
@@ -43,7 +43,6 @@
     q: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17v.5"/>'
   };
   const ic = (n, s = 20) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n] || ''}</svg>`;
-  const LOGO = `<svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><path d="M7 8.5A3.5 3.5 0 0 1 10.5 5H17a8.5 8.5 0 0 1 0 17h-3v4.5a3.5 3.5 0 0 1-7 0Z" fill="#0E3A2C"/><path d="m12.4 13.6 2.7 2.7 5.2-5.6" fill="none" stroke="#EDB14C" stroke-width="2.9" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
   /* ---------- helpers ---------- */
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
