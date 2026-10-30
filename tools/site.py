@@ -86,7 +86,7 @@ def run():
         'guides': [{'id': i['id'], 'title': i['title'], 'cat': i['cat'], 'checked': i.get('checked'), 'sources': len(i.get('sources') or []), 'nq': i['nq'], 'urgent': i['urgent']} for i in data['issues']]}, ensure_ascii=False))
     lastmod = data.get('checked') or ''
     (OUT / 'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + ''.join(f'<url><loc>{BASE}{u}</loc><lastmod>{lastmod}</lastmod><priority>{p}</priority></url>' for u, p in urls) + '</urlset>\n')
-    (OUT / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /admin\nSitemap: {BASE}/sitemap.xml\n')
+    (OUT / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nDisallow: /admin\nSitemap: {BASE}/sitemap.xml\n')
     (OUT / 'manifest.webmanifest').write_text(json.dumps({
         'name': 'Pehlo — papers for your advocate', 'short_name': 'Pehlo', 'start_url': '/', 'display': 'standalone',
         'background_color': '#FCFAF4', 'theme_color': '#04453B', 'lang': 'en',
