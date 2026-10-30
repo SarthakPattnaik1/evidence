@@ -516,3 +516,25 @@ html[dir=rtl] .hero2::before{inset:0 0 0 auto;border-radius:0 0 0 56% / 0 0 0 30
   .hart img{width:100vw;max-width:none;margin-inline:calc(50% - 50vw)}
 }
 @media (min-width:761px){ .hero2in{min-height:600px} .hart{display:block} .hart img{height:600px;width:auto;position:absolute;right:0;bottom:0} }
+/* v10: illustration fills the whole right half, no empty band on wide screens */
+@media (min-width:761px){
+  .hero2in{min-height:clamp(560px,44vw,720px)}
+  .hart{position:absolute;left:50%;right:0;top:0;bottom:0;width:auto;display:block;justify-self:stretch;align-self:stretch}
+  .hart img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;object-position:50% 78%;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 12%);mask-image:linear-gradient(90deg,transparent 0,#000 12%)}
+  .hero2::before{width:54%}
+  .hcopy{max-width:46%}
+}
+/* v11: keep illustration beside the text at every width (no zoom, no empty band) */
+@media (min-width:761px){
+  .hero2{background:var(--paper)}
+  .hero2::before{display:none}
+  .hero2in{position:relative;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);min-height:0;align-items:end;gap:24px}
+  .hcopy{max-width:none;align-self:center;padding:48px 0}
+  .hart{position:static;inset:auto;justify-self:end;align-self:end;display:block}
+  .hart img{position:static;inset:auto;height:clamp(500px,44vw,640px);width:auto;max-width:100%;object-fit:contain;border-radius:32px 32px 0 0;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 10%);mask-image:linear-gradient(90deg,transparent 0,#000 10%)}
+}
+@media (min-width:761px){
+  .hero2in{align-items:center}
+  .hart{align-self:center;padding:28px 0}
+  .hart img{border-radius:32px;-webkit-mask-image:none;mask-image:none;box-shadow:0 24px 50px -28px rgba(1,49,46,.45);height:clamp(480px,40vw,600px)}
+}
