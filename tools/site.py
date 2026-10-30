@@ -47,9 +47,9 @@ def page(title, desc, body, path, icon):
     return f"""<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(title)}</title><meta name="description" content="{e(desc)}"><link rel="canonical" href="{BASE}{path}">
 <meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:type" content="article">
-<meta name="theme-color" content="#1B3A5C"><meta name="author" content="Sarthak Pattnaik, Subhankar Das"><link rel="icon" href="/icon-64.png" type="image/png"><link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#1B3A5C"><meta name="author" content="Sarthak Pattnaik, Subhankar Das"><link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml"><link rel="icon" href="/icon-64.png?v=2" type="image/png"><link rel="manifest" href="/manifest.webmanifest">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
-<style>{CSS}</style></head><body><header><a href="/" style="display:flex;align-items:center;gap:8px;text-decoration:none"><img src="/mark.png" alt="" style="height:28px;width:auto"><img src="/wordmark.png" alt="Saboot" style="height:26px;width:auto"></a><a class="back" href="/">Open Saboot</a></header>
+<style>{CSS}</style></head><body><header><a href="/" style="display:flex;align-items:center;gap:8px;text-decoration:none"><img src="/mark.png?v=2" alt="" style="height:28px;width:auto"><img src="/wordmark.png" alt="Saboot" style="height:26px;width:auto"></a><a class="back" href="/">Open Saboot</a></header>
 <main>{body}</main><footer>Saboot is a free preparation tool, not a law firm, and does not give legal advice. Made by <a href="https://www.linkedin.com/in/sarthakad" rel="noopener">Sarthak Pattnaik</a> and <a href="https://www.linkedin.com/in/subhankar-das-311030b1/" rel="noopener">Subhankar Das</a>. Emergency: 112 · Free legal aid: 15100 · Cyber fraud: 1930.<br><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="/">Open Saboot</a></footer></body></html>"""
 
 
@@ -138,11 +138,11 @@ def run():
     (OUT / 'manifest.webmanifest').write_text(json.dumps({
         'name': 'Saboot — papers for your advocate', 'short_name': 'Saboot', 'start_url': '/', 'display': 'standalone',
         'background_color': '#FBF8F3', 'theme_color': '#1B3A5C', 'lang': 'en',
-        'icons': [{'src': '/icon-192.png', 'sizes': '192x192', 'type': 'image/png'}, {'src': '/icon-512.png', 'sizes': '512x512', 'type': 'image/png'}]}, ensure_ascii=False))
+        'icons': [{'src': '/icon-192.png?v=2', 'sizes': '192x192', 'type': 'image/png'}, {'src': '/icon-512.png?v=2', 'sizes': '512x512', 'type': 'image/png'}]}, ensure_ascii=False))
     # Network-first so law updates reach people immediately; cache only as an offline fallback.
-    (OUT / 'sw.js').write_text("""const C='saboot-v1';
+    (OUT / 'sw.js').write_text("""const C='saboot-v2';
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(['/'])))});
-self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));
+self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{const r=e.request;if(r.method!=='GET'||new URL(r.url).origin!==location.origin||r.url.includes('/api/'))return;
 e.respondWith(fetch(r).then(res=>{const cp=res.clone();caches.open(C).then(c=>c.put(r,cp));return res}).catch(()=>caches.match(r).then(m=>m||caches.match('/'))))});
 """)
