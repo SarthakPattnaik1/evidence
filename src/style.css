@@ -585,8 +585,8 @@ footer.foot .flink{color:var(--go-d);padding:6px 0;text-decoration:underline;fon
 
 /* v14: hero matches the brand board — sage panel bleeds to the right edge, illustration anchored to it */
 @media (min-width:820px){
-  .hero2{--hh:clamp(560px,44vw,720px);--iw:calc(var(--hh) * .6606);background:var(--paper);position:relative;overflow:hidden;min-height:var(--hh)}
-  .hero2::before{display:block;content:"";position:absolute;inset:0 0 0 auto;width:calc(var(--iw) + 190px);background:linear-gradient(180deg,#EAF0E7 0%,#E8EEE4 100%);border-radius:70% 0 0 30% / 56% 0 0 44%}
+  .hero2{--hh:clamp(620px,50vw,840px);--iw:calc(var(--hh) * .6606);background:var(--paper);position:relative;overflow:hidden;min-height:var(--hh)}
+  .hero2::before{display:block;content:"";position:absolute;inset:0 0 0 auto;width:calc(var(--iw) + 150px);background:linear-gradient(180deg,#EAF0E7 0%,#E8EEE4 100%);border-radius:70% 0 0 30% / 56% 0 0 44%}
   html[dir=rtl] .hero2::before{inset:0 auto 0 0;border-radius:0 62% 38% 0 / 0 54% 46% 0}
   .hero2in{position:static;display:block;min-height:var(--hh)}
   .hcopy{position:relative;z-index:2;max-width:min(520px,calc(100% - var(--iw) - 40px));min-height:var(--hh);display:flex;flex-direction:column;justify-content:center;padding:40px 0;align-self:auto}
@@ -595,7 +595,7 @@ footer.foot .flink{color:var(--go-d);padding:6px 0;text-decoration:underline;fon
   .hart img{position:absolute;inset:0;width:100%;height:100%;max-width:none;margin:0;object-fit:cover;object-position:100% 100%;border-radius:0 0 0 70% / 0 0 0 52%;box-shadow:none;
     -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14%),linear-gradient(180deg,transparent 50%,#000 66%);-webkit-mask-composite:source-over;mask-image:linear-gradient(90deg,transparent 0,#000 14%),linear-gradient(180deg,transparent 50%,#000 66%);mask-composite:add}
 }
-@media (min-width:820px) and (max-width:1023px){ .hero2{--hh:540px} .hcopy h1{font-size:clamp(30px,4vw,40px)} }
+@media (min-width:820px) and (max-width:1023px){ .hero2{--hh:600px} .hcopy h1{font-size:clamp(30px,4vw,40px)} }
 
 /* v15 feedback + tappable helplines */
 .fbk{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:14px 0;padding:12px 14px;border:1px dashed var(--line);border-radius:12px;background:#fff}

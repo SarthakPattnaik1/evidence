@@ -278,7 +278,7 @@ ${JSON.stringify(map)}`;
           <button class="getstarted" data-act="getstarted">${esc(H('hero_go', HERO.hero_go))} ${ic('arrow', 20)}</button>
           <p class="fsm">${esc(H('hero_f', HERO.hero_f))}</p>
         </div>
-        <div class="hart"><img src="${window.ER_BRAND.hero}" alt="" width="436" height="660"></div>
+        <div class="hart"><img src="${window.ER_BRAND.hero}" alt="" width="872" height="1320"></div>
       </div></section>
       <section class="feats"><div class="wrap featsin">${FEAT.map(([icn, k, en, ks, ens, tone]) => `<div class="feat"><span class="fic ${tone}">${ic(icn, 30)}</span><div><b>${esc(H(k, en))}</b><span>${esc(H(ks, ens))}</span></div></div>`).join('')}</div></section>
       <div class="wrap home" id="start">
