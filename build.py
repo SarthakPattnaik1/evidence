@@ -15,5 +15,5 @@ _a=pathlib.Path(_o.path.join(_o.path.dirname(_o.path.abspath(__file__)),'api'));
 (_a/'_corpus.js').write_text('module.exports='+_j.dumps(_src)+';\n')
 # static SEO pages, sitemap, manifest, service worker
 import importlib.util as _iu
-_sp=_iu.spec_from_file_location('pehlo_site',_o.path.join(_o.path.dirname(_o.path.abspath(__file__)),'tools','site.py'));_m=_iu.module_from_spec(_sp);_sp.loader.exec_module(_m)
+_sp=_iu.spec_from_file_location('saboot_site',_o.path.join(_o.path.dirname(_o.path.abspath(__file__)),'tools','site.py'));_m=_iu.module_from_spec(_sp);_sp.loader.exec_module(_m)
 print('pages',_m.run())

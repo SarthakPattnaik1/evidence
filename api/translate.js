@@ -1,4 +1,4 @@
-// Pehlo translation endpoint (Vercel serverless, Node 18+).
+// Saboot translation endpoint (Vercel serverless, Node 18+).
 //
 // Free providers, tried in this order (set whichever you have in Vercel → Settings → Environment Variables):
 //   1. Bhashini (Government of India, free, all 22 scheduled languages)

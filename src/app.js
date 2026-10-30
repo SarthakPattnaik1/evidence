@@ -286,7 +286,7 @@ ${JSON.stringify(map)}`;
     const sensitive = !!(issue() && issue().sensitive && opt.inJourney);
     document.body.classList.toggle('calm', sensitive);
     return `<header class="top"><div class="wrap">
-        <button class="brand" data-go="home" aria-label="Pehlo home"><img class="blogo" src="${window.ER_BRAND.logo}" alt="Pehlo" width="132" height="49"></button>
+        <button class="brand" data-go="home" aria-label="Saboot home"><img class="bicon" src="${window.ER_BRAND.icon}" alt="" width="36" height="36"><span class="bword">Saboot</span></button>
         <button class="nav navq" data-go="questions" aria-label="${esc(T('q'))}">${ic('q', 18)}<span class="lbl-long">${esc(T('q').replace(/\?$/, ''))}</span></button>
         <button class="nav" data-go="help">${ic('phone', 18)}<span class="lbl-long">${esc(T('help').replace(/\?$/, ''))}</span><span class="lbl-short">${esc(H('nav_help', 'Help'))}</span></button>
         <button class="nav lang" data-act="lang" aria-label="Language: ${esc(LMETA[LANG].name)}. Change language">${ic('globe', 18)}<span>${esc(LMETA[LANG].native)}</span></button>
@@ -296,16 +296,16 @@ ${JSON.stringify(map)}`;
       ${opt.tray ? trayHTML() : ''}
       ${opt.noFooter ? '' : opt.inJourney ? slimFooter() : footer()}`;
   }
-  const FOOT = {"f_disc": "Pehlo helps you prepare for a meeting with an advocate.", "f_about": "How this works & privacy", "f_adv": "For advocates", "f_myth": "Myth or fact", "f_help": "Legal aid & urgent help", "f_clear": "Clear my answers"};
+  const FOOT = {"f_disc": "Saboot helps you prepare for a meeting with an advocate.", "f_about": "How this works & privacy", "f_adv": "For advocates", "f_myth": "Myth or fact", "f_help": "Legal aid & urgent help", "f_clear": "Clear my answers"};
   function slimFooter() {
-    return `<footer class="foot slim"><div class="wrap"><span class="small muted">Pehlo</span><span class="row"><button data-go="help">${esc(H('nav_help', 'Help'))}</button><button data-go="about">${esc(H('f_about', FOOT.f_about))}</button>${S.issueId ? `<button data-act="clear">${esc(H('f_clear', FOOT.f_clear))}</button>` : ''}</span></div></footer>`;
+    return `<footer class="foot slim"><div class="wrap"><span class="small muted">Saboot</span><span class="row"><button data-go="help">${esc(H('nav_help', 'Help'))}</button><button data-go="about">${esc(H('f_about', FOOT.f_about))}</button>${S.issueId ? `<button data-act="clear">${esc(H('f_clear', FOOT.f_clear))}</button>` : ''}</span></div></footer>`;
   }
   function footer() {
     const f = (k) => esc(H(k, FOOT[k]));
     return `<footer class="foot"><div class="wrap">
-      <img class="flogo" src="${window.ER_BRAND.logoFull}" alt="Pehlo — Samajh. Tayyari. Apna Haq." width="210" height="96">
+      <div class="fmark"><img src="${window.ER_BRAND.icon}" alt="" width="44" height="44"><div><b>Saboot</b><span>Samajh. Tayyari. Apna Haq.</span></div></div>
       <p style="max-width:62em">${f('f_disc')}</p>
-      <p class="small muted madeby">${esc(X('Made by'))} <a class="plink" href="https://www.linkedin.com/in/sarthakad" target="_blank" rel="noopener">Sarthak Pattnaik</a> ${esc(X('and'))} <a class="plink" href="https://www.linkedin.com/in/subhankar-das-311030b1/" target="_blank" rel="noopener">Subhankar Das</a>. ${esc(X('Pehlo does not take cases, referrals or fees.'))}</p>
+      <p class="small muted madeby">${esc(X('Made by'))} <a class="plink" href="https://www.linkedin.com/in/sarthakad" target="_blank" rel="noopener">Sarthak Pattnaik</a> ${esc(X('and'))} <a class="plink" href="https://www.linkedin.com/in/subhankar-das-311030b1/" target="_blank" rel="noopener">Subhankar Das</a>. ${esc(X('Saboot does not take cases, referrals or fees.'))}</p>
       <div class="row"><button data-go="about">${f('f_about')}</button><button data-go="advocates">${f('f_adv')}</button><button data-go="myths">${f('f_myth')}</button><button data-go="help">${f('f_help')}</button><button data-act="reportissue">${esc(X('Report a problem'))}</button>${S.issueId ? `<button data-act="clear">${f('f_clear')}</button>` : ''}${/^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname) ? `<a class="flink" href="/guide">${esc(X('All guides'))}</a><a class="flink" href="/privacy">${esc(X('Privacy'))}</a><a class="flink" href="/terms">${esc(X('Terms'))}</a>` : ''}</div>
       <p class="small muted" style="margin:8px 0 0">${esc(X('Law last checked {d} against official sources.').replace('{d}', new Date((KB.lawChecked || '2026-10-30') + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })))}</p>
       ${/^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname) && /^#?(home)?$/.test(location.hash) ? '<a class="adminlink" href="/admin" rel="nofollow">Admin</a>' : ''}
@@ -349,7 +349,7 @@ ${JSON.stringify(map)}`;
   function ensureHome() {
     if (LANG === 'en' || RT.tr[LANG + '|home']) return Promise.resolve(true);
     const map = {}; KB.categories.forEach((c) => { map['b_' + c.id] = c.blurb; }); SUGGEST.forEach((x, i) => { map['s' + i] = x; }); Object.assign(map, FOOT, HERO); delete map.tagline; [['f1', 'Ask'], ['f1s', 'In your language'], ['f2', 'Prepare'], ['f2s', 'Step by step'], ['f3', 'Organize'], ['f3s', 'Your evidence'], ['f4', 'Be Ready'], ['f4s', 'With confidence']].forEach(([k, v]) => { map[k] = v; });
-    return translateMap(map, 'home8', (o) => { RT.tr[LANG + '|home'] = o; });
+    return translateMap(map, 'home9', (o) => { RT.tr[LANG + '|home'] = o; });
   }
   /* Home: act-now strip and situation cards. Every fact here is taken from the guide it opens. */
   const URGENT_NOW = [
@@ -655,7 +655,7 @@ ${JSON.stringify(map)}`;
   }
   function reportHTML(d) {
     const iss = d.iss; const li = (arr, f) => arr.length ? `<ul>${arr.map((x) => `<li>${f(x)}</li>`).join('')}</ul>` : '<p class="muted">None recorded.</p>';
-    return `<p class="meta">Pehlo preparation pack. Prepared ${esc(fmtDate(today()))}. Content v${esc(KB.version)} (${esc(KB.reviewed.label)}).</p>
+    return `<p class="meta">Saboot preparation pack. Prepared ${esc(fmtDate(today()))}. Content v${esc(KB.version)} (${esc(KB.reviewed.label)}).</p>
       <h1>Papers for my lawyer</h1><p><b>${esc(S.topic ? S.topic.title : iss.title)}</b></p>
       ${S.adv && S.adv.issueId === iss.id && S.adv.name ? `<p class="meta">Prepared at the request of ${esc(S.adv.name)}.</p>` : ''}
       ${d.urgent.length ? `<p class="instr" style="background:var(--tape-l)">Flagged for prompt attention: ${d.urgent.map((u) => esc(u.title)).join('; ')}.</p>` : ''}
@@ -677,7 +677,7 @@ ${JSON.stringify(map)}`;
         : '<p class="muted">No documents named yet. Mark a record "I have it" and name it to include it here. Missing records are never listed as annexures.</p>'}
       <p class="meta">These numbers are provisional preparation references, not final court exhibit labels.</p>
       <p class="instr">${esc(INSTRUCTION)}</p>
-      <p class="meta" style="margin-top:22px">Prepared with Pehlo, a free preparation tool. Not legal advice and not a court filing. It does not show that any record is admissible or legally required. Electronic records may have additional legal requirements.</p>`;
+      <p class="meta" style="margin-top:22px">Prepared with Saboot, a free preparation tool. Not legal advice and not a court filing. It does not show that any record is admissible or legally required. Electronic records may have additional legal requirements.</p>`;
   }
   function viewReport() {
     return shell(`<div class="wrap narrow" style="padding-bottom:30px">
@@ -805,7 +805,7 @@ ${JSON.stringify(map)}`;
     const counts = KB.categories.map((c) => `${c.title}: ${BUILT.filter((i) => i.cat === c.id).length}`).join(', ');
     return shell(`<div class="wrap narrow" style="padding:26px 0 40px">
       <h1 style="font-size:clamp(30px,5vw,46px)">${esc(X('How this works'))}</h1>
-      <details class="panel accp" open><summary><h2>${esc(X('Who made Pehlo'))}</h2>${ic('down', 18)}</summary><div class="accb"><p>${esc(X('Made by'))} <a class="plink" href="https://www.linkedin.com/in/sarthakad" target="_blank" rel="noopener">Sarthak Pattnaik</a> ${esc(X('and'))} <a class="plink" href="https://www.linkedin.com/in/subhankar-das-311030b1/" target="_blank" rel="noopener">Subhankar Das</a>, ${esc(X('in Bhubaneswar.'))}</p><p style="margin:0">${esc(X('Pehlo is a free preparation tool. It does not recommend, refer you to, or advertise any advocate — including us. We do not take cases, referrals or fees through Pehlo. Choose any advocate you trust, or call 15100 for free legal aid.'))}</p></div></details>
+      <details class="panel accp" open><summary><h2>${esc(X('Who made Saboot'))}</h2>${ic('down', 18)}</summary><div class="accb"><p>${esc(X('Made by'))} <a class="plink" href="https://www.linkedin.com/in/sarthakad" target="_blank" rel="noopener">Sarthak Pattnaik</a> ${esc(X('and'))} <a class="plink" href="https://www.linkedin.com/in/subhankar-das-311030b1/" target="_blank" rel="noopener">Subhankar Das</a>, ${esc(X('in Bhubaneswar.'))}</p><p style="margin:0">${esc(X('Saboot is a free preparation tool. It does not recommend, refer you to, or advertise any advocate — including us. We do not take cases, referrals or fees through Saboot. Choose any advocate you trust, or call 15100 for free legal aid.'))}</p></div></details>
       <details class="panel accp"><summary><h2>${esc(X('What it does'))}</h2>${ic('down', 18)}</summary><div class="accb"><p>Pick your problem and answer a few one-tap questions. Each answer changes which papers you need. The rules come from a written, tested set of guides — not from a chatbot making things up.</p><p style="margin:0">At the end you get one list: what to do first, the papers to take to your advocate, and where you stand. You can print it, or make a page for your advocate with your answers and a dated timeline.</p></div></details>
       <details class="panel accp"><summary><h2>${esc(X('What it doesn\'t do'))}</h2>${ic('down', 18)}</summary><div class="accb"><ul style="margin:0;padding-left:20px"><li>Give legal advice or predict results.</li><li>Say a record is legally required or admissible.</li><li>Prepare court filings.</li><li>Ask you to upload documents.</li></ul></div></details>
       <details class="panel accp"><summary><h2>${esc(X('Why these problems'))}</h2>${ic('down', 18)}</summary><div class="accb"><p style="margin:0">Guides are chosen from what most often reaches Indian courts and Lok Adalats (cheque bounce, family, motor accident, traffic challans, property), the National Consumer Helpline (e-commerce, banking, telecom, travel), the RBI Ombudsman (loans and credit cards lead) and police cyber-crime data (online fraud and fake-police "digital arrest" calls). Guides by area — ${esc(counts)}.</p></div></details>
@@ -818,14 +818,14 @@ ${JSON.stringify(map)}`;
     const iss = issue() || BY_ID.general; if (!iss) return;
     const ov = document.createElement('div'); ov.className = 'overlay'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-labelledby', 'reph');
     const kinds = [['law', X('The law or a deadline looks wrong')], ['paper', X('A paper is missing or not needed')], ['confusing', X('Something is confusing')], ['translation', X('The translation is wrong')], ['other', X('Something else')]];
-    ov.innerHTML = `<div class="dialog"><h2 id="reph">${esc(X('Report a mistake'))}</h2><p class="small muted">${esc(X('This goes to the Pehlo team so we can fix the guide. Please don\'t write names, phone numbers or details of your case.'))}</p>
+    ov.innerHTML = `<div class="dialog"><h2 id="reph">${esc(X('Report a mistake'))}</h2><p class="small muted">${esc(X('This goes to the Saboot team so we can fix the guide. Please don\'t write names, phone numbers or details of your case.'))}</p>
       <form id="repform"><div class="opts" style="margin:10px 0">${kinds.map(([k, t], i) => `<label class="opt"><input type="radio" name="k" value="${k}" ${i ? '' : 'checked'}><span class="dot" aria-hidden="true"></span><span>${esc(t)}</span></label>`).join('')}</div>
       <label class="f">${esc(X('What should we fix? (optional)'))}<textarea class="t" name="m" rows="3" maxlength="400"></textarea></label>
       <div class="row" style="margin-top:12px"><button class="btn go" type="submit">${esc(X('Send'))}</button><button class="btn text" type="button" data-close="1">${esc(X('Cancel'))}</button></div></form></div>`;
     document.body.appendChild(ov);
     const close = () => ov.remove();
     ov.addEventListener('click', (e) => { if (e.target === ov || e.target.dataset.close) close(); });
-    ov.querySelector('form').addEventListener('submit', (e) => { e.preventDefault(); const f = new FormData(e.target); TRACK.ev('report', { g: iss.id, x: String(f.get('k')), m: String(f.get('m') || '').slice(0, 400), v: KB.version }); TRACK.flush && TRACK.flush(); close(); toast(X('Thank you — sent to the Pehlo team.')); });
+    ov.querySelector('form').addEventListener('submit', (e) => { e.preventDefault(); const f = new FormData(e.target); TRACK.ev('report', { g: iss.id, x: String(f.get('k')), m: String(f.get('m') || '').slice(0, 400), v: KB.version }); TRACK.flush && TRACK.flush(); close(); toast(X('Thank you — sent to the Saboot team.')); });
     setTimeout(() => { const t = ov.querySelector('input'); if (t) t.focus(); }, 30);
   }
   function showLang() {
@@ -932,7 +932,7 @@ ${JSON.stringify(map)}`;
         const iss = issue(); const items = E.evidence(iss, S.answers); const g = (e) => G(iss, e.id + '.n', e.name);
         const steps = items.filter((x) => x.action); const papers = items.filter((x) => !x.action);
         const line = (e) => (S.status[e.id] === 'have' ? '✅ ' : '⬜ ') + g(e);
-        const txt = [`*${T('carry')}* — ${S.topic ? S.topic.title : G(iss, 's', iss.short)}`, steps.length ? '\n*' + T('dofirst') + '*\n' + steps.map(line).join('\n') : '', '\n*' + T('papers') + '*\n' + papers.map(line).join('\n'), '\n' + X('Made with Pehlo — free help to prepare for your advocate.') + ' ' + location.origin + '/'].filter(Boolean).join('\n');
+        const txt = [`*${T('carry')}* — ${S.topic ? S.topic.title : G(iss, 's', iss.short)}`, steps.length ? '\n*' + T('dofirst') + '*\n' + steps.map(line).join('\n') : '', '\n*' + T('papers') + '*\n' + papers.map(line).join('\n'), '\n' + X('Made with Saboot — free help to prepare for your advocate.') + ' ' + location.origin + '/'].filter(Boolean).join('\n');
         TRACK.once('share', { g: iss.id });
         window.open('https://wa.me/?text=' + encodeURIComponent(txt.slice(0, 3500)), '_blank', 'noopener');
         break;
@@ -963,7 +963,7 @@ ${JSON.stringify(map)}`;
      Off inside Claude, on file://, and when the browser asks not to be tracked. */
   const TRACK = (() => {
     const on = /^https:$/.test(location.protocol) && !/claude\.ai|anthropic|claudeusercontent|localhost$/.test(location.hostname) && navigator.doNotTrack !== '1' && window.doNotTrack !== '1';
-    const forced = /^http:$/.test(location.protocol) && /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && /pehlo_track=1/.test(document.cookie + location.search);
+    const forced = /^http:$/.test(location.protocol) && /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && /saboot_track=1/.test(document.cookie + location.search);
     if (!on && !forced) return { ev() {}, once() {}, flush() {} };
     let sid = ''; try { sid = sessionStorage.getItem('pa_s') || ''; if (!sid) { sid = Math.random().toString(36).slice(2, 12) + Date.now().toString(36).slice(-4); sessionStorage.setItem('pa_s', sid); } } catch (e) { sid = Math.random().toString(36).slice(2, 14); }
     const seen = new Set(); let q = []; let first = true; let timer = null;

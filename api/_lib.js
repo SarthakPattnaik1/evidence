@@ -1,4 +1,4 @@
-// Shared helpers for Pehlo's serverless functions (files starting with _ are not routes).
+// Shared helpers for Saboot's serverless functions (files starting with _ are not routes).
 // Analytics storage works with EITHER backend, whichever is connected in Vercel:
 //   • Supabase (Postgres): SUPABASE_URL (or NEXT_PUBLIC_SUPABASE_URL) + SUPABASE_SERVICE_ROLE_KEY (or SUPABASE_SECRET_KEY)
 //     → run supabase/schema.sql once in the Supabase SQL Editor.
@@ -100,7 +100,7 @@ function daysBack(n, offset = 0) { const out = []; const now = Date.now(); for (
 
 function ip(req) { return String(req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || '').split(',')[0].trim() || '0.0.0.0'; }
 function secret() {
-  const s = process.env.ADMIN_SECRET || ((process.env.ADMIN_PASSWORD || '') + '|pehlo-admin|' + (SB_KEY() || R_TOK() || ''));
+  const s = process.env.ADMIN_SECRET || ((process.env.ADMIN_PASSWORD || '') + '|saboot-admin|' + (SB_KEY() || R_TOK() || ''));
   return crypto.createHash('sha256').update(s).digest();
 }
 const hmac = (data) => crypto.createHmac('sha256', secret()).update(data).digest('base64url');

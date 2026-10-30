@@ -2,7 +2,7 @@
 // Set ADMIN_PASSWORD (and optionally ADMIN_USER, default "admin"; ADMIN_SECRET to sign sessions) in Vercel.
 const { backend, hasStore, store, daysBack, ip, hmac, cookies, body, send, crypto, sum } = require('./_lib.js');
 
-const COOKIE = 'pehlo_admin';
+const COOKIE = 'saboot_admin';
 const TTL = 12 * 3600;
 const eq = (a, b) => { const x = crypto.createHash('sha256').update(String(a)).digest(); const y = crypto.createHash('sha256').update(String(b)).digest(); return crypto.timingSafeEqual(x, y); };
 

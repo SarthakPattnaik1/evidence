@@ -33,7 +33,7 @@ jobs:
           node tools/pretranslate.js "${{ github.event.inputs.langs }}"
       - name: Commit translations
         run: |
-          git config user.name "pehlo-translate-bot"
+          git config user.name "saboot-translate-bot"
           git config user.email "actions@users.noreply.github.com"
           git add src/tr
           git diff --cached --quiet && echo "No changes" || (git commit -m "Update pre-translated text [skip translate]" && git push)

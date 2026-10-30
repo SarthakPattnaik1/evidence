@@ -1,4 +1,4 @@
--- Pehlo analytics schema for Supabase (Postgres).
+-- Saboot analytics schema for Supabase (Postgres).
 -- Run once: Supabase dashboard → SQL Editor → paste this file → Run. Safe to run again.
 -- Stores only anonymous daily counts. Row Level Security is on with no policies, so only the
 -- server (service role key, kept in Vercel) can read or write. The public anon key cannot.

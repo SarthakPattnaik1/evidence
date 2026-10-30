@@ -40,7 +40,7 @@ if (process.env.FAKE_TRANSLATE) {
   };
 }
 const handlers = {}; const load = (n) => handlers[n] || (handlers[n] = require(path.join(ROOT, 'api', n + '.js')));
-const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.json': 'application/json', '.webp': 'image/webp', '.png': 'image/png', '.xml': 'application/xml', '.txt': 'text/plain', '.webmanifest': 'application/manifest+json' };
+const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.json': 'application/json', '.webp': 'image/webp', '.png': 'image/png', '.xml': 'application/xml', '.txt': 'text/plain', '.webmanifest': 'application/manifest+json', '.svg': 'image/svg+xml' };
 http.createServer(async (req, res) => {
   const u = new URL(req.url, 'http://x');
   if (u.pathname === '/__gemcalls') { res.end(String(global.GEMCALLS || 0)); return; }

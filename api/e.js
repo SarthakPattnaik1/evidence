@@ -20,7 +20,7 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return send(res, 405, { error: 'POST only' });
   if (!hasStore()) return send(res, 202, { ok: false, reason: 'no store' });
   const ua = String(req.headers['user-agent'] || '');
-  if (!ua || BOT.test(ua)) { if (process.env.PEHLO_DEBUG) console.error('[e] bot', ua); return send(res, 202, { ok: false }); }
+  if (!ua || BOT.test(ua)) { if (process.env.SABOOT_DEBUG) console.error('[e] bot', ua); return send(res, 202, { ok: false }); }
   const b = await body(req);
   const ev = Array.isArray(b.e) ? b.e.slice(0, 60) : [];
   if (!ev.length) return send(res, 400, { error: 'no events' });

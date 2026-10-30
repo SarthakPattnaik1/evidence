@@ -447,7 +447,7 @@ html[data-script] .srow b{text-transform:none;letter-spacing:0}
 .cbody details p{font-size:14px;margin:6px 0 0;color:var(--ink2)}
 @media print{.crow{box-shadow:none;break-inside:avoid}.carryhead{background:#fff;color:#000;box-shadow:none;border:1px solid #000}.carryhead h1,.carryhead .fh,.carryhead .typed{color:#000}}
 
-/* v8: Pehlo brand */
+/* v8: Saboot brand */
 .brand span{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.03em;color:var(--ink)}
 .band{background:radial-gradient(900px 380px at 92% -20%,rgba(169,200,174,.28),transparent 60%),radial-gradient(600px 300px at -10% 120%,rgba(237,177,76,.14),transparent 60%),linear-gradient(180deg,#0E3A2C 0%,#0B2F23 100%)}
 .band .searchbox{box-shadow:0 18px 40px -12px rgba(0,0,0,.4)}
@@ -462,7 +462,7 @@ html[data-script] .srow b{text-transform:none;letter-spacing:0}
 .mini{background:var(--ink)}
 .deeper{background:var(--ink)}
 
-/* v9: Pehlo brand board, used as supplied */
+/* v9: Saboot brand board, used as supplied */
 :root{--paper:#FCFAF4;--ink:#01312E;--ink2:#3C524C;--manila:#EBAB47;--manila-l:#FBEFD9;--sage:#ABC5A8;--sage-l:#E9F0E6;--go:#04453B;--go-d:#01312E;--go-l:#E6EFE9;--line:#E9E3D6}
 header.top{background:rgba(252,250,244,.95)}
 .brand{padding:2px 0}
@@ -770,3 +770,14 @@ footer.foot .wrap{position:relative}
 }
 .plink{color:var(--go-d);font-weight:700;text-decoration:underline;text-decoration-color:var(--manila);text-underline-offset:2px}
 .plink:hover{color:var(--go)}
+
+/* v22: Saboot wordmark */
+.brand{display:flex;align-items:center;gap:9px}
+.bicon{width:36px;height:36px;border-radius:9px;display:block}
+.bword{font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:-.03em;color:var(--ink);line-height:1}
+.blogo{display:none}
+.fmark{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.fmark img{width:44px;height:44px;border-radius:11px}
+.fmark b{display:block;font-family:var(--display);font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--ink);line-height:1.05}
+.fmark span{display:block;font-size:13px;color:var(--ink2);letter-spacing:.01em}
+@media (max-width:420px){ .bicon{width:30px;height:30px} .bword{font-size:20px} }

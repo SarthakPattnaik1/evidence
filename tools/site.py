@@ -22,20 +22,16 @@ def page(title, desc, body, path, icon):
     return f"""<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(title)}</title><meta name="description" content="{e(desc)}"><link rel="canonical" href="{BASE}{path}">
 <meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:type" content="article">
-<meta name="theme-color" content="#04453B"><meta name="author" content="Sarthak Pattnaik, Subhankar Das"><link rel="icon" href="/icon.webp"><link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#04453B"><meta name="author" content="Sarthak Pattnaik, Subhankar Das"><link rel="icon" href="/icon.svg"><link rel="manifest" href="/manifest.webmanifest">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
-<style>{CSS}</style></head><body><header><a href="/"><img src="/icon.webp" alt="" width="34" height="34"></a><a href="/" style="font-weight:800;text-decoration:none;font-size:20px">Pehlo</a></header>
-<main>{body}</main><footer>Pehlo is a free preparation tool, not a law firm, and does not give legal advice. Made by <a href="https://www.linkedin.com/in/sarthakad" rel="noopener">Sarthak Pattnaik</a> and <a href="https://www.linkedin.com/in/subhankar-das-311030b1/" rel="noopener">Subhankar Das</a>. Pehlo does not take cases, referrals or fees. Emergency: 112 · Free legal aid: 15100 · Cyber fraud: 1930.<br><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="/">Open Pehlo</a></footer></body></html>"""
+<style>{CSS}</style></head><body><header><a href="/"><img src="/icon.svg" alt="" width="34" height="34"></a><a href="/" style="font-weight:800;text-decoration:none;font-size:20px">Saboot</a></header>
+<main>{body}</main><footer>Saboot is a free preparation tool, not a law firm, and does not give legal advice. Made by <a href="https://www.linkedin.com/in/sarthakad" rel="noopener">Sarthak Pattnaik</a> and <a href="https://www.linkedin.com/in/subhankar-das-311030b1/" rel="noopener">Subhankar Das</a>. Saboot does not take cases, referrals or fees. Emergency: 112 · Free legal aid: 15100 · Cyber fraud: 1930.<br><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="/">Open Saboot</a></footer></body></html>"""
 
 
 def run():
     OUT.mkdir(exist_ok=True)
     data = json.loads(subprocess.check_output(['node', str(ROOT / 'tools' / 'dump.js')]))
-    brand = (ROOT / 'src' / 'brand.js').read_text()
-    m = re.search(r'"icon":\s*"data:image/webp;base64,([^"]+)"', brand)
-    icon = base64.b64decode(m.group(1)) if m else b''
-    if icon:
-        (OUT / 'icon.webp').write_bytes(icon)
+    icon = True
     import shutil
     for f in (ROOT / 'src' / 'static').glob('*'):
         shutil.copy(f, OUT / f.name)
@@ -56,19 +52,19 @@ def run():
 <a class="cta" href="/#start-{e(i['id'])}">Answer a few questions and get your list →</a>
 <h2>What the law says</h2><div class="box"><p>{e(i['juris'])}</p><p class="muted"><span class="tag">Law checked {e(i.get('checked',''))}</span> {('Reviewed by ' + e(i['review']['by']) + (' (' + e(i['review'].get('enrol','')) + ')' if i['review'].get('enrol') else '') + ' on ' + e(i['review']['date'])) if i.get('review') else 'Draft — not yet reviewed by a named advocate.'}</p></div>
 <h2>Papers that usually help</h2><ul>{ev}</ul>
-<h2>Questions Pehlo will ask you</h2><ul>{qs}</ul>
+<h2>Questions Saboot will ask you</h2><ul>{qs}</ul>
 <h2>Official sources</h2><ul>{srcs}</ul>
 <a class="cta" href="/#start-{e(i['id'])}">Start — it's free, no sign-up</a>
 <p class="muted">Also searched as: {e(', '.join(i.get('synonyms', [])[:12]))}</p>"""
         desc = (i['short'] + ' — ' + i['intro'])[:155]
-        (gdir / f"{i['id']}.html").write_text(page(f"{i['title']} — papers to take to your advocate | Pehlo", desc, body, f"/guide/{i['id']}", icon))
+        (gdir / f"{i['id']}.html").write_text(page(f"{i['title']} — papers to take to your advocate | Saboot", desc, body, f"/guide/{i['id']}", icon))
         urls.append((f"/guide/{i['id']}", '0.8'))
         index_rows.append(f'<li><a href="/guide/{e(i["id"])}">{e(i["title"])}</a> <span class="muted">— {e(i["short"])}</span></li>')
-    (gdir / 'index.html').write_text(page('All guides | Pehlo', 'Every legal situation Pehlo helps you prepare for, in plain language.', '<h1>All guides</h1><ul>' + ''.join(index_rows) + '</ul>', '/guide', icon))
+    (gdir / 'index.html').write_text(page('All guides | Saboot', 'Every legal situation Saboot helps you prepare for, in plain language.', '<h1>All guides</h1><ul>' + ''.join(index_rows) + '</ul>', '/guide', icon))
     urls.append(('/guide', '0.9'))
 
-    (OUT / 'privacy.html').write_text(page('Privacy | Pehlo', 'How Pehlo handles your answers.', """<h1>Privacy</h1>
-<p>Your answers stay on your own device. Pehlo has no accounts and does not send your answers to a server.</p>
+    (OUT / 'privacy.html').write_text(page('Privacy | Saboot', 'How Saboot handles your answers.', """<h1>Privacy</h1>
+<p>Your answers stay on your own device. Saboot has no accounts and does not send your answers to a server.</p>
 <ul><li>If you tick "save on this device", your answers are kept in your browser's local storage. "Delete all" removes them.</li>
 <li>If you choose a language other than English, the app's own text (not your answers) may be sent to a translation service so it can be shown in your language. Translations are stored on your device.</li>
 <li>To improve the guides, the app counts anonymous events such as "a list was made for the cheque-bounce guide", which language was used, and which helpline number was tapped. It never sends your answers, notes, names, dates or documents. It uses no cookies and stores no IP address; unique visitors are counted with a code that changes every day, so no one can be followed over time.</li>
@@ -77,11 +73,11 @@ def run():
 <li>We do not sell data or track you across other sites.</li>
 <li>Documents you print or save are created in your browser.</li></ul>
 <p class="muted">Contact: through the GitHub project page.</p>""", '/privacy', icon))
-    (OUT / 'terms.html').write_text(page('Terms | Pehlo', 'Terms of use for Pehlo.', """<h1>Terms of use</h1>
-<p>Pehlo is a free tool that helps you organise facts and papers before meeting an advocate. It is not a law firm and does not give legal advice. Using it does not create an advocate–client relationship.</p>
-<p>Pehlo is made by Sarthak Pattnaik and Subhankar Das. It does not recommend, refer to or advertise any advocate, including its makers, and no cases, referrals or fees are taken through it.</p>
+    (OUT / 'terms.html').write_text(page('Terms | Saboot', 'Terms of use for Saboot.', """<h1>Terms of use</h1>
+<p>Saboot is a free tool that helps you organise facts and papers before meeting an advocate. It is not a law firm and does not give legal advice. Using it does not create an advocate–client relationship.</p>
+<p>Saboot is made by Sarthak Pattnaik and Subhankar Das. It does not recommend, refer to or advertise any advocate, including its makers, and no cases, referrals or fees are taken through it.</p>
 <ul><li>The content is a draft prepared from official sources and has not yet been reviewed by a named advocate. Laws, deadlines and fees change; check with an advocate before acting.</li>
-<li>Pehlo does not recommend or rank advocates. Any directory is for convenience only.</li>
+<li>Saboot does not recommend or rank advocates. Any directory is for convenience only.</li>
 <li>In an emergency call 112. For free legal aid call 15100 (NALSA). For cyber fraud call 1930.</li></ul>""", '/terms', icon))
     urls += [('/privacy', '0.3'), ('/terms', '0.3')]
 
@@ -92,11 +88,11 @@ def run():
     (OUT / 'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + ''.join(f'<url><loc>{BASE}{u}</loc><lastmod>{lastmod}</lastmod><priority>{p}</priority></url>' for u, p in urls) + '</urlset>\n')
     (OUT / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nDisallow: /admin\nSitemap: {BASE}/sitemap.xml\n')
     (OUT / 'manifest.webmanifest').write_text(json.dumps({
-        'name': 'Pehlo — papers for your advocate', 'short_name': 'Pehlo', 'start_url': '/', 'display': 'standalone',
+        'name': 'Saboot — papers for your advocate', 'short_name': 'Saboot', 'start_url': '/', 'display': 'standalone',
         'background_color': '#FCFAF4', 'theme_color': '#04453B', 'lang': 'en',
-        'icons': [{'src': '/icon-192.png', 'sizes': '192x192', 'type': 'image/png'}, {'src': '/icon-512.png', 'sizes': '512x512', 'type': 'image/png'}]}, ensure_ascii=False))
+        'icons': [{'src': '/icon.svg', 'sizes': 'any', 'type': 'image/svg+xml'}, {'src': '/icon-192.png', 'sizes': '192x192', 'type': 'image/png'}, {'src': '/icon-512.png', 'sizes': '512x512', 'type': 'image/png'}]}, ensure_ascii=False))
     # Network-first so law updates reach people immediately; cache only as an offline fallback.
-    (OUT / 'sw.js').write_text("""const C='pehlo-v1';
+    (OUT / 'sw.js').write_text("""const C='saboot-v1';
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(['/'])))});
 self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));
 self.addEventListener('fetch',e=>{const r=e.request;if(r.method!=='GET'||new URL(r.url).origin!==location.origin||r.url.includes('/api/'))return;

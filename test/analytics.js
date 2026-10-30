@@ -4,7 +4,7 @@ const B = 'http://localhost:8790';
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 async function visitor(b, { geo, mobile, lang, guide, answers, search, call, deep, fb, miss, pick }) {
   const ctx = await b.newContext({ viewport: mobile ? { width: 390, height: 844 } : { width: 1366, height: 860 }, userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/130 Safari/537.36', extraHTTPHeaders: { 'x-test-geo': geo } });
-  await ctx.addCookies([{ name: 'pehlo_track', value: '1', url: B }]);
+  await ctx.addCookies([{ name: 'saboot_track', value: '1', url: B }]);
   const p = await ctx.newPage(); const errs = []; p.on('pageerror', (e) => errs.push(e.message));
   await p.goto(B + '/#home'); await p.evaluate((l) => { localStorage.clear(); if (l) localStorage.setItem('er_lang', JSON.stringify(l)); }, lang); await p.reload(); await wait(700);
   if (miss) { await p.fill('#matter', miss); await wait(1800); }
