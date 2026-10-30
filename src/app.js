@@ -109,12 +109,12 @@
   }
 
   /* ============ HOME ============ */
-  const SUGGEST = ['My cheque bounced', 'UPI fraud', 'Bank froze my account', 'Landlord kept my deposit', 'Divorce', 'Insurance claim rejected', 'Builder delayed my flat', 'Salary not paid', 'FIR not registered', 'Recovery agent harassment'];
+  const SUGGEST = ['My cheque bounced', 'UPI fraud', 'Divorce', 'NRI property', 'Client not paying', 'Landlord kept my deposit'];
   function clubRows(cid) {
     const deep = BUILT.filter((i) => i.cat === cid);
     const gen = KB.directory.map((d, idx) => ({ ...d, idx })).filter((d) => d.cat === cid);
-    return deep.map((i) => `<button class="issue" data-go="start-${i.id}"><b>${esc(i.short)}</b><span>${esc(i.title)}</span><em>Guided, up to ${i.evidence.length} records</em></button>`).join('')
-      + gen.map((d) => `<button class="issue gen" data-go="topic-${d.idx}"><b>${esc(d.title)}</b><span>General preparation for now</span><em>general</em></button>`).join('');
+    return deep.map((i) => `<button class="issue" data-play="${i.id}"><b>${esc(i.short)}</b><span>${esc(i.title)}</span><em>Guided, up to ${i.evidence.length} records</em></button>`).join('')
+      + gen.map((d) => `<button class="issue gen" data-play="general" data-topic="${d.idx}"><b>${esc(d.title)}</b><span>General preparation for now</span><em>general</em></button>`).join('');
   }
   function viewHome() {
     const saved = !S.issueId && loadSaved();
@@ -143,7 +143,7 @@
         <p class="muted" style="margin:0">${BUILT.length} guided problems, chosen from the disputes that most often reach Indian courts, consumer helplines and the RBI Ombudsman.</p>
         <div class="tabs" role="tablist" aria-label="Problem areas">${KB.categories.map((c) => `<button class="tab" role="tab" id="tab-${c.id}" aria-controls="drawer" aria-selected="${UI.club === c.id}" data-club="${c.id}">${ic(c.icon, 17)} ${esc(c.title)}</button>`).join('')}</div>
         <div class="drawer" id="drawer" role="tabpanel" aria-labelledby="tab-${UI.club}">${clubRows(UI.club)}
-          <button class="issue gen" data-go="start-general"><b>Something else, or not sure</b><span>Answer a few general questions</span><em>general</em></button></div>
+          <button class="issue gen" data-play="general"><b>Something else, or not sure</b><span>Answer a few general questions</span><em>general</em></button></div>
       </section>
       <section class="split">
         <div>
@@ -158,8 +158,7 @@
           <button class="btn go" data-go="myths">Play</button>
         </div>
       </section>
-      <h2>How it works</h2>
-      <ol class="how"><li><b>Pick what happened</b><span>No legal words needed.</span></li><li><b>Answer in chapters</b><span>One tap per question. Skip anything.</span></li><li><b>Build your file</b><span>Records appear as you answer.</span></li><li><b>Take it to your advocate</b><span>Print or save a tidy preparation pack.</span></li></ol>
+
     </div>`);
   }
   function searchAll(q) {
@@ -169,8 +168,8 @@
     const ql = q.toLowerCase();
     const score = (t, syn) => { const hay = (t + ' | ' + syn.join(' | ')).toLowerCase(); let s = 0; words.forEach((w) => { if (hay.includes(w)) s += 2; else if (w.length > 4 && hay.includes(w.slice(0, -1))) s += 1; }); syn.forEach((x) => { if (ql.includes(x)) s += 4; }); return s; };
     const res = [];
-    BUILT.forEach((i) => { const s = score(i.title + ' ' + i.short, i.synonyms); if (s) res.push({ s: s + 1, go: 'start-' + i.id, title: i.short, kind: 'Guided' }); });
-    KB.directory.forEach((d, idx) => { const s = score(d.title, d.synonyms); if (s) res.push({ s, go: 'topic-' + idx, title: d.title, kind: 'General' }); });
+    BUILT.forEach((i) => { const s = score(i.title + ' ' + i.short, i.synonyms); if (s) res.push({ s: s + 1, play: i.id, title: i.short, kind: 'Guided' }); });
+    KB.directory.forEach((d, idx) => { const s = score(d.title, d.synonyms); if (s) res.push({ s, play: 'general', topic: idx, title: d.title, kind: 'General' }); });
     KB.questions.forEach((x) => { const s = score(x.q, x.kw); if (s > 2) res.push({ s: s - 1, go: 'q-' + x.id, title: x.q, kind: 'Answer' }); });
     return res.sort((a, b) => b.s - a.s).slice(0, 6);
   }
@@ -179,8 +178,8 @@
     document.getElementById('suggest').hidden = !!q.trim();
     if (!q.trim()) { box.innerHTML = ''; return; }
     const r = searchAll(q);
-    box.innerHTML = r.length ? r.map((x) => `<button class="res" data-go="${x.go}"><span>${esc(x.title)}</span><small>${x.kind}</small></button>`).join('')
-      : `<button class="res" data-go="start-general"><span>Not sure what this is? Use general preparation</span><small>General</small></button>`;
+    box.innerHTML = r.length ? r.map((x) => `<button class="res" ${x.play ? `data-play="${x.play}" ${x.topic != null ? `data-topic="${x.topic}"` : ''}` : `data-go="${x.go}"`}><span>${esc(x.title)}</span><small>${x.kind}</small></button>`).join('')
+      : `<button class="res" data-play="general"><span>Not sure what this is? Use general preparation</span><small>General</small></button>`;
   }
 
   /* ============ INTRO ============ */
@@ -229,6 +228,7 @@
     const urg = E.urgent(iss, S.answers).filter((u) => u.level !== 'info');
     return shell(`<div class="wrap narrow qwrap">
       <nav class="chapters" aria-label="Chapters">${chaptersFor(S.stage, q).map((c) => `<span class="chap ${c.now ? 'now' : c.done ? 'done' : ''}" ${c.now ? 'aria-current="step"' : ''}>${c.done && !c.now ? ic('check', 14) : ''}${esc(c.n)}</span>`).join('')}</nav>
+      ${S.stage === 'quick' && pr.done === 0 ? `<div class="opener"><span class="typed">In the matter of:</span> <b>${esc(S.topic ? S.topic.title : iss.short)}</b><p>${esc(iss.intro)}</p>${S.topic && S.topic.urgentNote ? `<p class="warn">${esc(S.topic.urgentNote)}</p>` : ''}${S.adv && S.adv.issueId === iss.id ? advBanner(S.adv) : ''}</div>` : ''}
       ${urg.map(urgentBanner).join('')}
       <div class="qmeta"><span>${S.stage === 'quick' ? 'Quick round' : 'Going deeper'}</span><span>${pr.done + 1} of about ${pr.total}</span></div>
       <form id="qform" data-q="${q.id}">
@@ -241,7 +241,7 @@
         <div class="qfoot"><div class="row"><button type="button" class="btn line" data-act="qback" ${S.history.length ? '' : 'disabled'}>${ic('back', 18)} Back</button><button type="button" class="btn text" data-act="skip">Skip</button></div>
           <button type="submit" class="btn go" id="nextbtn" ${multi ? '' : 'hidden'}>Continue</button></div>
       </form>
-      <p class="small muted" style="margin-top:14px">Tip: press ${KEYS.slice(0, q.options.length).split('').join(', ')} to answer.</p>
+      <p class="small muted keytip" style="margin-top:14px">Tip: press ${KEYS.slice(0, q.options.length).split('').join(', ')} to answer.</p>
     </div>`, { tray: true, inJourney: true });
   }
   function urgentBanner(u) {
@@ -268,7 +268,7 @@
     if (!nq) { S._fly = null; finishStage(); go('brk'); return; }
     if (q && chapOf(nq) !== chapOf(q)) {
       const chapQs = issue().questions.filter((x) => chapOf(x) === chapOf(q) && (S.answers[x.id] != null || S.skipped[x.id]));
-      if ((S.chapterFound || []).length || chapQs.length >= 2) { S._fly = null; S.breakChapter = chapOf(q); go('brk'); return; }
+      if ((S.chapterFound || []).length) { S._fly = null; S.breakChapter = chapOf(q); go('brk'); return; }
     }
     render();
   }
@@ -467,7 +467,7 @@
       <div id="qalist">${list.map((q) => `<details class="qa" id="qa-${q.id}" ${q.id === openId ? 'open' : ''}><summary>${esc(q.q)}</summary><div class="body">
         <p>${esc(q.a)}</p><p class="small" style="margin:0"><b>What can change the answer</b></p><ul>${q.depends.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
         <p class="law">Law: ${esc(q.law)}. ${esc(KB.reviewed.label)}.</p>
-        ${q.journey && BY_ID[q.journey] ? `<button class="btn line" data-go="start-${q.journey}">Prepare for a lawyer: ${esc(BY_ID[q.journey].short)}</button>` : ''}
+        ${q.journey && BY_ID[q.journey] ? `<button class="btn line" data-play="${q.journey}">Prepare for a lawyer: ${esc(BY_ID[q.journey].short)}</button>` : ''}
       </div></details>`).join('') || '<p class="panel muted">No match. Try other words, or <button class="btn text" data-go="start-general">use general preparation</button>.</p>'}</div>
     </div>`);
   }
@@ -622,9 +622,11 @@
     const a = document.getElementById(anchor); if (a) { const b = a.querySelector(sel) || a.querySelector('[aria-pressed=true]'); if (b) b.focus({ preventScroll: true }); }
   }
   document.addEventListener('click', async (e) => {
+    const pl = e.target.closest('[data-play]');
+    if (pl) { e.preventDefault(); startIssue(pl.dataset.play, pl.dataset.topic != null ? KB.directory[Number(pl.dataset.topic)] : null); go('quiz'); return; }
     const t = e.target.closest('[data-go],[data-act],[data-status],[data-delrec],[data-delchrono],[data-ex],[data-copy],[data-club],[data-qcat],[data-mf]'); if (!t) return;
     if (t.dataset.go) { e.preventDefault(); go(t.dataset.go); return; }
-    if (t.dataset.club) { UI.club = t.dataset.club; document.querySelectorAll('.tab').forEach((x) => x.setAttribute('aria-selected', x === t)); const d = document.getElementById('drawer'); d.setAttribute('aria-labelledby', t.id); d.innerHTML = clubRows(UI.club) + '<button class="issue gen" data-go="start-general"><b>Something else, or not sure</b><span>Answer a few general questions</span><em>general</em></button>'; return; }
+    if (t.dataset.club) { UI.club = t.dataset.club; document.querySelectorAll('.tab').forEach((x) => x.setAttribute('aria-selected', x === t)); const d = document.getElementById('drawer'); d.setAttribute('aria-labelledby', t.id); d.innerHTML = clubRows(UI.club) + '<button class="issue gen" data-play="general"><b>Something else, or not sure</b><span>Answer a few general questions</span><em>general</em></button>'; return; }
     if (t.dataset.qcat) { UI.qcat = t.dataset.qcat; render(); return; }
     if (t.dataset.ex) { const m = document.getElementById('matter'); m.value = t.dataset.ex; renderResults(m.value); m.focus(); return; }
     if (t.dataset.copy) { try { await navigator.clipboard.writeText(t.dataset.copy); toast('Copied'); } catch (err) { toast('Copy blocked — select and copy manually'); } return; }

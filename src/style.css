@@ -281,3 +281,12 @@ body.calm .opt:active{transform:none}
   .report{border:0;box-shadow:none;padding:0}
   .report tr,.report li{break-inside:avoid}
 }
+
+.opener{background:var(--manila);border-radius:6px 14px 14px 14px;padding:14px 18px 14px 18px;margin:0 0 20px;border-left:6px solid var(--tape)}
+.opener .typed{font-family:var(--typed);font-size:14px;color:#5A4A22}
+.opener b{font-family:var(--display);font-size:18px}
+.opener p{margin:6px 0 0;font-size:15px;color:#4A3C17}
+.opener .warn{font-weight:700;color:var(--tape)}
+.opener .banner{margin:10px 0 0}
+@media (hover:none){.keytip{display:none}}
+@media (max-width:860px){.hero>div:first-child .row{display:none}.hero .lead{font-size:16.5px}}

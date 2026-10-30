@@ -1,5 +1,5 @@
 /* Automated checks: KB invariants + branch behaviour. Run: node test/test.js */
-['kb','j-money','j-family','j-consumer','j-other','qa','engine'].forEach((f) => require('../src/' + f + '.js'));
+['kb','j-money','j-family','j-consumer','j-other','j-nri','j-business','qa','engine'].forEach((f) => require('../src/' + f + '.js'));
 const KB = globalThis.ER_KB, E = globalThis.ER_ENGINE;
 let fails = 0, passes = 0;
 const ok = (c, m) => { if (c) passes++; else { fails++; console.log('FAIL:', m); } };
@@ -79,7 +79,7 @@ ok(E.info(byId('failed-payment-debited'), { fp_mode: 'upi_p2p' })[0].text.includ
 
 // QA journeys exist
 KB.questions.forEach((q) => ok(!q.journey || KB.issues.some((i) => i.id === q.journey), 'qa journey missing ' + q.id));
-ok(KB.issues.filter((i) => !i.general).length >= 28, 'expected >=28 journeys, got ' + KB.issues.length);
+ok(KB.issues.filter((i) => !i.general).length >= 40, 'expected >=40 journeys, got ' + KB.issues.length);
 // Directory titles unique
 const titles = KB.directory.map((d) => d.title.toLowerCase());
 ok(new Set(titles).size === titles.length, 'directory titles unique');

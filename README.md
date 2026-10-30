@@ -8,14 +8,16 @@ A free, open-source preparation tool for people in India facing a legal problem.
 
 ## What's in it
 
-- **29 guided problems** with branching questions, chosen from what most often reaches Indian courts (cheque bounce, matrimonial, motor accident, rent, property), the National Consumer Helpline (e-commerce, durables, banking, telecom, travel) and the RBI Ombudsman (loans and credit cards lead).
+- **41 guided problems** with branching questions, chosen from what most often reaches Indian courts (cheque bounce, matrimonial, motor accident, rent, property), the National Consumer Helpline (e-commerce, durables, banking, telecom, travel) and the RBI Ombudsman (loans and credit cards lead).
   - Money & banking: cheque bounce (both sides), loan/EMI recovery and SARFAESI, credit cards, CIBIL errors, UPI/online fraud, frozen accounts, failed payments
   - Family: divorce, maintenance, domestic violence, child custody, dowry/498A (both sides), inheritance and partition
   - Shopping & services: refunds, defective products, insurance claims, builder delays
+  - NRI: property abroad, sale & repatriation, power of attorney from abroad, NRI marriage disputes (both sides), running a case from abroad, NRI bank/tax issues
+  - Business & company: unpaid invoices (MSME council, commercial suit, insolvency), shareholder/director disputes, partnership/LLP, commercial contracts, brand copying and trade secrets
   - Home & land, police & notices, work, accidents, online harassment, money lent
 - **General preparation route** for other problems (clearly labelled)
-- **Legal questions hub** — 41 answer-first explainers with "what can change the answer" and the governing law
-- **Myth or fact** — 18-card rights quiz
+- **Legal questions hub** — 52 answer-first explainers with "what can change the answer" and the governing law
+- **Myth or fact** — 22-card rights quiz
 - **Advocate links** — advocates can send clients a guide with flagged records and a note (no client data in the link)
 - **Urgent routing** — help-first screens for danger, fresh fraud, cheque deadlines, custody/arrest
 - **Privacy** — no login, no uploads, no server; answers stay in the browser tab unless the user opts in to local saving
@@ -28,6 +30,8 @@ src/
   j-money.js     cheque bounce, loan recovery, credit card, credit report
   j-family.js    domestic violence, custody, dowry/498A, inheritance
   j-consumer.js  defective product, insurance claim, builder delay
+  j-nri.js       NRI guides
+  j-business.js  business and company guides
   j-other.js     eviction, encroachment, termination, POSH, FIR, arrest, legal notice, road accident, online harassment
   qa.js          legal questions and myth/fact cards
   engine.js      deterministic interview engine (pure functions)

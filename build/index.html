@@ -291,6 +291,15 @@ body.calm .opt:active{transform:none}
   .report{border:0;box-shadow:none;padding:0}
   .report tr,.report li{break-inside:avoid}
 }
+
+.opener{background:var(--manila);border-radius:6px 14px 14px 14px;padding:14px 18px 14px 18px;margin:0 0 20px;border-left:6px solid var(--tape)}
+.opener .typed{font-family:var(--typed);font-size:14px;color:#5A4A22}
+.opener b{font-family:var(--display);font-size:18px}
+.opener p{margin:6px 0 0;font-size:15px;color:#4A3C17}
+.opener .warn{font-weight:700;color:var(--tape)}
+.opener .banner{margin:10px 0 0}
+@media (hover:none){.keytip{display:none}}
+@media (max-width:860px){.hero>div:first-child .row{display:none}.hero .lead{font-size:16.5px}}
 </style>
 </head>
 <body>
@@ -1961,6 +1970,406 @@ body.calm .opt:active{transform:none}
   });
 })(globalThis);
 </script>
+<script>/* NRI journeys (draft, not advocate-reviewed). */
+(function (root) {
+  const { W, ALL, ANY, NOT, ANS, o, NS, PN, LAWFUL } = root.ER_H;
+  const KB = root.ER_KB; const I = KB.issues;
+  KB.categories.splice(2, 0, { id: 'nri', title: 'NRI', blurb: 'Property, PoA, marriage, cases and money from abroad', icon: 'globe' });
+  Object.assign(KB.help, {
+    madad: { label: 'MADAD', name: 'MEA consular grievance portal', detail: 'For NRIs abroad: consular help, including in matrimonial and legal matters.', href: 'https://madad.gov.in' },
+    ncwnri: { label: 'NCW', name: 'National Commission for Women — NRI cell', detail: 'Complaints by women deserted or harassed by NRI spouses.', href: 'https://ncw.nic.in' },
+    passport: { label: 'Passport', name: 'Passport Seva / Regional Passport Office', detail: 'Applications relating to passports, including impounding requests.', href: 'https://www.passportindia.gov.in' }
+  });
+  const ABROAD = 'Documents signed abroad for use in India are usually executed before an Indian embassy/consulate, or before a local notary and then apostilled (for Hague Apostille countries).';
+
+  /* ---------------- NRI property ---------------- */
+  I.push({
+    id: 'nri-property', cat: 'nri', title: 'My property in India is occupied, misused or claimed while I live abroad', short: 'NRI property problems',
+    synonyms: ['nri property', 'nri property dispute', 'tenant not vacating nri', 'relative occupied my house', 'property grabbed nri', 'nri land encroachment', 'caretaker', 'nri rent', 'property abroad india', 'oci property'],
+    intro: 'Most NRI property disputes are lost on missing papers and delay, not on the law. We\'ll build the file you\'d need to act from abroad.',
+    juris: 'NRIs and OCIs can own and inherit residential and commercial property in India. They generally cannot buy agricultural land, plantations or farmhouses, but can inherit them. You can act through an advocate and a power-of-attorney holder without living in India.',
+    tips: ['You can file and pursue most civil cases through a power-of-attorney holder and an advocate; personal evidence may be recorded by video conference with court permission.', 'Keep paying property tax and utility bills in your own name — they help prove possession and ownership.', 'Mutation in revenue records does not by itself decide ownership, but check it regularly so changes don\'t go unnoticed.'],
+    questions: [
+      { id: 'np_problem', text: 'What is happening with the property?', type: 'multi', chapter: 'The problem', why: 'Each problem has a different remedy and different records.',
+        options: o([['tenant', 'Tenant won\'t pay or won\'t leave'], ['relative', 'A relative is occupying or claiming it'], ['stranger', 'Someone encroached or built on it'], ['caretaker', 'Caretaker or agent misused it'], ['sold', 'Someone sold or mortgaged it with fake papers'], ['records', 'Records changed into someone else\'s name']]) },
+      { id: 'np_how', text: 'How did you get the property?', chapter: 'Your title', why: 'Your title documents depend on this.', options: o([['bought', 'Bought it'], ['inherited', 'Inherited it'], ['gift', 'Gift or family settlement'], ['builder', 'Builder allotment']]) },
+      { id: 'np_kind', text: 'What kind of property is it?', chapter: 'Your title', why: 'Agricultural land has extra rules for NRIs; flats and plots have different records.', options: o([['flat', 'Flat / apartment'], ['house', 'House'], ['plot', 'Plot'], ['agri', 'Agricultural land'], ['commercial', 'Shop / office']]) },
+      { id: 'np_status', text: 'What is your status abroad?', chapter: 'Your title', why: 'NRI (Indian passport) and OCI (foreign passport) have slightly different rules and documents.', options: o([['nri', 'NRI — Indian passport'], ['oci', 'OCI — foreign passport'], ['foreign', 'Foreign citizen without OCI'], NS]) },
+      { id: 'np_poa', text: 'Is someone in India acting for you under a power of attorney?', chapter: 'In India', why: 'A PoA holder can act for you — or can be the source of the problem.', options: o([['yes_good', 'Yes, someone I trust'], ['yes_problem', 'Yes, and they misused it'], ['no', 'No']]) },
+      { id: 'np_tenancy', text: 'Is there a written rent agreement?', chapter: 'In India', when: W('np_problem', 'tenant'), why: 'Rent terms and notice periods usually come from it.', options: o([['registered', 'Registered'], ['unregistered', 'Unregistered'], ['none', 'None']]) },
+      { id: 'np_since', text: 'Since when has this been going on?', chapter: 'Timing', why: 'Long, open occupation by others can create claims. Delay hurts.', options: o([['recent', 'Within a year'], ['years', '1–10 years'], ['long', 'More than 10 years']]) },
+      { id: 'np_visit', text: 'Can you travel to India if needed?', deep: true, chapter: 'Logistics', why: 'Some steps (like registration) may need you in person or a properly authenticated PoA.', options: o([['yes', 'Yes'], ['maybe', 'Maybe, with notice'], ['no', 'Not for now']]) },
+      { id: 'np_police', text: 'Have you complained to police or revenue officials?', deep: true, chapter: 'Steps so far', type: 'multi', why: 'Prompt complaints show you objected.', options: o([['police', 'Police'], ['revenue', 'Revenue / tehsil office'], ['madad', 'Indian embassy / MADAD'], ['none', 'Not yet']]) }
+    ],
+    evidence: [
+      { id: 'np_e_deed', name: 'Title deed (sale deed, gift deed, allotment) — certified copy', fact: 'Your ownership', why: 'The foundation of any case.', where: 'Your records; certified copy from the sub-registrar (many states allow online request).', preserve: 'Keep originals in a safe place; share scans with your advocate.' },
+      { id: 'np_e_inherit', name: 'Death certificate, legal heir/succession papers, will (if any)', fact: 'How the property came to you', why: 'Inherited property needs the chain of succession.', where: 'Family records, municipality, court.', preserve: '', when: W('np_how', 'inherited') },
+      { id: 'np_e_records', name: 'Land/property records: mutation, khata/khatian, 7/12, property card', fact: 'Who is recorded as owner', why: 'Shows any changes made behind your back.', where: 'State land records portal; municipal property tax portal.', preserve: 'Download and date screenshots now.' },
+      { id: 'np_e_ec', name: 'Encumbrance certificate (last 15–30 years)', fact: 'Any sale or mortgage registered', why: 'Detects fake sales or loans.', where: 'Sub-registrar / state portal.', preserve: '', when: W('np_problem', 'sold', 'records', 'caretaker') },
+      { id: 'np_e_tax', name: 'Property tax receipts and electricity/water bills in your name', fact: 'Continuous ownership and possession', why: 'Strong supporting proof.', where: 'Municipality and utility portals.', preserve: '' },
+      { id: 'np_e_passport', name: 'Your passport, OCI card and visa/residence proof abroad', fact: 'Your identity and status', why: 'Needed for PoA, cases and registration.', where: 'Your documents.', preserve: 'Keep certified copies ready.' },
+      { id: 'np_e_pan', name: 'PAN and Indian bank (NRO) account details', fact: 'Tax and payment identity', why: 'Needed for rent, sale and court fees.', where: 'Your records.', preserve: '' },
+      { id: 'np_e_poa', name: 'The power of attorney (and proof of any revocation)', fact: 'What your representative may do', why: 'Misused or overbroad PoAs are a common cause of loss.', where: 'Your records; sub-registrar if registered.', preserve: '', when: W('np_poa', 'yes_good', 'yes_problem') },
+      { id: 'np_e_revoke', name: 'Revoke the misused PoA in writing, notify the sub-registrar and third parties', fact: 'Authority was withdrawn', why: 'Stops further misuse.', where: 'Indian consulate or notary + apostille; send to the holder, sub-registrar and banks.', preserve: '', action: true, when: W('np_poa', 'yes_problem') },
+      { id: 'np_e_tenancy', name: 'Rent agreement, rent received, and the tenant\'s police verification', fact: 'Tenancy terms and default', why: 'Basis for eviction or recovery.', where: 'Your records; bank statements.', preserve: '', when: W('np_problem', 'tenant') },
+      { id: 'np_e_photos', name: 'Recent dated photos/video of the property (ask a trusted person)', fact: 'Current state and occupation', why: 'Shows encroachment or unauthorised use.', where: 'Trusted friend, neighbour or local advocate.', preserve: '' },
+      { id: 'np_e_comms', name: 'Messages and emails with the occupant, relative or caretaker', fact: 'What they claim and promised', why: 'Admissions and promises matter.', where: 'Your phone and email.', preserve: 'Export complete chats.' },
+      { id: 'np_e_complaints', name: 'Copies of police, revenue or MADAD complaints and replies', fact: 'You objected promptly', why: 'Shows you acted in time.', where: 'Email, portals.', preserve: '', when: W('np_police', 'police', 'revenue', 'madad') },
+      { id: 'np_e_newpoa', name: 'A fresh, specific PoA for your trusted representative/advocate', fact: 'Someone can act for you in India', why: 'Lets cases and complaints proceed while you\'re abroad.', where: ABROAD, preserve: 'Make it specific to this property and dispute; avoid broad "sell anything" powers.', action: true, when: W('np_poa', 'no', 'yes_problem') }
+    ],
+    urgent: [
+      { id: 'np_u_sale', level: 'now', when: W('np_problem', 'sold', 'stranger'), title: 'Move quickly to stop a sale or construction', text: 'Courts can grant urgent injunctions, and a public notice/caution with the sub-registrar can warn buyers. Speak to an advocate in India this week.', help: ['l15100', 'madad'] },
+      { id: 'np_u_long', level: 'soon', when: W('np_since', 'long'), title: 'Long occupation can create claims', text: 'Occupation for many years may let the occupant raise adverse-possession claims. Don\'t delay further.', help: ['l15100'] }
+    ],
+    lawyerQs: [{ text: 'Which case should be filed — eviction, injunction, possession or declaration — and where?' }, { text: 'Can my PoA holder pursue the case, and will I need to depose by video?' }, { text: 'Should I also file a criminal complaint for forgery or trespass?', when: W('np_problem', 'sold', 'records', 'caretaker') }]
+  });
+
+  /* ---------------- Selling / inheriting property and moving money abroad ---------------- */
+  I.push({
+    id: 'nri-sale-repatriation', cat: 'nri', title: 'Selling or inheriting property in India and moving the money abroad', short: 'NRI property sale & repatriation',
+    synonyms: ['nri sell property', 'repatriation', 'repatriate money', 'nri tds property', 'form 15ca', '15cb', 'lower tds certificate', 'nro to nre', 'usd 1 million', 'nri inherited property sale', 'capital gains nri'],
+    intro: 'Selling is mostly paperwork: title, tax and banking. Getting the order right saves months and a lot of blocked tax.',
+    juris: 'Buyers must deduct tax (TDS) from payments to NRI sellers on the full sale value unless a lower/nil deduction certificate is obtained. From 1 April 2026 these rules sit in the Income-tax Act, 2025 (renumbered sections and forms). Repatriation is governed by FEMA and RBI rules.',
+    tips: ['RBI generally allows NRIs to repatriate up to USD 1 million per financial year from their NRO account, including property sale proceeds, after tax.', 'Applying for a lower/nil TDS certificate before the sale can stop a large amount of tax being blocked until your refund.', 'Your bank will usually need a chartered accountant\'s certificate and online declaration before sending money abroad.'],
+    questions: [
+      { id: 'ns_what', text: 'What are you doing?', chapter: 'The deal', why: 'Selling, inheriting and transferring money each need different papers.', options: o([['sell', 'Selling property I own'], ['inherit', 'Selling or claiming inherited property'], ['money', 'Moving money already in India to abroad']]) },
+      { id: 'ns_kind', text: 'What kind of property?', chapter: 'The deal', when: W('ns_what', 'sell', 'inherit'), why: 'Agricultural land and residential property have different rules.', options: o([['res', 'Residential'], ['comm', 'Commercial'], ['agri', 'Agricultural / farmhouse']]) },
+      { id: 'ns_held', text: 'How long has it been owned (by you or the person you inherited from)?', chapter: 'Tax', when: W('ns_what', 'sell', 'inherit'), why: 'Long-term and short-term gains are taxed differently.', options: o([['short', 'Less than 2 years'], ['long', '2 years or more'], NS]) },
+      { id: 'ns_cert', text: 'Have you applied for a lower/nil TDS certificate?', chapter: 'Tax', when: W('ns_what', 'sell', 'inherit'), why: 'Without it, TDS is on the whole sale value, not just the gain.', options: o([['yes', 'Yes'], ['no', 'Not yet'], NS]) },
+      { id: 'ns_present', text: 'Will you be in India to sign the sale deed?', chapter: 'Signing', when: W('ns_what', 'sell', 'inherit'), why: 'If not, you need a properly executed PoA.', options: o([['yes', 'Yes'], ['poa', 'No, through a PoA holder'], NS]) },
+      { id: 'ns_account', text: 'Which Indian account will receive the money?', chapter: 'Moving money', why: 'Sale proceeds usually go to an NRO account before repatriation.', options: o([['nro', 'NRO account'], ['nre', 'NRE account'], ['resident', 'An old resident savings account'], ['none', 'No Indian account']]) },
+      { id: 'ns_heirs', text: 'Are other heirs involved?', deep: true, chapter: 'Other heirs', when: W('ns_what', 'inherit'), why: 'All co-owners must join or release their share.', options: o([['yes_agree', 'Yes, all agree'], ['yes_dispute', 'Yes, there is a dispute'], ['no', 'No']]) }
+    ],
+    evidence: [
+      { id: 'ns_e_title', name: 'Title deed and chain of earlier deeds', fact: 'You can sell it', why: 'Buyers and banks check the full chain.', where: 'Your records; sub-registrar.', preserve: '', when: W('ns_what', 'sell', 'inherit') },
+      { id: 'ns_e_cost', name: 'Purchase cost proof: original sale deed value, payment records, improvement bills', fact: 'Cost of acquisition', why: 'Capital gains (and TDS certificate) are worked out from it.', where: 'Your records, builder receipts.', preserve: '', when: W('ns_what', 'sell', 'inherit') },
+      { id: 'ns_e_inherit', name: 'Death certificate, will/probate or succession/legal heir papers, and mutation in your name', fact: 'You inherited it', why: 'Needed before you can sell.', where: 'Municipality, court, revenue office.', preserve: '', when: W('ns_what', 'inherit') },
+      { id: 'ns_e_release', name: 'Release / relinquishment deeds or consent of other heirs', fact: 'Other heirs\' shares', why: 'A sale without all co-owners is risky for buyers.', where: 'Sub-registrar (registered deeds).', preserve: '', when: W('ns_heirs', 'yes_agree', 'yes_dispute') },
+      { id: 'ns_e_certapp', name: 'Apply for a lower/nil TDS certificate (through a CA) before the sale', fact: 'Correct tax deduction', why: 'Avoids TDS on the full sale value.', where: 'Income-tax portal (a CA usually files it).', preserve: '', action: true, time: 'Apply well before the sale — processing takes time.', when: ALL(W('ns_what', 'sell', 'inherit'), W('ns_cert', 'no', 'unsure')) },
+      { id: 'ns_e_ids', name: 'PAN, passport, OCI card, overseas address proof', fact: 'Your identity and tax status', why: 'Required for the deed, TDS and bank.', where: 'Your documents.', preserve: '' },
+      { id: 'ns_e_poa', name: 'Sale PoA executed abroad (consulate, or notary + apostille), stamped in India', fact: 'Your representative can sign', why: 'Registrars reject improperly executed PoAs.', where: ABROAD, preserve: '', time: 'Documents executed abroad generally must be stamped within 3 months of reaching India — check your state\'s stamp law.', when: W('ns_present', 'poa') },
+      { id: 'ns_e_tds', name: 'Buyer\'s TDS payment proof and TDS certificate', fact: 'Tax was deducted', why: 'Needed for your tax return and repatriation.', where: 'From the buyer; income-tax portal.', preserve: '', when: W('ns_what', 'sell', 'inherit') },
+      { id: 'ns_e_ca', name: 'CA certificate and online declaration for the remittance (Forms 15CA/15CB or new equivalents)', fact: 'Tax is settled on the money being sent', why: 'Banks need it before sending money abroad.', where: 'Your chartered accountant; bank.', preserve: '' },
+      { id: 'ns_e_bank', name: 'NRO statement showing sale proceeds and the bank\'s remittance form', fact: 'Source of funds', why: 'Banks track repatriation limits.', where: 'Your bank.', preserve: '' },
+      { id: 'ns_e_convert', name: 'Ask your bank to redesignate old resident accounts as NRO', fact: 'Account compliance', why: 'FEMA requires resident accounts to be redesignated when you become NRI; frozen accounts are a common result.', where: 'Your bank.', preserve: '', action: true, when: W('ns_account', 'resident', 'none') },
+      { id: 'ns_e_return', name: 'Indian income-tax return for the year of sale', fact: 'Final tax and refund', why: 'Claims refund of excess TDS and shows tax compliance.', where: 'Income-tax portal / CA.', preserve: '', when: W('ns_what', 'sell', 'inherit') }
+    ],
+    info: [{ when: W('ns_kind', 'agri'), text: 'NRIs and OCIs generally cannot buy agricultural land in India but may inherit it and can usually sell it to a resident Indian. Check state land laws with your advocate.' }],
+    urgent: [{ id: 'ns_u_dispute', level: 'soon', when: W('ns_heirs', 'yes_dispute'), title: 'Settle the heirs\' dispute first', text: 'A sale with an unresolved co-owner dispute can be challenged. Ask an advocate about partition or a family settlement.', help: ['l15100'] }],
+    lawyerQs: [{ text: 'Is the title clean enough for a buyer, and are all heirs\' rights settled?' }, { text: 'How much TDS and capital gains tax applies, and should I apply for a lower deduction certificate?', when: W('ns_what', 'sell', 'inherit') }, { text: 'How much can I repatriate this year, and what will my bank need?' }]
+  });
+
+  /* ---------------- Power of attorney from abroad ---------------- */
+  I.push({
+    id: 'nri-poa', cat: 'nri', title: 'Giving, using or cancelling a power of attorney from abroad', short: 'Power of attorney (from abroad)',
+    synonyms: ['power of attorney', 'poa', 'gpa', 'spa', 'poa from abroad', 'apostille', 'consulate attestation', 'cancel power of attorney', 'revoke poa', 'poa misuse', 'adjudication of poa'],
+    intro: 'A power of attorney is how most NRIs act in India. A badly drafted or badly executed one causes more disputes than it solves.',
+    juris: 'A PoA signed abroad is generally executed before an Indian consulate, or before a notary and then apostilled. It must usually be stamped in India within a set time after it arrives, and registered if it will be used to sell property.',
+    tips: ['Prefer a specific PoA (for one property or one case) over a general one.', 'Courts have held that a PoA holder cannot give evidence about facts only you personally know.', 'Since 2011, transfers of property through "GPA sales" are not valid substitutes for a registered sale deed.'],
+    questions: [
+      { id: 'pa_goal', text: 'What do you need?', chapter: 'Goal', why: 'Creating, using and cancelling a PoA have different steps.', options: o([['give', 'Give someone a PoA'], ['use', 'My PoA was rejected or questioned'], ['cancel', 'Cancel a PoA'], ['misuse', 'A PoA was misused']]) },
+      { id: 'pa_for', text: 'What is it for?', type: 'multi', chapter: 'Goal', why: 'Selling property needs a registered PoA; court cases and bank work need specific powers.', options: o([['sell', 'Selling property'], ['rent', 'Renting / managing property'], ['case', 'A court case'], ['bank', 'Bank or tax work'], ['other', 'Other']]) },
+      { id: 'pa_where', text: 'Which country are you in?', chapter: 'Signing', why: 'Apostille works in Hague Convention countries; otherwise the Indian consulate route is used.', options: o([['hague', 'A Hague Apostille country (e.g. USA, UK, Australia, most of Europe)'], ['nonhague', 'A non-Hague country (e.g. many Gulf countries)'], NS]) },
+      { id: 'pa_stage', text: 'Where is the document now?', chapter: 'Signing', when: W('pa_goal', 'give', 'use'), why: 'Stamping and registration deadlines run from when it arrives in India.', options: o([['draft', 'Still a draft'], ['signed', 'Signed abroad, not yet sent'], ['india', 'Already in India'], ['rejected', 'Rejected by the registrar/bank/court']]) }
+    ],
+    evidence: [
+      { id: 'pa_e_draft', name: 'A clear PoA draft naming the property/case and the exact powers', fact: 'What the agent may do', why: 'Vague, broad drafts are the main cause of misuse and rejection.', where: 'Your advocate in India.', preserve: '', action: true, when: W('pa_goal', 'give') },
+      { id: 'pa_e_exec', name: 'Execution proof: consular attestation, or notarisation + apostille certificate', fact: 'Valid execution abroad', why: 'Registrars and courts check this first.', where: ABROAD, preserve: 'Get extra certified copies.' },
+      { id: 'pa_e_stamp', name: 'Stamp duty payment / adjudication in India', fact: 'Duly stamped', why: 'Unstamped documents can be refused or impounded.', where: 'Sub-registrar / collector of stamps in your state.', preserve: '', time: 'Generally within 3 months of the document reaching India — confirm your state rule.', when: W('pa_stage', 'india', 'signed', 'rejected') },
+      { id: 'pa_e_reg', name: 'Registration of the PoA (if it will be used to sell property)', fact: 'Registered authority to sell', why: 'Many registrars require it.', where: 'Sub-registrar office.', preserve: '', when: W('pa_for', 'sell') },
+      { id: 'pa_e_ids', name: 'Passport/OCI copies of you and ID of the attorney holder; photos', fact: 'Identity of both parties', why: 'Required at execution and registration.', where: 'Your documents.', preserve: '' },
+      { id: 'pa_e_reason', name: 'The written rejection or objection', fact: 'What went wrong', why: 'Tells you what to fix.', where: 'Registrar, bank or court.', preserve: '', when: W('pa_stage', 'rejected') },
+      { id: 'pa_e_revoke', name: 'Revocation deed executed abroad, and notices to the holder, sub-registrar, banks and buyers', fact: 'Authority was withdrawn', why: 'Revocation must be communicated to be effective against others.', where: ABROAD, preserve: 'Keep postal/email proof of each notice.', action: true, when: W('pa_goal', 'cancel', 'misuse') },
+      { id: 'pa_e_misuse', name: 'Records of what the holder did (deeds, bank withdrawals, messages)', fact: 'Misuse of authority', why: 'Supports civil and criminal action.', where: 'Encumbrance certificate, bank statements, sub-registrar.', preserve: '', when: W('pa_goal', 'misuse') }
+    ],
+    urgent: [{ id: 'pa_u_misuse', level: 'now', when: W('pa_goal', 'misuse'), title: 'Revoke and warn others now', text: 'Revoke the PoA, notify the sub-registrar and banks, and see an advocate about stopping any sale.', help: ['l15100', 'madad'] }],
+    lawyerQs: [{ text: 'Should this be a general or specific PoA, and what exact powers should it have?' }, { text: 'Does it need registration, and what stamp duty applies in this state?' }, { text: 'Can my attorney give evidence in my case, or will I need to appear by video?', when: W('pa_for', 'case') }]
+  });
+
+  /* ---------------- NRI marriage ---------------- */
+  I.push({
+    id: 'nri-marriage', cat: 'nri', sensitive: true, title: 'NRI marriage problem — abandoned, divorce abroad, child taken, or case against an NRI spouse', short: 'NRI marriage disputes',
+    synonyms: ['nri husband', 'nri marriage', 'abandoned by nri husband', 'deserted wife nri', 'foreign divorce', 'divorce abroad valid in india', 'nri divorce', 'child taken abroad', 'child abduction', 'passport impound', 'look out circular', 'loc', 'nri wife'],
+    intro: 'This guide works for both sides: a spouse left behind in India, and an NRI spouse facing cases in India. You can stop any time.',
+    juris: 'A foreign divorce is generally recognised in India only if the court had proper jurisdiction and decided on grounds available under the law the couple married under, with both sides participating. India is not a party to the Hague Convention on child abduction, so courts decide custody on the child\'s welfare.',
+    tips: ['Indian courts can hear maintenance and domestic-violence cases against a spouse living abroad; summons can be served through the embassy.', 'The Ministry of External Affairs and the National Commission for Women have cells for deserted spouses of NRIs.', 'A foreign divorce obtained without the other spouse\'s participation may not be recognised in India.'],
+    questions: [
+      { id: 'nm_safe', text: 'First: are you safe right now?', sensitive: true, chapter: 'Safety', why: 'Safety first.', options: o([['safe', 'Yes'], ['threat', 'I have been threatened'], ['danger', 'I am in danger'], PN]) },
+      { id: 'nm_side', text: 'Which describes you?', chapter: 'Your side', why: 'The two sides need very different records.', options: o([['left', 'My NRI spouse left me / stopped contact'], ['foreigndiv', 'My spouse got (or is seeking) a divorce abroad'], ['child', 'Our child has been taken to / kept in another country'], ['nri_accused', 'I am the NRI spouse and a case was filed against me in India'], ['nri_divorce', 'I live abroad and want a divorce']]) },
+      { id: 'nm_where', text: 'Where was the marriage performed and registered?', chapter: 'The marriage', why: 'Decides which law and court applies.', options: o([['india_reg', 'In India, registered'], ['india_unreg', 'In India, not registered'], ['abroad', 'Abroad'], NS]) },
+      { id: 'nm_know', text: 'What do you know about the spouse abroad?', type: 'multi', chapter: 'The other side', when: W('nm_side', 'left', 'foreigndiv', 'child'), why: 'Address, employer and passport details help courts and authorities reach them.', options: o([['address', 'Address abroad'], ['employer', 'Employer'], ['passport', 'Passport details'], ['visa', 'Visa / immigration status'], ['none', 'Very little']]) },
+      { id: 'nm_cases', text: 'What cases or orders exist?', type: 'multi', chapter: 'Cases', why: 'Existing cases decide next steps.', options: o([['india', 'A case in India'], ['abroad', 'A case or order abroad'], ['loc', 'Look Out Circular / passport action'], ['none', 'None yet']]) },
+      { id: 'nm_money', text: 'Is financial support an issue?', deep: true, chapter: 'Money', when: W('nm_side', 'left', 'foreigndiv', 'child'), why: 'Maintenance can be claimed in India against a spouse abroad.', options: o([['yes', 'Yes'], ['no', 'No'], PN]) },
+      { id: 'nm_participate', text: 'Did you take part in the foreign divorce case?', deep: true, chapter: 'Foreign divorce', when: W('nm_side', 'foreigndiv'), why: 'Participation affects whether India will recognise the decree.', options: o([['yes', 'Yes, I contested or consented'], ['no', 'No'], ['notice', 'I only got a notice']]) }
+    ],
+    evidence: [
+      { id: 'nm_e_marriage', name: 'Marriage certificate, wedding photos, invitation', fact: 'The marriage', why: 'Basic proof in every case.', where: 'Registrar, family.', preserve: '' },
+      { id: 'nm_e_register', name: 'Get the marriage registered (if it isn\'t)', fact: 'Registered marriage', why: 'Registration makes enforcement and passport-linked remedies easier.', where: 'Marriage registrar.', preserve: '', action: true, when: W('nm_where', 'india_unreg') },
+      { id: 'nm_e_spouse', name: 'Spouse\'s passport copy, visa/residence details, foreign address, employer', fact: 'How to reach the spouse abroad', why: 'Needed for service of summons, maintenance enforcement and passport action.', where: 'Old documents, emails, visa papers.', preserve: LAWFUL, when: W('nm_side', 'left', 'foreigndiv', 'child') },
+      { id: 'nm_e_desertion', name: 'Proof of desertion: last contact, travel dates, messages, money stopped', fact: 'Abandonment', why: 'Supports maintenance, DV and divorce claims.', where: 'Phone, bank statements, passport stamps.', preserve: 'Export full chats.', when: W('nm_side', 'left') },
+      { id: 'nm_e_dowry', name: 'Records of dowry demands, money transferred, stridhan kept', fact: 'Demands and property', why: 'Supports criminal and recovery claims.', where: 'Messages, bank records, photos.', preserve: '', when: W('nm_side', 'left') },
+      { id: 'nm_e_foreigndecree', name: 'The foreign divorce decree/petition and proof of how you were served', fact: 'Validity of the foreign divorce', why: 'Decides whether India will recognise it.', where: 'Court papers, emails.', preserve: '', when: W('nm_side', 'foreigndiv', 'nri_divorce') },
+      { id: 'nm_e_child', name: 'Child\'s birth certificate, passport details, school records, travel details', fact: 'The child\'s residence and removal', why: 'Courts decide custody on the child\'s welfare and habitual residence.', where: 'Your records, school, airline.', preserve: '', when: W('nm_side', 'child') },
+      { id: 'nm_e_indiacase', name: 'FIR, complaint, summons or orders in India', fact: 'What is alleged', why: 'Your response starts here.', where: 'Police portal, court, your advocate.', preserve: '', when: ANY(W('nm_side', 'nri_accused'), W('nm_cases', 'india')) },
+      { id: 'nm_e_loc', name: 'Any Look Out Circular, passport notice or impounding order', fact: 'Travel restrictions', why: 'May need urgent legal action before travel.', where: 'Passport office, police, your advocate.', preserve: '', when: W('nm_cases', 'loc') },
+      { id: 'nm_e_abroad', name: 'Your residence, job and immigration papers abroad', fact: 'Your situation abroad', why: 'Relevant to appearance, bail and jurisdiction.', where: 'Your documents.', preserve: '', when: W('nm_side', 'nri_accused', 'nri_divorce') },
+      { id: 'nm_e_income', name: 'Income and expense records (both spouses, as far as lawfully known)', fact: 'Maintenance', why: 'Courts require income disclosure.', where: 'Salary slips, bank statements.', preserve: LAWFUL, when: W('nm_money', 'yes') }
+    ],
+    urgent: [
+      { id: 'nm_u_danger', level: 'now', when: W('nm_safe', 'danger'), title: 'Please get help now', text: 'If you are in danger, call 112 in India or the local emergency number abroad.', help: ['e112', 'w181', 'madad'] },
+      { id: 'nm_u_child', level: 'now', when: W('nm_side', 'child'), title: 'Act fast for the child', text: 'Courts can pass urgent orders, including on passports and travel. See an advocate now and contact the Indian embassy through MADAD.', help: ['madad', 'l15100'] },
+      { id: 'nm_u_left', level: 'soon', when: W('nm_side', 'left'), title: 'Support for deserted spouses', text: 'The National Commission for Women\'s NRI cell and legal aid can help with complaints, maintenance and service of summons abroad.', help: ['ncwnri', 'l15100', 'madad'] },
+      { id: 'nm_u_accused', level: 'now', when: W('nm_side', 'nri_accused'), title: 'Get advice before you travel', text: 'If an FIR or Look Out Circular exists, you may be stopped at the airport. Speak to an advocate about anticipatory bail first.', help: ['l15100'] }
+    ],
+    lawyerQs: [{ text: 'Will the foreign divorce be recognised in India?', when: W('nm_side', 'foreigndiv', 'nri_divorce') }, { text: 'Can I claim maintenance in India and enforce it against my spouse abroad?', when: W('nm_side', 'left') }, { text: 'What can be done to bring the child back or get custody?', when: W('nm_side', 'child') }, { text: 'Do I need anticipatory bail before travelling to India?', when: W('nm_side', 'nri_accused') }]
+  });
+
+  /* ---------------- Case in India while living abroad ---------------- */
+  I.push({
+    id: 'nri-case-abroad', cat: 'nri', title: 'I live abroad and have a case, notice or summons in India', short: 'Handling a case from abroad',
+    synonyms: ['nri court case', 'case in india living abroad', 'summons nri', 'appear in court from abroad', 'video conferencing court', 'exemption from appearance', 'nri cheque case', 'nri consumer complaint', 'nri legal notice'],
+    intro: 'You can run most cases from abroad with the right advocate, papers and authority. Missing a date is the real risk.',
+    juris: 'Many courts allow exemption from personal appearance and evidence by video conference. Criminal cases may need personal appearance at certain stages. A power-of-attorney holder can file and manage civil cases but cannot testify to facts only you know.',
+    tips: ['Consumer complaints can be filed online on e-Jagriti from abroad.', 'You can track case status online on the eCourts services portal using the case number.', 'Keep your advocate updated with a working phone and email — notices are now often served electronically.'],
+    questions: [
+      { id: 'nc_side', text: 'Are you bringing the case or responding to one?', chapter: 'The case', why: 'Different documents and urgency.', options: o([['me', 'I want to file a case'], ['against', 'A case/notice is against me']]) },
+      { id: 'nc_type', text: 'What kind of matter?', chapter: 'The case', why: 'Civil, criminal and consumer matters handle absence differently.', options: o([['civil', 'Property / money / civil'], ['criminal', 'Criminal (FIR, complaint, cheque)'], ['family', 'Family'], ['consumer', 'Consumer'], ['tax', 'Tax notice']]) },
+      { id: 'nc_stage', text: 'What do you have right now?', chapter: 'The case', type: 'multi', why: 'Tells us the deadline.', options: o([['notice', 'A legal notice'], ['summons', 'A court summons'], ['warrant', 'A warrant'], ['caseno', 'A case number'], ['none', 'Nothing yet']]) },
+      { id: 'nc_advocate', text: 'Do you have an advocate in India?', chapter: 'Your team', why: 'Needed to appear and seek exemptions.', options: o([['yes', 'Yes'], ['no', 'Not yet']]) },
+      { id: 'nc_travel', text: 'Can you travel to India if the court insists?', deep: true, chapter: 'Your team', why: 'Affects what to ask the court.', options: o([['yes', 'Yes'], ['hard', 'With difficulty'], ['no', 'No']]) }
+    ],
+    evidence: [
+      { id: 'nc_e_papers', name: 'The notice/summons/warrant and its envelope or email, with date received', fact: 'What is required and by when', why: 'Dates run from receipt.', where: 'Post at your Indian address, email.', preserve: '', when: W('nc_stage', 'notice', 'summons', 'warrant') },
+      { id: 'nc_e_status', name: 'Case status printout (eCourts) with next date', fact: 'Next hearing', why: 'Avoids missing dates.', where: 'eCourts services portal or app.', preserve: '', action: true, when: W('nc_stage', 'caseno', 'summons') },
+      { id: 'nc_e_vakalat', name: 'Signed vakalatnama for your advocate (executed abroad as required)', fact: 'Advocate\'s authority', why: 'Your advocate can\'t appear without it.', where: 'Advocate sends; sign as instructed, often with consular/notary attestation.', preserve: '' },
+      { id: 'nc_e_poa', name: 'Specific PoA for a trusted person to manage the case (civil matters)', fact: 'Someone can act for you', why: 'Lets the case move while you\'re abroad.', where: ABROAD, preserve: '', when: W('nc_type', 'civil', 'consumer', 'family') },
+      { id: 'nc_e_abroad', name: 'Proof of residence and job abroad; travel constraints', fact: 'Why you can\'t attend', why: 'Supports exemption from appearance / video evidence.', where: 'Employer letter, visa, residence permit.', preserve: '' },
+      { id: 'nc_e_merits', name: 'All documents about the underlying dispute', fact: 'Your side', why: 'Your advocate needs them before the first date.', where: 'Your records.', preserve: 'Scan and share in date order.' },
+      { id: 'nc_e_passport', name: 'Passport and OCI copies', fact: 'Identity', why: 'Needed for affidavits and bail papers.', where: 'Your documents.', preserve: '' }
+    ],
+    urgent: [
+      { id: 'nc_u_warrant', level: 'now', when: W('nc_stage', 'warrant'), title: 'A warrant is serious', text: 'Ask your advocate to apply to recall the warrant before you travel. You may be stopped on arrival.', help: ['l15100'] },
+      { id: 'nc_u_noadv', level: 'soon', when: ALL(W('nc_side', 'against'), W('nc_advocate', 'no')), title: 'Appoint an advocate before the date', text: 'Missing a hearing can lead to orders against you. Legal aid (15100) may help if you\'re eligible.', help: ['l15100', 'madad'] }
+    ],
+    lawyerQs: [{ text: 'Can I be exempted from personal appearance or give evidence by video?' }, { text: 'What powers should my PoA holder have?', when: W('nc_type', 'civil', 'consumer', 'family') }, { text: 'Is it safe for me to travel to India?', when: W('nc_type', 'criminal') }]
+  });
+
+  /* ---------------- NRI bank / tax ---------------- */
+  I.push({
+    id: 'nri-bank-tax', cat: 'nri', title: 'NRI bank account frozen, KYC problems or an Indian tax notice', short: 'NRI bank account or tax notice',
+    synonyms: ['nri account frozen', 'nre account', 'nro account', 'account frozen after moving abroad', 'kyc nri', 'income tax notice nri', 'tax notice nri', 'residential status', 'fema account'],
+    intro: 'Most NRI account freezes come from status or KYC mismatches. Tax notices usually come from data mismatches. Both are fixable with the right papers.',
+    juris: 'FEMA rules require accounts held as a resident to be redesignated as NRO once you become non-resident. Indian tax notices from 1 April 2026 are issued under the Income-tax Act, 2025 (older years may still refer to the 1961 Act).',
+    tips: ['Tell every Indian bank and investment platform when your residential status changes.', 'Most tax notices give a reply date; responding late can lead to orders without hearing you.'],
+    questions: [
+      { id: 'nb_issue', text: 'What is the problem?', type: 'multi', chapter: 'The problem', why: 'Each problem has different fixes.', options: o([['frozen', 'Account frozen / debit-blocked'], ['kyc', 'KYC update demanded'], ['convert', 'Need to convert a resident account to NRO/NRE'], ['tax', 'Income-tax notice'], ['tds', 'Too much TDS deducted']]) },
+      { id: 'nb_notice_due', text: 'Does the tax notice have a reply date?', chapter: 'Deadlines', when: W('nb_issue', 'tax'), why: 'Missing it can lead to an order without your side.', options: o([['soon', 'Within 15 days'], ['later', 'Later'], ['passed', 'It has passed'], NS]) }
+    ],
+    evidence: [
+      { id: 'nb_e_bank', name: 'Bank\'s freeze/KYC message and account statements', fact: 'What the bank wants', why: 'Shows the reason.', where: 'Email, net banking.', preserve: '', when: W('nb_issue', 'frozen', 'kyc', 'convert') },
+      { id: 'nb_e_kyc', name: 'Passport, visa/residence permit, overseas address proof, PAN, photo (attested as the bank asks)', fact: 'NRI status and identity', why: 'Standard NRI KYC set.', where: 'Your documents; consulate/notary attestation if required.', preserve: '' },
+      { id: 'nb_e_request', name: 'Written request to the bank to redesignate/unfreeze, with reference number', fact: 'You asked for correction', why: 'Starts the bank\'s timeline and RBI complaint route.', where: 'Bank NRI desk email.', preserve: '', action: true, when: W('nb_issue', 'frozen', 'convert', 'kyc') },
+      { id: 'nb_e_notice', name: 'The tax notice and the income-tax portal "e-proceedings" page', fact: 'What the department asks', why: 'Every reply starts here.', where: 'Income-tax e-filing portal.', preserve: '', when: W('nb_issue', 'tax', 'tds') },
+      { id: 'nb_e_ais', name: 'Annual Information Statement (AIS), Form 26AS and your filed returns', fact: 'What the department sees', why: 'Most notices come from mismatches.', where: 'Income-tax portal.', preserve: '', when: W('nb_issue', 'tax', 'tds') },
+      { id: 'nb_e_status', name: 'Proof of days spent in India and abroad (passport stamps, travel history)', fact: 'Residential status', why: 'Decides how you are taxed.', where: 'Passport, airline records.', preserve: '', when: W('nb_issue', 'tax') },
+      { id: 'nb_e_trc', name: 'Tax residency certificate from your country of residence', fact: 'Treaty benefits', why: 'Needed to claim lower tax under a tax treaty.', where: 'Your foreign tax authority.', preserve: '', when: W('nb_issue', 'tax', 'tds') }
+    ],
+    urgent: [{ id: 'nb_u_tax', level: 'soon', when: W('nb_notice_due', 'soon', 'passed'), title: 'Reply before the date', text: 'Ask a chartered accountant or advocate to reply or seek more time now.', help: [] }],
+    lawyerQs: [{ text: 'What is my residential status for this year?', when: W('nb_issue', 'tax') }, { text: 'Can I go to the RBI Ombudsman if the bank doesn\'t unfreeze my account?', when: W('nb_issue', 'frozen') }]
+  });
+
+  /* ---------- NRI questions ---------- */
+  const Q = (id, q, a, depends, law, journey, kw) => KB.questions.push({ cat: 'nri', id, q, a, depends, law, journey, kw });
+  Q('nri-buy-agri', 'Can an NRI or OCI buy agricultural land in India?', 'Generally no. NRIs and OCIs can buy residential and commercial property, but not agricultural land, plantations or farmhouses. They can inherit such land and can usually sell it to a resident Indian.', ['Whether you are NRI or OCI', 'State land laws'], 'FEMA (Non-debt Instruments) Rules, 2019', 'nri-sale-repatriation', ['nri agricultural land']);
+  Q('nri-repatriate', 'How much money can an NRI send abroad from India?', 'Under RBI rules, NRIs can generally repatriate up to USD 1 million per financial year from their NRO account, which can include property sale proceeds, after taxes are paid. Your bank will usually ask for a CA certificate and an online declaration.', ['Source of the money', 'Taxes paid'], 'FEMA; RBI Master Direction on remittances', 'nri-sale-repatriation', ['repatriation limit', 'usd 1 million']);
+  Q('nri-tds-sale', 'How much tax is deducted when an NRI sells property?', 'The buyer must deduct tax on the whole sale value, not only the profit — for long-term gains at an effective rate of up to about 15% including surcharge and cess. You can apply for a lower or nil deduction certificate before the sale to reduce it. Section numbers changed when the Income-tax Act, 2025 took effect on 1 April 2026.', ['How long the property was held', 'Your actual gain'], 'Income-tax Act, 2025 (TDS on payments to non-residents)', 'nri-sale-repatriation', ['nri tds', 'capital gains nri']);
+  Q('nri-poa-abroad', 'How do I make a power of attorney while living abroad?', 'Sign it before the Indian embassy or consulate, or before a local notary and then get it apostilled if your country is in the Hague Apostille Convention. After it reaches India it must usually be stamped within three months, and registered if it will be used to sell property.', ['Your country', 'What the PoA is for', 'Your state\'s stamp law'], 'Indian Stamp Act / state stamp laws; Registration Act; Hague Apostille Convention', 'nri-poa', ['power of attorney abroad', 'apostille']);
+  Q('nri-foreign-divorce', 'Is a divorce obtained abroad valid in India?', 'Only if certain conditions are met. Indian courts generally recognise a foreign divorce if that court had proper jurisdiction, decided on grounds available under the law you married under, and both spouses had a fair chance to participate. A one-sided foreign divorce may not be recognised.', ['Where and under which law you married', 'Whether you took part in the foreign case'], 'CPC s.13; Y. Narasimha Rao v. Y. Venkata Lakshmi (1991)', 'nri-marriage', ['foreign divorce']);
+  Q('nri-case-video', 'Do I have to fly to India for my court case?', 'Not always. Courts can exempt you from personal appearance at many stages, record evidence by video conference, and let a PoA holder manage civil cases. Criminal cases may still need you in person at certain stages.', ['Type of case', 'Stage of case', 'Court\'s directions'], 'CPC; BNSS; High Court video-conferencing rules', 'nri-case-abroad', ['nri court case', 'video conferencing']);
+
+  const M2 = (s, fact, why) => KB.myths.push({ s, fact, why });
+  M2('An OCI card holder can buy agricultural land in India.', false, 'OCIs, like NRIs, generally cannot buy agricultural land, but can inherit it.');
+  M2('A power of attorney signed abroad can be used in India without any further steps.', false, 'It usually needs consular attestation or an apostille, and stamping in India within a set time.');
+})(globalThis);
+</script>
+<script>/* Business & company journeys (draft, not advocate-reviewed). */
+(function (root) {
+  const { W, ALL, ANY, NOT, ANS, o, NS, PN, LAWFUL } = root.ER_H;
+  const KB = root.ER_KB; const I = KB.issues;
+  KB.categories.splice(3, 0, { id: 'business', title: 'Business & company', blurb: 'Unpaid invoices, shareholder and partner disputes, contracts', icon: 'briefcase' });
+  Object.assign(KB.help, {
+    msmeodr: { label: 'MSME ODR', name: 'MSME Online Dispute Resolution portal (Ministry of MSME)', detail: 'For micro and small suppliers with delayed payments. New claims go here instead of Samadhaan (since 15 Oct 2025).', href: null },
+    mca: { label: 'MCA', name: 'Ministry of Corporate Affairs portal', detail: 'Company master data, filings, directors and charges.', href: 'https://www.mca.gov.in' },
+    ecourts: { label: 'eCourts', name: 'eCourts services', detail: 'Check case status, orders and next dates.', href: 'https://services.ecourts.gov.in' }
+  });
+
+  /* ---------------- Unpaid invoice / business dues ---------------- */
+  I.push({
+    id: 'business-unpaid', cat: 'business', title: 'A client or buyer hasn\'t paid my business', short: 'Unpaid invoices & business dues',
+    synonyms: ['unpaid invoice', 'client not paying', 'payment pending', 'msme delayed payment', 'msme samadhaan', 'msme odr', 'recovery of dues', 'commercial suit', 'insolvency notice', 'ibc', 'operational creditor', 'vendor dues', 'freelancer payment'],
+    intro: 'You have more routes than a regular suit: the MSME council, a commercial suit, arbitration or insolvency. The records decide which is best.',
+    juris: 'Micro and small suppliers must be paid within the agreed period (never more than 45 days), with compound interest at three times the RBI bank rate on delay. Commercial disputes of ₹3 lakh or more go to commercial courts, usually after mandatory pre-institution mediation. Insolvency against a company needs a default of at least ₹1 crore.',
+    tips: ['If you are a registered micro or small enterprise, the buyer cannot contract out of the 45-day limit or the interest.', 'Before filing a commercial suit you usually must try mediation, unless you need urgent interim relief.', 'Insolvency is a collective remedy, not a debt-collection tool — a genuine prior dispute can defeat it.'],
+    questions: [
+      { id: 'bu_who', text: 'Who owes you?', chapter: 'The debt', why: 'Companies, individuals and government buyers have different remedies.', options: o([['company', 'A company or LLP'], ['person', 'An individual or proprietorship'], ['govt', 'A government body or PSU'], ['foreign', 'A foreign client']]) },
+      { id: 'bu_amount', text: 'How much is unpaid (approximately)?', chapter: 'The debt', why: 'Thresholds decide the forum: ₹3 lakh for commercial courts, ₹1 crore for insolvency.', options: o([['u3', 'Under ₹3 lakh'], ['3to100', '₹3 lakh to ₹1 crore'], ['over1cr', 'More than ₹1 crore']]) },
+      { id: 'bu_msme', text: 'Is your business registered as a micro or small enterprise (Udyam)?', chapter: 'Your business', why: 'Opens the MSME Facilitation Council route with statutory interest.', options: o([['yes', 'Yes, before the supply'], ['after', 'Registered after the supply'], ['no', 'No'], NS]) },
+      { id: 'bu_contract', text: 'What do you have in writing?', type: 'multi', chapter: 'Paper trail', why: 'Written terms, purchase orders and acceptance prove the debt.', options: o([['contract', 'Signed contract'], ['po', 'Purchase order / work order'], ['invoice', 'Invoices'], ['emails', 'Emails / messages agreeing terms'], ['none', 'Little in writing']]) },
+      { id: 'bu_dispute', text: 'Has the client raised any complaint about your work?', chapter: 'Paper trail', why: 'A genuine dispute before your demand can block insolvency and weaken summary routes.', options: o([['no', 'No, they just haven\'t paid'], ['after', 'Only after I demanded payment'], ['before', 'Yes, they complained earlier'], NS]) },
+      { id: 'bu_arb', text: 'Does the contract have an arbitration clause?', chapter: 'Paper trail', when: W('bu_contract', 'contract', 'po'), why: 'An arbitration clause usually sends the dispute to arbitration, not court.', options: o([['yes', 'Yes'], ['no', 'No'], NS]) },
+      { id: 'bu_since', text: 'When was payment due?', chapter: 'Timing', why: 'Money claims generally have a 3-year limit; acknowledgements extend it.', options: o([['recent', 'Within the last year'], ['y3', '1–3 years ago'], ['older', 'More than 3 years ago']]) },
+      { id: 'bu_ack', text: 'Has the client admitted the dues (ledger confirmation, part-payment, email)?', deep: true, chapter: 'Timing', why: 'Admissions strengthen your case and can extend limitation.', options: o([['yes', 'Yes'], ['no', 'No']]) },
+      { id: 'bu_gst', text: 'Have you paid GST on these invoices?', deep: true, chapter: 'Tax', why: 'Affects the amount and your records.', options: o([['yes', 'Yes'], ['no', 'No / not applicable']]) }
+    ],
+    evidence: [
+      { id: 'bu_e_contract', name: 'Contract, purchase/work order and any amendments', fact: 'The agreed terms', why: 'Defines scope, price and payment terms.', where: 'Your files, email.', preserve: '', when: W('bu_contract', 'contract', 'po') },
+      { id: 'bu_e_invoices', name: 'All invoices, with dates and GST details', fact: 'Amounts billed', why: 'The core of the claim.', where: 'Accounting software.', preserve: 'Export a statement of account.' },
+      { id: 'bu_e_delivery', name: 'Proof of delivery/acceptance (delivery challans, sign-offs, completion emails)', fact: 'Goods/services were accepted', why: 'The 45-day clock and your claim run from acceptance.', where: 'Your records, client emails.', preserve: '' },
+      { id: 'bu_e_ledger', name: 'Ledger of the client\'s account, payments received and balance', fact: 'Outstanding amount', why: 'Shows exactly what is due.', where: 'Accounting software.', preserve: '' },
+      { id: 'bu_e_emails', name: 'Emails/messages agreeing terms or promising payment', fact: 'Agreement and admissions', why: 'Fills gaps where nothing is signed.', where: 'Email, WhatsApp.', preserve: 'Export full threads.', when: W('bu_contract', 'emails', 'none') },
+      { id: 'bu_e_udyam', name: 'Udyam registration certificate', fact: 'MSME status at the time of supply', why: 'Needed for the MSME council route.', where: 'Udyam portal.', preserve: '', when: W('bu_msme', 'yes', 'after') },
+      { id: 'bu_e_msmeclaim', name: 'File a delayed-payment reference on the MSME ODR portal', fact: 'Statutory claim made', why: 'Councils can mediate, arbitrate and award interest at three times the bank rate.', where: 'MSME ODR portal (Ministry of MSME).', preserve: '', action: true, when: W('bu_msme', 'yes') },
+      { id: 'bu_e_ack', name: 'Ledger confirmations, part-payments or emails admitting dues', fact: 'Admission of debt', why: 'Strong evidence and may extend the time limit.', where: 'Email, bank statements.', preserve: '', when: W('bu_ack', 'yes') },
+      { id: 'bu_e_complaints', name: 'The client\'s complaints and your replies', fact: 'Whether a genuine dispute exists', why: 'Decides which remedies are realistic.', where: 'Email.', preserve: '', when: W('bu_dispute', 'before', 'after') },
+      { id: 'bu_e_demand', name: 'Legal demand notice and proof of delivery', fact: 'Formal demand made', why: 'Usually the first formal step.', where: 'Your advocate.', preserve: '' },
+      { id: 'bu_e_company', name: 'Debtor company details: CIN, registered office, directors, charges', fact: 'Who to sue and whether they can pay', why: 'Needed for notices, suits and insolvency.', where: 'MCA portal.', preserve: '', when: W('bu_who', 'company') },
+      { id: 'bu_e_gst', name: 'GST returns showing the invoices', fact: 'Invoices were declared', why: 'Corroborates the supply; the client\'s input credit records may also show acceptance.', where: 'GST portal.', preserve: '', when: W('bu_gst', 'yes') }
+    ],
+    urgent: [{ id: 'bu_u_limit', level: 'soon', when: ALL(W('bu_since', 'y3', 'older'), NOT(W('bu_ack', 'yes'))), title: 'Check the time limit now', text: 'Money claims generally must be filed within 3 years of the due date unless the debt was acknowledged. See an advocate soon.', help: ['l15100'] }],
+    lawyerQs: [{ text: 'MSME council, commercial suit, arbitration or insolvency — which is fastest here?' }, { text: 'Can I claim interest at three times the bank rate?', when: W('bu_msme', 'yes') }, { text: 'Is pre-institution mediation required before a commercial suit?', when: W('bu_amount', '3to100', 'over1cr') }]
+  });
+
+  /* ---------------- Shareholder / director dispute ---------------- */
+  I.push({
+    id: 'shareholder-dispute', cat: 'business', title: 'Dispute with co-founders, shareholders or directors of my company', short: 'Shareholder & director disputes',
+    synonyms: ['shareholder dispute', 'co-founder dispute', 'founder dispute', 'oppression and mismanagement', 'nclt', 'removed as director', 'director removal', 'shares transferred without consent', 'share dilution', 'company records access', 'minority shareholder', 'vesting', 'cap table'],
+    intro: 'Company disputes are won on the company\'s own paperwork: shareholding, minutes and filings. We\'ll build that record.',
+    juris: 'Oppression and mismanagement cases go to the National Company Law Tribunal (NCLT). Members generally need at least 10% of shares (or 100 members), though the Tribunal can waive this. Shareholders\' agreements often add arbitration.',
+    tips: ['Download the company\'s filings from the MCA portal now — they show directors, allotments and changes.', 'A director can only be removed by an ordinary resolution of shareholders after special notice and a chance to be heard.', 'Keep company documents you lawfully hold, but don\'t copy confidential company data after your access ends.'],
+    questions: [
+      { id: 'sd_role', text: 'What is your position?', chapter: 'Your position', why: 'Shareholders, directors and founders have different rights.', options: o([['founder', 'Co-founder / shareholder-director'], ['minority', 'Minority shareholder (not a director)'], ['majority', 'Majority shareholder'], ['investor', 'Investor']]) },
+      { id: 'sd_stake', text: 'What percentage of the shares do you hold?', chapter: 'Your position', why: 'Decides eligibility for oppression cases and voting power.', options: o([['u10', 'Under 10%'], ['10to50', '10% to 50%'], ['over50', 'More than 50%'], NS]) },
+      { id: 'sd_issue', text: 'What has happened?', type: 'multi', chapter: 'The dispute', why: 'Each act has different proof.', options: o([['removed', 'I was removed as director / from management'], ['dilution', 'New shares issued to dilute me'], ['transfer', 'My shares transferred without consent'], ['records', 'Denied access to accounts or records'], ['siphon', 'Money diverted / related-party deals'], ['deadlock', 'Complete deadlock between founders'], ['exit', 'I want to exit / be bought out']]) },
+      { id: 'sd_sha', text: 'Is there a shareholders\' or founders\' agreement?', chapter: 'Paper trail', why: 'It may decide exits, vesting, deadlock and arbitration.', options: o([['yes', 'Yes'], ['no', 'No'], NS]) },
+      { id: 'sd_arb', text: 'Does it have an arbitration clause?', chapter: 'Paper trail', when: W('sd_sha', 'yes'), why: 'May decide the forum for contractual claims.', options: o([['yes', 'Yes'], ['no', 'No'], NS]) },
+      { id: 'sd_notice', text: 'Did you receive notice of the board/general meeting where this happened?', chapter: 'Process', when: W('sd_issue', 'removed', 'dilution', 'transfer'), why: 'Lack of proper notice can make decisions invalid.', options: o([['yes', 'Yes'], ['no', 'No'], NS]) },
+      { id: 'sd_type', text: 'What type of company?', deep: true, chapter: 'Company', why: 'Private, public and LLP rules differ.', options: o([['pvt', 'Private limited'], ['public', 'Public company'], ['llp', 'LLP'], NS]) },
+      { id: 'sd_when', text: 'When did the main act happen?', deep: true, chapter: 'Timing', why: 'Delay can weaken claims and urgent relief.', options: o([['recent', 'Within 3 months'], ['year', 'Within a year'], ['older', 'Earlier']]) }
+    ],
+    evidence: [
+      { id: 'sd_e_moa', name: 'Memorandum and Articles of Association (current version)', fact: 'Company rules', why: 'Sets transfer, appointment and meeting rules.', where: 'MCA portal (public documents).', preserve: '' },
+      { id: 'sd_e_sha', name: 'Shareholders\' / founders\' agreement and term sheets', fact: 'What was agreed between you', why: 'Often decides exit, vesting and deadlock.', where: 'Your records.', preserve: '', when: W('sd_sha', 'yes') },
+      { id: 'sd_e_shares', name: 'Share certificates, register of members extract, cap table, allotment filings', fact: 'Your shareholding', why: 'Proves your stake and any dilution.', where: 'Company, MCA filings (allotment returns).', preserve: '' },
+      { id: 'sd_e_mca', name: 'MCA filings: director appointments/resignations, allotments, charges, annual returns', fact: 'What was officially recorded', why: 'Shows unauthorised changes and their dates.', where: 'MCA portal (view public documents).', preserve: 'Download with dates now.', action: true },
+      { id: 'sd_e_minutes', name: 'Board and general meeting notices, agendas and minutes you hold', fact: 'What was decided and how', why: 'Defective notice or quorum can invalidate decisions.', where: 'Your email, company secretary.', preserve: LAWFUL, when: W('sd_issue', 'removed', 'dilution', 'transfer', 'deadlock') },
+      { id: 'sd_e_accounts', name: 'Financial statements, bank statements and related-party transactions you can lawfully access', fact: 'Diversion of funds', why: 'Supports mismanagement claims.', where: 'Annual filings on MCA, company records.', preserve: LAWFUL, when: W('sd_issue', 'siphon', 'records') },
+      { id: 'sd_e_demand', name: 'Your written requests for records/meetings and the replies', fact: 'Access was denied', why: 'Shows exclusion from management.', where: 'Email.', preserve: '', when: W('sd_issue', 'records', 'removed') },
+      { id: 'sd_e_comms', name: 'Founder messages and emails about roles, equity and exits', fact: 'The understanding between founders', why: 'Fills gaps where nothing was signed.', where: 'Email, Slack, WhatsApp.', preserve: 'Export complete threads.' },
+      { id: 'sd_e_valuation', name: 'Latest valuation reports and funding round documents', fact: 'Value of your shares', why: 'Needed for any buy-out.', where: 'Company, investors.', preserve: '', when: W('sd_issue', 'exit', 'dilution') }
+    ],
+    urgent: [{ id: 'sd_u_recent', level: 'soon', when: ALL(W('sd_issue', 'removed', 'dilution', 'transfer'), W('sd_when', 'recent')), title: 'Urgent relief may be possible', text: 'NCLT can pass interim orders to freeze changes. Speak to an advocate soon — delay weakens urgency.', help: ['mca'] }],
+    lawyerQs: [{ text: 'Do I qualify to file an oppression and mismanagement case, or should I seek a waiver?' }, { text: 'Is the dispute for NCLT or for arbitration under our agreement?', when: W('sd_arb', 'yes') }, { text: 'Can the removal, allotment or transfer be reversed?', when: W('sd_issue', 'removed', 'dilution', 'transfer') }]
+  });
+
+  /* ---------------- Partnership / LLP ---------------- */
+  I.push({
+    id: 'partnership-dispute', cat: 'business', title: 'Dispute with my business partner (partnership firm or LLP)', short: 'Partnership & LLP disputes',
+    synonyms: ['partnership dispute', 'business partner dispute', 'partner cheated', 'dissolution of partnership', 'llp dispute', 'partner not sharing profit', 'retirement of partner', 'partnership deed'],
+    intro: 'Partner disputes come down to the deed, the accounts and who did what. Let\'s collect those.',
+    juris: 'Partnership firms are governed by the Partnership Act, 1932; LLPs by the LLP Act, 2008. An unregistered firm faces limits on suing third parties and partners in some cases. Many deeds require arbitration.',
+    tips: ['A partner can ask for accounts and a share of profits as per the deed.', 'Retirement and dissolution follow the deed; where it is silent, the statute fills the gaps.'],
+    questions: [
+      { id: 'pd_type', text: 'What kind of business?', chapter: 'The business', why: 'Firm and LLP rules differ.', options: o([['firm', 'Partnership firm'], ['llp', 'LLP'], ['informal', 'Informal, nothing registered']]) },
+      { id: 'pd_reg', text: 'Is the firm registered with the Registrar of Firms?', chapter: 'The business', when: W('pd_type', 'firm'), why: 'Registration affects which suits can be filed.', options: o([['yes', 'Yes'], ['no', 'No'], NS]) },
+      { id: 'pd_issue', text: 'What is the problem?', type: 'multi', chapter: 'The dispute', why: 'Each issue needs different records.', options: o([['accounts', 'Partner won\'t show accounts'], ['money', 'Partner took money / clients'], ['exit', 'I want to exit / dissolve'], ['expelled', 'I was pushed out'], ['capital', 'Capital not returned'], ['debts', 'I\'m being made to pay firm debts']]) },
+      { id: 'pd_deed', text: 'Is there a written partnership deed / LLP agreement?', chapter: 'Paper trail', why: 'It usually decides profit shares, exit and arbitration.', options: o([['yes', 'Yes'], ['no', 'No']]) },
+      { id: 'pd_arb', text: 'Does it have an arbitration clause?', chapter: 'Paper trail', when: W('pd_deed', 'yes'), why: 'Usually sends the dispute to arbitration.', options: o([['yes', 'Yes'], ['no', 'No'], NS]) }
+    ],
+    evidence: [
+      { id: 'pd_e_deed', name: 'Partnership deed / LLP agreement and amendments', fact: 'Agreed shares and rules', why: 'The starting point.', where: 'Your records; Registrar of Firms; MCA for LLPs.', preserve: '', when: W('pd_deed', 'yes') },
+      { id: 'pd_e_reg', name: 'Registration certificate (Form A / LLP incorporation)', fact: 'Registration status', why: 'Affects remedies.', where: 'Registrar of Firms / MCA.', preserve: '', when: W('pd_type', 'firm', 'llp') },
+      { id: 'pd_e_capital', name: 'Proof of capital contributed by each partner', fact: 'Capital accounts', why: 'Basis for return of capital.', where: 'Bank statements, books.', preserve: '' },
+      { id: 'pd_e_books', name: 'Books of accounts, bank statements and tax returns of the business', fact: 'Profits and withdrawals', why: 'Shows diversion and profit shares.', where: 'Accountant, bank.', preserve: LAWFUL },
+      { id: 'pd_e_clients', name: 'Evidence of diverted clients or money (invoices raised elsewhere, messages)', fact: 'Misappropriation', why: 'Supports recovery and criminal complaints.', where: 'Your records, clients.', preserve: '', when: W('pd_issue', 'money') },
+      { id: 'pd_e_informal', name: 'Messages, payments and witnesses showing the partnership existed', fact: 'Partnership existed', why: 'Needed when nothing was written.', where: 'Phone, bank, people involved.', preserve: '', when: W('pd_deed', 'no') },
+      { id: 'pd_e_notice', name: 'Your notice of retirement/dissolution or the notice expelling you', fact: 'How the relationship ended', why: 'Fixes dates and rights.', where: 'Email, letters.', preserve: '', when: W('pd_issue', 'exit', 'expelled') },
+      { id: 'pd_e_debts', name: 'Firm loans, guarantees and creditor demands', fact: 'Liability for firm debts', why: 'Partners can be personally liable in firms.', where: 'Bank, creditors.', preserve: '', when: W('pd_issue', 'debts') }
+    ],
+    urgent: [],
+    lawyerQs: [{ text: 'Should I seek accounts, dissolution, or recovery — and in court or arbitration?' }, { text: 'Does non-registration of the firm affect my case?', when: W('pd_reg', 'no') }]
+  });
+
+  /* ---------------- Contract breach (commercial) ---------------- */
+  I.push({
+    id: 'contract-breach', cat: 'business', title: 'A business deal or contract was broken', short: 'Commercial contract dispute',
+    synonyms: ['breach of contract', 'contract dispute', 'agreement broken', 'vendor did not deliver', 'supplier dispute', 'franchise dispute', 'distributor dispute', 'commercial dispute', 'arbitration', 'pre-institution mediation'],
+    intro: 'Contract cases turn on what was promised, what was done, and what loss followed. We\'ll gather all three.',
+    juris: 'Commercial disputes of ₹3 lakh or more go to commercial courts, generally after mandatory pre-institution mediation unless urgent interim relief is needed. If the contract has an arbitration clause, courts usually refer the dispute to arbitration but can grant interim protection.',
+    tips: ['Send a clear written notice of breach before escalating; it fixes dates and positions.', 'Courts can grant urgent interim relief (e.g. to stop invocation of a bank guarantee) even when there is an arbitration clause.', 'You must take reasonable steps to limit your loss after a breach.'],
+    questions: [
+      { id: 'cbx_role', text: 'Which side are you on?', chapter: 'The deal', why: 'Claimants and respondents need different records.', options: o([['claim', 'The other side broke the deal'], ['defend', 'I am accused of breaking it']]) },
+      { id: 'cbx_kind', text: 'What kind of deal?', chapter: 'The deal', why: 'Different industries keep different records.', options: o([['supply', 'Supply of goods'], ['services', 'Services / software / consulting'], ['franchise', 'Franchise / distribution'], ['lease', 'Commercial lease'], ['jv', 'Joint venture / investment'], ['other', 'Other']]) },
+      { id: 'cbx_value', text: 'Value of the dispute?', chapter: 'The deal', why: '₹3 lakh is the threshold for commercial courts.', options: o([['u3', 'Under ₹3 lakh'], ['3to1cr', '₹3 lakh to ₹1 crore'], ['over1cr', 'More than ₹1 crore']]) },
+      { id: 'cbx_breach', text: 'What went wrong?', type: 'multi', chapter: 'The breach', why: 'Each breach needs specific proof.', options: o([['nondelivery', 'Not delivered / not performed'], ['quality', 'Poor quality'], ['delay', 'Delay'], ['nonpayment', 'Payment not made'], ['termination', 'Contract wrongly terminated'], ['guarantee', 'Bank guarantee being invoked'], ['confidential', 'Confidential information misused']]) },
+      { id: 'cbx_arb', text: 'Does the contract have an arbitration clause?', chapter: 'The contract', why: 'Decides forum.', options: o([['yes', 'Yes'], ['no', 'No'], ['nowritten', 'No written contract']]) },
+      { id: 'cbx_notice', text: 'Has a notice of breach been sent or received?', deep: true, chapter: 'Steps so far', why: 'Notices fix dates and cure periods.', options: o([['sent', 'Sent'], ['received', 'Received'], ['no', 'No']]) },
+      { id: 'cbx_loss', text: 'Can you show your loss in numbers?', deep: true, chapter: 'Loss', when: W('cbx_role', 'claim'), why: 'Damages must be proved, not assumed.', options: o([['yes', 'Yes'], ['partly', 'Partly'], ['no', 'Not yet']]) }
+    ],
+    evidence: [
+      { id: 'cbx_e_contract', name: 'Signed contract with annexures, amendments and SOWs', fact: 'What was promised', why: 'The foundation.', where: 'Your files.', preserve: '', when: NOT(W('cbx_arb', 'nowritten')) },
+      { id: 'cbx_e_oral', name: 'Emails, quotations, POs and messages forming the deal', fact: 'Terms without a signed contract', why: 'A contract can be formed by correspondence.', where: 'Email.', preserve: 'Export full threads.', when: W('cbx_arb', 'nowritten') },
+      { id: 'cbx_e_performance', name: 'Delivery records, milestones, acceptance and rejection notes', fact: 'Who performed what', why: 'Central to breach.', where: 'Project records, email.', preserve: '' },
+      { id: 'cbx_e_payments', name: 'Payment records and invoices', fact: 'Money paid or due', why: 'Shows the financial position.', where: 'Accounts.', preserve: '' },
+      { id: 'cbx_e_notices', name: 'Notices of breach, termination and replies', fact: 'Positions taken and dates', why: 'Fixes timeline and cure periods.', where: 'Email, letters.', preserve: '', when: W('cbx_notice', 'sent', 'received') },
+      { id: 'cbx_e_loss', name: 'Loss calculation with supporting bills, lost orders, replacement costs', fact: 'Damages', why: 'Courts and tribunals award proven loss.', where: 'Accounts.', preserve: '', when: W('cbx_role', 'claim') },
+      { id: 'cbx_e_bg', name: 'Bank guarantee and invocation letter', fact: 'Guarantee terms', why: 'Urgent injunctions turn on exact wording.', where: 'Bank.', preserve: '', time: 'Invocation can be paid quickly — act within days.', when: W('cbx_breach', 'guarantee') },
+      { id: 'cbx_e_nda', name: 'NDA/confidentiality clauses and proof of misuse', fact: 'Confidential information misused', why: 'Supports injunction claims.', where: 'Contract, emails, market evidence.', preserve: '', when: W('cbx_breach', 'confidential') },
+      { id: 'cbx_e_mitigate', name: 'Steps you took to limit the loss', fact: 'Mitigation', why: 'Required for damages.', where: 'Your records.', preserve: '', when: W('cbx_role', 'claim') }
+    ],
+    urgent: [{ id: 'cbx_u_bg', level: 'now', when: W('cbx_breach', 'guarantee'), title: 'Bank guarantee invocation is urgent', text: 'Courts can be approached for urgent interim relief. Speak to an advocate today.', help: ['l15100'] }],
+    lawyerQs: [{ text: 'Court or arbitration — and is pre-institution mediation required?' }, { text: 'What damages can I realistically claim?', when: W('cbx_role', 'claim') }, { text: 'Can I get interim relief now?', when: W('cbx_breach', 'guarantee', 'confidential', 'termination') }]
+  });
+
+  /* ---------------- Brand / IP / ex-employee ---------------- */
+  I.push({
+    id: 'ip-brand', cat: 'business', title: 'Someone copied my brand, product or content, or took my business secrets', short: 'Brand copying & business secrets',
+    synonyms: ['trademark infringement', 'brand copied', 'logo copied', 'passing off', 'copyright infringement', 'content copied', 'domain squatting', 'ex employee took clients', 'trade secrets', 'non compete', 'design copied'],
+    intro: 'Brand and IP cases are about proving you were first and showing the copying clearly.',
+    juris: 'Trademarks, copyright and designs are protected by statute; unregistered brands can still be protected through passing off. Post-employment non-compete clauses are generally unenforceable in India, but confidentiality obligations can be enforced.',
+    tips: ['Evidence of earlier use (invoices, ads, dated web pages) matters as much as registration.', 'Take dated screenshots and test purchases of the copy before sending a notice.'],
+    questions: [
+      { id: 'ip_what', text: 'What was copied or taken?', type: 'multi', chapter: 'What happened', why: 'Each right is proved differently.', options: o([['brand', 'Brand name / logo'], ['content', 'Content, photos, software'], ['design', 'Product design'], ['domain', 'Domain or social handle'], ['secrets', 'Client lists or confidential data (by ex-employee/partner)']]) },
+      { id: 'ip_reg', text: 'Is your brand or design registered?', chapter: 'Your rights', when: W('ip_what', 'brand', 'design'), why: 'Registration gives an infringement action; otherwise passing off.', options: o([['yes', 'Registered'], ['applied', 'Applied'], ['no', 'Not registered']]) },
+      { id: 'ip_since', text: 'Since when have you used it?', chapter: 'Your rights', when: W('ip_what', 'brand', 'design', 'content'), why: 'Prior use decides who wins.', options: o([['y5', 'More than 5 years'], ['y1', '1–5 years'], ['new', 'Under a year']]) },
+      { id: 'ip_where', text: 'Where is the copy being used?', type: 'multi', chapter: 'The copy', why: 'Marketplaces and platforms have takedown routes.', options: o([['online', 'Website / marketplace / social media'], ['shops', 'Shops / offline'], ['both', 'Both']]) }
+    ],
+    evidence: [
+      { id: 'ip_e_reg', name: 'Trademark/design registration certificate or application', fact: 'Your registered rights', why: 'Basis of infringement action.', where: 'IP India portal.', preserve: '', when: W('ip_reg', 'yes', 'applied') },
+      { id: 'ip_e_use', name: 'Proof of earliest and continuous use: invoices, ads, packaging, dated web pages', fact: 'You used it first', why: 'Decides priority and passing off.', where: 'Your records; web archives.', preserve: '' },
+      { id: 'ip_e_sales', name: 'Sales figures and marketing spend', fact: 'Your reputation (goodwill)', why: 'Needed for passing off.', where: 'Accounts.', preserve: '', when: W('ip_what', 'brand', 'design') },
+      { id: 'ip_e_copy', name: 'Dated screenshots, URLs, test purchases and invoices of the copy', fact: 'The infringement', why: 'Shows what is copied and where.', where: 'Web, marketplaces, shops.', preserve: 'Keep the purchased product sealed.' },
+      { id: 'ip_e_confusion', name: 'Instances of customer confusion (messages, reviews, misdirected orders)', fact: 'Consumers were misled', why: 'Strong evidence in brand cases.', where: 'Customer support, reviews.', preserve: '', when: W('ip_what', 'brand') },
+      { id: 'ip_e_creation', name: 'Original files with creation dates (source files, drafts, code repos)', fact: 'You created it', why: 'Proves authorship in copyright cases.', where: 'Your systems.', preserve: '', when: W('ip_what', 'content', 'design') },
+      { id: 'ip_e_employment', name: 'Employment/consultancy agreement with confidentiality clauses; exit records', fact: 'Confidentiality obligations', why: 'Basis for action over secrets.', where: 'HR records.', preserve: '', when: W('ip_what', 'secrets') },
+      { id: 'ip_e_leak', name: 'Evidence the data or clients were taken (access logs, client messages)', fact: 'Misuse of confidential information', why: 'Supports injunction.', where: 'IT logs, clients.', preserve: 'Ask IT to preserve logs; don\'t access the person\'s private accounts.', when: W('ip_what', 'secrets') }
+    ],
+    urgent: [],
+    lawyerQs: [{ text: 'Infringement, passing off, or both — and can I get an urgent injunction?' }, { text: 'Should I use platform takedowns first?', when: W('ip_where', 'online', 'both') }, { text: 'What can I enforce against the ex-employee?', when: W('ip_what', 'secrets') }]
+  });
+
+  /* ---------- Business questions ---------- */
+  const Q = (id, q, a, depends, law, journey, kw) => KB.questions.push({ cat: 'business', id, q, a, depends, law, journey, kw });
+  Q('msme-45', 'My buyer hasn\'t paid in 45 days. I\'m a small business. What can I do?', 'If you were registered as a micro or small enterprise when you supplied, the buyer must pay within the agreed period (not more than 45 days). Late payment carries compound interest at three times the RBI bank rate. You can file a reference with the state MSE Facilitation Council through the MSME ODR portal.', ['Udyam registration date', 'Proof of delivery and acceptance'], 'MSMED Act 2006 ss.15–18', 'business-unpaid', ['msme', '45 days', 'samadhaan']);
+  Q('ibc-threshold', 'Can I file insolvency against a company that owes me money?', 'Only if the unpaid debt is at least ₹1 crore and there is no genuine pre-existing dispute. As an operational creditor you first send a demand notice; the company can dispute it within 10 days. Insolvency is a collective process, not a recovery shortcut.', ['Amount and nature of debt', 'Any prior dispute'], 'Insolvency and Bankruptcy Code 2016 ss.8–9', 'business-unpaid', ['insolvency', 'nclt']);
+  Q('commercial-mediation', 'Do I have to try mediation before filing a commercial suit?', 'Generally yes. For commercial disputes not seeking urgent interim relief, pre-institution mediation is mandatory before filing a suit in a commercial court.', ['Whether you need urgent relief', 'Value of the dispute'], 'Commercial Courts Act 2015 s.12A; Patil Automation v. Rakheja Engineers (2022)', 'contract-breach', ['pre-institution mediation']);
+  Q('oppression', 'What is an oppression and mismanagement case?', 'It lets shareholders ask the NCLT for relief when the company is run in a way unfairly prejudicial to them — for example being removed, diluted or kept out of records. Members usually need at least 10% of shares (or 100 members), though the Tribunal can waive this.', ['Your shareholding', 'What exactly was done'], 'Companies Act 2013 ss.241–244', 'shareholder-dispute', ['oppression mismanagement', 'nclt']);
+  Q('non-compete', 'Can my ex-employer stop me from joining a competitor?', 'Generally no — restraints after employment ends are largely unenforceable in India. But you must still respect confidentiality obligations and not take confidential information or solicit in breach of a valid clause.', ['Your contract wording', 'What information you hold'], 'Indian Contract Act s.27', 'ip-brand', ['non compete']);
+  KB.myths.push({ s: 'A non-compete clause can stop you from working for a competitor after you resign.', fact: false, why: 'Post-employment restraints are generally unenforceable in India, though confidentiality obligations remain.' });
+  KB.myths.push({ s: 'A small supplier can charge interest if a registered buyer pays after 45 days.', fact: true, why: 'Micro and small enterprises are entitled to compound interest at three times the RBI bank rate on delayed payment.' });
+
+  KB.directory = KB.directory.filter((d) => !['Unpaid invoice or business payment', 'Breach of contract', 'Partnership dispute'].includes(d.title));
+})(globalThis);
+</script>
 <script>/* Legal questions (answer-first explainers) and Myth-or-Fact cards. Draft, not advocate-reviewed. */
 (function (root) {
   const KB = root.ER_KB;
@@ -2306,12 +2715,12 @@ body.calm .opt:active{transform:none}
   }
 
   /* ============ HOME ============ */
-  const SUGGEST = ['My cheque bounced', 'UPI fraud', 'Bank froze my account', 'Landlord kept my deposit', 'Divorce', 'Insurance claim rejected', 'Builder delayed my flat', 'Salary not paid', 'FIR not registered', 'Recovery agent harassment'];
+  const SUGGEST = ['My cheque bounced', 'UPI fraud', 'Divorce', 'NRI property', 'Client not paying', 'Landlord kept my deposit'];
   function clubRows(cid) {
     const deep = BUILT.filter((i) => i.cat === cid);
     const gen = KB.directory.map((d, idx) => ({ ...d, idx })).filter((d) => d.cat === cid);
-    return deep.map((i) => `<button class="issue" data-go="start-${i.id}"><b>${esc(i.short)}</b><span>${esc(i.title)}</span><em>Guided, up to ${i.evidence.length} records</em></button>`).join('')
-      + gen.map((d) => `<button class="issue gen" data-go="topic-${d.idx}"><b>${esc(d.title)}</b><span>General preparation for now</span><em>general</em></button>`).join('');
+    return deep.map((i) => `<button class="issue" data-play="${i.id}"><b>${esc(i.short)}</b><span>${esc(i.title)}</span><em>Guided, up to ${i.evidence.length} records</em></button>`).join('')
+      + gen.map((d) => `<button class="issue gen" data-play="general" data-topic="${d.idx}"><b>${esc(d.title)}</b><span>General preparation for now</span><em>general</em></button>`).join('');
   }
   function viewHome() {
     const saved = !S.issueId && loadSaved();
@@ -2340,7 +2749,7 @@ body.calm .opt:active{transform:none}
         <p class="muted" style="margin:0">${BUILT.length} guided problems, chosen from the disputes that most often reach Indian courts, consumer helplines and the RBI Ombudsman.</p>
         <div class="tabs" role="tablist" aria-label="Problem areas">${KB.categories.map((c) => `<button class="tab" role="tab" id="tab-${c.id}" aria-controls="drawer" aria-selected="${UI.club === c.id}" data-club="${c.id}">${ic(c.icon, 17)} ${esc(c.title)}</button>`).join('')}</div>
         <div class="drawer" id="drawer" role="tabpanel" aria-labelledby="tab-${UI.club}">${clubRows(UI.club)}
-          <button class="issue gen" data-go="start-general"><b>Something else, or not sure</b><span>Answer a few general questions</span><em>general</em></button></div>
+          <button class="issue gen" data-play="general"><b>Something else, or not sure</b><span>Answer a few general questions</span><em>general</em></button></div>
       </section>
       <section class="split">
         <div>
@@ -2355,8 +2764,7 @@ body.calm .opt:active{transform:none}
           <button class="btn go" data-go="myths">Play</button>
         </div>
       </section>
-      <h2>How it works</h2>
-      <ol class="how"><li><b>Pick what happened</b><span>No legal words needed.</span></li><li><b>Answer in chapters</b><span>One tap per question. Skip anything.</span></li><li><b>Build your file</b><span>Records appear as you answer.</span></li><li><b>Take it to your advocate</b><span>Print or save a tidy preparation pack.</span></li></ol>
+
     </div>`);
   }
   function searchAll(q) {
@@ -2366,8 +2774,8 @@ body.calm .opt:active{transform:none}
     const ql = q.toLowerCase();
     const score = (t, syn) => { const hay = (t + ' | ' + syn.join(' | ')).toLowerCase(); let s = 0; words.forEach((w) => { if (hay.includes(w)) s += 2; else if (w.length > 4 && hay.includes(w.slice(0, -1))) s += 1; }); syn.forEach((x) => { if (ql.includes(x)) s += 4; }); return s; };
     const res = [];
-    BUILT.forEach((i) => { const s = score(i.title + ' ' + i.short, i.synonyms); if (s) res.push({ s: s + 1, go: 'start-' + i.id, title: i.short, kind: 'Guided' }); });
-    KB.directory.forEach((d, idx) => { const s = score(d.title, d.synonyms); if (s) res.push({ s, go: 'topic-' + idx, title: d.title, kind: 'General' }); });
+    BUILT.forEach((i) => { const s = score(i.title + ' ' + i.short, i.synonyms); if (s) res.push({ s: s + 1, play: i.id, title: i.short, kind: 'Guided' }); });
+    KB.directory.forEach((d, idx) => { const s = score(d.title, d.synonyms); if (s) res.push({ s, play: 'general', topic: idx, title: d.title, kind: 'General' }); });
     KB.questions.forEach((x) => { const s = score(x.q, x.kw); if (s > 2) res.push({ s: s - 1, go: 'q-' + x.id, title: x.q, kind: 'Answer' }); });
     return res.sort((a, b) => b.s - a.s).slice(0, 6);
   }
@@ -2376,8 +2784,8 @@ body.calm .opt:active{transform:none}
     document.getElementById('suggest').hidden = !!q.trim();
     if (!q.trim()) { box.innerHTML = ''; return; }
     const r = searchAll(q);
-    box.innerHTML = r.length ? r.map((x) => `<button class="res" data-go="${x.go}"><span>${esc(x.title)}</span><small>${x.kind}</small></button>`).join('')
-      : `<button class="res" data-go="start-general"><span>Not sure what this is? Use general preparation</span><small>General</small></button>`;
+    box.innerHTML = r.length ? r.map((x) => `<button class="res" ${x.play ? `data-play="${x.play}" ${x.topic != null ? `data-topic="${x.topic}"` : ''}` : `data-go="${x.go}"`}><span>${esc(x.title)}</span><small>${x.kind}</small></button>`).join('')
+      : `<button class="res" data-play="general"><span>Not sure what this is? Use general preparation</span><small>General</small></button>`;
   }
 
   /* ============ INTRO ============ */
@@ -2426,6 +2834,7 @@ body.calm .opt:active{transform:none}
     const urg = E.urgent(iss, S.answers).filter((u) => u.level !== 'info');
     return shell(`<div class="wrap narrow qwrap">
       <nav class="chapters" aria-label="Chapters">${chaptersFor(S.stage, q).map((c) => `<span class="chap ${c.now ? 'now' : c.done ? 'done' : ''}" ${c.now ? 'aria-current="step"' : ''}>${c.done && !c.now ? ic('check', 14) : ''}${esc(c.n)}</span>`).join('')}</nav>
+      ${S.stage === 'quick' && pr.done === 0 ? `<div class="opener"><span class="typed">In the matter of:</span> <b>${esc(S.topic ? S.topic.title : iss.short)}</b><p>${esc(iss.intro)}</p>${S.topic && S.topic.urgentNote ? `<p class="warn">${esc(S.topic.urgentNote)}</p>` : ''}${S.adv && S.adv.issueId === iss.id ? advBanner(S.adv) : ''}</div>` : ''}
       ${urg.map(urgentBanner).join('')}
       <div class="qmeta"><span>${S.stage === 'quick' ? 'Quick round' : 'Going deeper'}</span><span>${pr.done + 1} of about ${pr.total}</span></div>
       <form id="qform" data-q="${q.id}">
@@ -2438,7 +2847,7 @@ body.calm .opt:active{transform:none}
         <div class="qfoot"><div class="row"><button type="button" class="btn line" data-act="qback" ${S.history.length ? '' : 'disabled'}>${ic('back', 18)} Back</button><button type="button" class="btn text" data-act="skip">Skip</button></div>
           <button type="submit" class="btn go" id="nextbtn" ${multi ? '' : 'hidden'}>Continue</button></div>
       </form>
-      <p class="small muted" style="margin-top:14px">Tip: press ${KEYS.slice(0, q.options.length).split('').join(', ')} to answer.</p>
+      <p class="small muted keytip" style="margin-top:14px">Tip: press ${KEYS.slice(0, q.options.length).split('').join(', ')} to answer.</p>
     </div>`, { tray: true, inJourney: true });
   }
   function urgentBanner(u) {
@@ -2465,7 +2874,7 @@ body.calm .opt:active{transform:none}
     if (!nq) { S._fly = null; finishStage(); go('brk'); return; }
     if (q && chapOf(nq) !== chapOf(q)) {
       const chapQs = issue().questions.filter((x) => chapOf(x) === chapOf(q) && (S.answers[x.id] != null || S.skipped[x.id]));
-      if ((S.chapterFound || []).length || chapQs.length >= 2) { S._fly = null; S.breakChapter = chapOf(q); go('brk'); return; }
+      if ((S.chapterFound || []).length) { S._fly = null; S.breakChapter = chapOf(q); go('brk'); return; }
     }
     render();
   }
@@ -2664,7 +3073,7 @@ body.calm .opt:active{transform:none}
       <div id="qalist">${list.map((q) => `<details class="qa" id="qa-${q.id}" ${q.id === openId ? 'open' : ''}><summary>${esc(q.q)}</summary><div class="body">
         <p>${esc(q.a)}</p><p class="small" style="margin:0"><b>What can change the answer</b></p><ul>${q.depends.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
         <p class="law">Law: ${esc(q.law)}. ${esc(KB.reviewed.label)}.</p>
-        ${q.journey && BY_ID[q.journey] ? `<button class="btn line" data-go="start-${q.journey}">Prepare for a lawyer: ${esc(BY_ID[q.journey].short)}</button>` : ''}
+        ${q.journey && BY_ID[q.journey] ? `<button class="btn line" data-play="${q.journey}">Prepare for a lawyer: ${esc(BY_ID[q.journey].short)}</button>` : ''}
       </div></details>`).join('') || '<p class="panel muted">No match. Try other words, or <button class="btn text" data-go="start-general">use general preparation</button>.</p>'}</div>
     </div>`);
   }
@@ -2819,9 +3228,11 @@ body.calm .opt:active{transform:none}
     const a = document.getElementById(anchor); if (a) { const b = a.querySelector(sel) || a.querySelector('[aria-pressed=true]'); if (b) b.focus({ preventScroll: true }); }
   }
   document.addEventListener('click', async (e) => {
+    const pl = e.target.closest('[data-play]');
+    if (pl) { e.preventDefault(); startIssue(pl.dataset.play, pl.dataset.topic != null ? KB.directory[Number(pl.dataset.topic)] : null); go('quiz'); return; }
     const t = e.target.closest('[data-go],[data-act],[data-status],[data-delrec],[data-delchrono],[data-ex],[data-copy],[data-club],[data-qcat],[data-mf]'); if (!t) return;
     if (t.dataset.go) { e.preventDefault(); go(t.dataset.go); return; }
-    if (t.dataset.club) { UI.club = t.dataset.club; document.querySelectorAll('.tab').forEach((x) => x.setAttribute('aria-selected', x === t)); const d = document.getElementById('drawer'); d.setAttribute('aria-labelledby', t.id); d.innerHTML = clubRows(UI.club) + '<button class="issue gen" data-go="start-general"><b>Something else, or not sure</b><span>Answer a few general questions</span><em>general</em></button>'; return; }
+    if (t.dataset.club) { UI.club = t.dataset.club; document.querySelectorAll('.tab').forEach((x) => x.setAttribute('aria-selected', x === t)); const d = document.getElementById('drawer'); d.setAttribute('aria-labelledby', t.id); d.innerHTML = clubRows(UI.club) + '<button class="issue gen" data-play="general"><b>Something else, or not sure</b><span>Answer a few general questions</span><em>general</em></button>'; return; }
     if (t.dataset.qcat) { UI.qcat = t.dataset.qcat; render(); return; }
     if (t.dataset.ex) { const m = document.getElementById('matter'); m.value = t.dataset.ex; renderResults(m.value); m.focus(); return; }
     if (t.dataset.copy) { try { await navigator.clipboard.writeText(t.dataset.copy); toast('Copied'); } catch (err) { toast('Copy blocked — select and copy manually'); } return; }

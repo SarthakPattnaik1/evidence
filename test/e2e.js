@@ -16,8 +16,7 @@ const url = 'file://' + require('path').resolve(__dirname, '../build/index.html'
     await shot(p, n + '-home', n === 'd');
     if (n === 'm') await shot(p, 'm-home-full', true);
     await p.fill('#matter', 'my cheque bounced'); await p.waitForTimeout(150); await shot(p, n + '-search');
-    await p.click('.res >> nth=0'); await p.waitForTimeout(200); await shot(p, n + '-intro');
-    await p.click('[data-act=begin]'); await p.waitForTimeout(250);
+    await p.click('.res >> nth=0'); await p.waitForTimeout(250); await shot(p, n + '-firstq');
     const pick = async (t) => { await p.click(`.opt:has-text("${t}")`); await p.waitForTimeout(450); if (await p.locator('[data-act=continue]').count() && !/30-day/.test(await p.textContent('h1'))) { await p.click('[data-act=continue]'); await p.waitForTimeout(250); } };
     await p.click('.opt:has-text("I received the cheque")'); await p.waitForTimeout(450);
     await shot(p, n + '-break1');
