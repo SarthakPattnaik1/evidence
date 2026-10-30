@@ -286,7 +286,7 @@ ${JSON.stringify(map)}`;
     const sensitive = !!(issue() && issue().sensitive && opt.inJourney);
     document.body.classList.toggle('calm', sensitive);
     return `<header class="top"><div class="wrap">
-        <button class="brand" data-go="home" aria-label="Saboot home"><img class="bicon" src="${window.ER_BRAND.icon}" alt="" width="36" height="36"><span class="bword">Saboot</span></button>
+        <button class="brand" data-go="home" aria-label="Saboot home"><img class="bicon" src="${window.ER_BRAND.icon}" alt="" width="31" height="38"><span class="bword">Saboot</span></button>
         <button class="nav navq" data-go="questions" aria-label="${esc(T('q'))}">${ic('q', 18)}<span class="lbl-long">${esc(T('q').replace(/\?$/, ''))}</span></button>
         <button class="nav" data-go="help">${ic('phone', 18)}<span class="lbl-long">${esc(T('help').replace(/\?$/, ''))}</span><span class="lbl-short">${esc(H('nav_help', 'Help'))}</span></button>
         <button class="nav lang" data-act="lang" aria-label="Language: ${esc(LMETA[LANG].name)}. Change language">${ic('globe', 18)}<span>${esc(LMETA[LANG].native)}</span></button>
@@ -303,7 +303,7 @@ ${JSON.stringify(map)}`;
   function footer() {
     const f = (k) => esc(H(k, FOOT[k]));
     return `<footer class="foot"><div class="wrap">
-      <div class="fmark"><img src="${window.ER_BRAND.icon}" alt="" width="44" height="44"><div><b>Saboot</b><span>Samajh. Tayyari. Apna Haq.</span></div></div>
+      <div class="fmark"><img src="${window.ER_BRAND.icon}" alt="" width="40" height="49"><div><b>Saboot</b><span>${esc(X('Know what to bring. Meet your lawyer prepared.'))}</span></div></div>
       <p style="max-width:62em">${f('f_disc')}</p>
       <p class="small muted madeby">${esc(X('Made by'))} <a class="plink" href="https://www.linkedin.com/in/sarthakad" target="_blank" rel="noopener">Sarthak Pattnaik</a> ${esc(X('and'))} <a class="plink" href="https://www.linkedin.com/in/subhankar-das-311030b1/" target="_blank" rel="noopener">Subhankar Das</a>. ${esc(X('Saboot does not take cases, referrals or fees.'))}</p>
       <div class="row"><button data-go="about">${f('f_about')}</button><button data-go="advocates">${f('f_adv')}</button><button data-go="myths">${f('f_myth')}</button><button data-go="help">${f('f_help')}</button><button data-act="reportissue">${esc(X('Report a problem'))}</button>${S.issueId ? `<button data-act="clear">${f('f_clear')}</button>` : ''}${/^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname) ? `<a class="flink" href="/guide">${esc(X('All guides'))}</a><a class="flink" href="/privacy">${esc(X('Privacy'))}</a><a class="flink" href="/terms">${esc(X('Terms'))}</a>` : ''}</div>
@@ -345,11 +345,11 @@ ${JSON.stringify(map)}`;
       + gen.map((d) => `<button class="prob" data-play="general" data-topic="${d.idx}"><b>${esc(C(cid, 'd' + d.idx, d.title))}</b><span>${esc(T('basic'))}</span>${ic('chev', 22)}</button>`).join('');
   }
   const H = (k, en) => { if (LANG === 'en') return en; const m = RT.tr[LANG + '|home']; return (m && m[k]) || X(en); };
-  const HERO = { nav_help: 'Help', hero_h: 'Walk into your lawyer’s office ready.', hero_s1: 'Answer a few simple questions.', hero_s2: 'Know exactly which papers to carry — free, in your language.', hero_go: 'Get Started', hero_f: 'Free • Simple • Multilingual', tagline: 'Samajh. Tayyari. Apna Haq.', f1: 'Ask', f1s: 'In your language', f2: 'Prepare', f2s: 'Step by step', f3: 'Organize', f3s: 'Your evidence', f4: 'Be Ready', f4s: 'With confidence' };
+  const HERO = { nav_help: 'Help', hero_h: 'Walk into your lawyer’s office ready.', hero_s1: 'Answer a few simple questions.', hero_s2: 'Know exactly which papers to carry — free, in your language.', hero_go: 'Get Started', hero_f: 'Free • Simple • Multilingual', tagline: 'Know what to bring. Meet your lawyer prepared.', f1: 'Ask', f1s: 'In your language', f2: 'Prepare', f2s: 'Step by step', f3: 'Organize', f3s: 'Your evidence', f4: 'Be Ready', f4s: 'With confidence' };
   function ensureHome() {
     if (LANG === 'en' || RT.tr[LANG + '|home']) return Promise.resolve(true);
     const map = {}; KB.categories.forEach((c) => { map['b_' + c.id] = c.blurb; }); SUGGEST.forEach((x, i) => { map['s' + i] = x; }); Object.assign(map, FOOT, HERO); delete map.tagline; [['f1', 'Ask'], ['f1s', 'In your language'], ['f2', 'Prepare'], ['f2s', 'Step by step'], ['f3', 'Organize'], ['f3s', 'Your evidence'], ['f4', 'Be Ready'], ['f4s', 'With confidence']].forEach(([k, v]) => { map[k] = v; });
-    return translateMap(map, 'home9', (o) => { RT.tr[LANG + '|home'] = o; });
+    return translateMap(map, 'home11', (o) => { RT.tr[LANG + '|home'] = o; });
   }
   /* Home: act-now strip and situation cards. Every fact here is taken from the guide it opens. */
   const URGENT_NOW = [

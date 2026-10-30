@@ -781,3 +781,7 @@ footer.foot .wrap{position:relative}
 .fmark b{display:block;font-family:var(--display);font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--ink);line-height:1.05}
 .fmark span{display:block;font-size:13px;color:var(--ink2);letter-spacing:.01em}
 @media (max-width:420px){ .bicon{width:30px;height:30px} .bword{font-size:20px} }
+
+/* v23: Saboot logo (mark from the brand board) — colours unchanged */
+.bicon{width:31px;height:38px;border-radius:0}
+.fmark img{width:40px;height:49px;border-radius:0}

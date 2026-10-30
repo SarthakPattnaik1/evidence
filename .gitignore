@@ -2,3 +2,4 @@ node_modules/
 test/shots/
 shots*/
 *.log
+__pycache__/
