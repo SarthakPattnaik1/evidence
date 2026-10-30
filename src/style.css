@@ -406,3 +406,20 @@ header.top{background:rgba(255,255,255,.86);border-bottom:1px solid rgba(15,30,6
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.spinner{animation-duration:3s}.tile:hover,.prob:hover{transform:none}}
 @media (max-width:520px){.band{padding:16px 0 26px}.band h1{margin-top:16px}.lchip{padding:6px 12px;font-size:14px;min-height:36px}}
+
+/* v6: situation check + question counter */
+.barrow{display:flex;align-items:center;gap:10px;flex-wrap:nowrap;margin:10px 0 14px}
+.barrow .bar{flex:1;min-width:0;width:auto;margin-top:0;margin-bottom:0}
+.qcount{font-size:13px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;min-width:38px;text-align:end}
+.standcard{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh2);padding:18px 18px 8px;margin:4px 0 16px}
+.standcard h2{font-size:20px;margin-bottom:10px}
+.srow{display:grid;grid-template-columns:32px 1fr;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.srow:first-of-type{border-top:0}
+.srow b{display:block;font-size:13px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px}
+.srow ul{margin:0;padding-inline-start:18px}
+.srow li{margin:3px 0;line-height:1.45}
+.sic{width:32px;height:32px;border-radius:10px;display:grid;place-items:center}
+.s-good .sic{background:var(--go-l);color:var(--go-d)} .s-good b{color:var(--go-d)}
+.s-risk .sic{background:var(--amber-l);color:#8a5a00} .s-risk b{color:#8a5a00}
+.s-next .sic{background:#E8ECF5;color:var(--ink)} .s-next b{color:var(--ink)}
+html[data-script] .srow b{text-transform:none;letter-spacing:0}

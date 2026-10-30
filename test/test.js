@@ -1,5 +1,5 @@
 /* Automated checks: KB invariants + branch behaviour. Run: node test/test.js */
-['kb','j-money','j-family','j-consumer','j-other','j-nri','j-business','qa','engine'].forEach((f) => require('../src/' + f + '.js'));
+['kb','j-money','j-family','j-consumer','j-other','j-nri','j-business','j-more','stand','qa','engine'].forEach((f) => require('../src/' + f + '.js'));
 const KB = globalThis.ER_KB, E = globalThis.ER_ENGINE;
 let fails = 0, passes = 0;
 const ok = (c, m) => { if (c) passes++; else { fails++; console.log('FAIL:', m); } };
@@ -29,6 +29,7 @@ for (const issue of KB.issues) {
   (issue.urgent || []).forEach((u) => { check(u.when, u.id); (u.help || []).forEach((h) => ok(KB.help[h], `${u.id}: unknown help ${h}`)); });
   (issue.info || []).forEach((x, i) => check(x.when, 'info' + i));
   (issue.lawyerQs || []).forEach((x, i) => check(x.when, 'lq' + i));
+  (issue.stand || []).forEach((x, i) => { check(x.when, 'st' + i); ok(['good', 'risk', 'next'].includes(x.k) && x.text, `${issue.id}/st${i}: bad stand item`); });
   // first quick question must be unconditional; quick round 3-6 questions on the default path
   const first = E.nextQuestion(issue, {}, 'quick');
   ok(first && !first.when, `${issue.id}: first question must be unconditional`);
@@ -77,6 +78,13 @@ ok(E.urgent(byId('money-lent-not-returned'), { ml_cheque: 'bounced', ml_bounce_d
 ok(E.info(byId('failed-payment-debited'), { fp_mode: 'atm' })[0].text.includes('T+5'), 'ATM TAT is T+5');
 ok(E.info(byId('failed-payment-debited'), { fp_mode: 'upi_p2p' })[0].text.includes('T+1'), 'UPI P2P TAT is T+1');
 
+// New guides: situation check + key branches
+ok(E.stand(byId('cheque-bounce'), { cb_side: 'payee', cb_memo_when: 'd15' }).some((x) => x.k === 'good'), 'cheque: inside notice window => good');
+ok(E.urgent(byId('digital-arrest-scam'), { da_now: 'ongoing' }).some((u) => u.level === 'now'), 'digital arrest ongoing => urgent');
+ok(E.urgent(byId('traffic-challan'), { tr_problem: 'wrong', tr_days: 'u45' }).length === 1, 'challan within 45 days => contest banner');
+ok(ev('ecommerce-order', { ec_problem: 'wrong', ec_paid: 'card', ec_complained: 'no', ec_value: 'u5k' }).includes('ec_e_unbox'), 'ecommerce wrong item asks for unboxing');
+ok(!ev('ecommerce-order', { ec_problem: 'notdel', ec_paid: 'cod', ec_complained: 'no', ec_value: 'u5k' }).includes('ec_e_pay'), 'COD: no payment proof');
+ok(KB.issues.length >= 56, 'at least 56 guides');
 // QA journeys exist
 KB.questions.forEach((q) => ok(!q.journey || KB.issues.some((i) => i.id === q.journey), 'qa journey missing ' + q.id));
 ok(KB.issues.filter((i) => !i.general).length >= 40, 'expected >=40 journeys, got ' + KB.issues.length);

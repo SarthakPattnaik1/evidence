@@ -79,7 +79,7 @@
   }
   const uiReady = (l) => l === 'en' || !!I18N.STRINGS[l] || !!RT.ui[l];
   function trGet(chunk, key, en) { if (LANG === 'en') return en; const m = RT.tr[LANG + '|' + chunk]; return (m && m[key]) || en; }
-  const G = (iss, key, en) => trGet('g:' + iss.id + ':' + (/^[a-z]+_e_|^lq|^info/.test(key) || /_u_/.test(key) ? 'b' : 'a'), key, en);
+  const G = (iss, key, en) => trGet('g:' + iss.id + ':' + (/^[a-z]+_e_|^lq|^info|^st\d/.test(key) || /_u_/.test(key) ? 'b' : 'a'), key, en);
   function applyLangDom() {
     const m = LMETA[LANG]; const root = document.documentElement;
     root.lang = LANG; root.dir = m.rtl ? 'rtl' : 'ltr';
@@ -120,6 +120,7 @@ ${JSON.stringify(map)}`;
     iss.evidence.forEach((e) => { b[e.id + '.n'] = e.name; b[e.id + '.y'] = e.why; if (e.where) b[e.id + '.wh'] = e.where; if (e.preserve) b[e.id + '.p'] = e.preserve; if (e.time) b[e.id + '.tm'] = e.time; if (e.limit) b[e.id + '.l'] = e.limit; });
     (iss.urgent || []).forEach((u) => { b[u.id + '.t'] = u.title; b[u.id + '.x'] = u.text; });
     (iss.info || []).forEach((x, i) => { b['info' + i] = x.text; });
+    (iss.stand || []).forEach((x, i) => { b['st' + i] = x.text; });
     return { a, b };
   }
   function ensureGuide(iss, part) {
@@ -197,7 +198,7 @@ ${JSON.stringify(map)}`;
   }
 
   /* ============ HOME ============ */
-  const SUGGEST = ['Cheque bounced', 'Money stolen online', 'Divorce', 'Property in India (NRI)', 'Client not paying', 'Rent deposit not returned'];
+  const SUGGEST = ['Cheque bounced', 'Money stolen online', '"Digital arrest" call', 'Divorce', 'Online order not delivered', 'Flight refund', 'Wrong challan', 'Legal heir certificate', 'Loan app harassment', 'Rent deposit not returned'];
   const TOP_LANGS = ['en', 'hi', 'bn', 'te', 'mr', 'ta', 'ur', 'gu', 'kn', 'or', 'ml', 'pa'];
   const catTitle = (c) => T('c_' + c.id) || c.title;
   function problemRows(cid) {
@@ -310,7 +311,7 @@ ${JSON.stringify(map)}`;
     const first = S.stage === 'quick' && pr.done === 0;
     return shell(`<div class="wrap narrow qwrap">
       <div class="qtop"><button class="btn text" data-act="${S.history.length ? 'qback' : 'quit'}">${ic('back', 20)} ${esc(T('back'))}</button><span class="ptitle">${esc(S.topic ? S.topic.title : G(iss, 's', iss.short))}</span></div>
-      <div class="bar" role="progressbar" aria-label="Progress" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><span style="width:${Math.max(pct, 4)}%"></span></div>
+      <div class="barrow"><div class="bar" role="progressbar" aria-label="Progress" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><span style="width:${Math.max(pct, 4)}%"></span></div><span class="qcount">${pr.done + 1}/${Math.max(pr.total, pr.done + 1)}</span></div>
       ${first ? `${trNote()}<p class="opener">${esc(G(iss, 'i', iss.intro))}</p>${S.topic && S.topic.urgentNote ? `<div class="banner soon">${ic('alert')}<div><p>${esc(S.topic.urgentNote)}</p></div></div>` : ''}${S.adv && S.adv.issueId === iss.id ? advBanner(S.adv) : ''}` : ''}
       ${urg.map((u) => urgentBanner(u, iss)).join('')}
       <form id="qform" data-q="${q.id}">
@@ -384,6 +385,7 @@ ${JSON.stringify(map)}`;
         <div class="stack" aria-hidden="true">${items.map((e) => `<i class="${st(e)}"></i>`).join('')}</div>
       </div>
       ${trNote()}
+      ${standCard(iss, items, have)}
       <p class="muted">${esc(T('worry'))}</p>
       ${urg.map((u) => urgentBanner(u, iss)).join('')}
       ${infos.map((x, i) => `<div class="banner info">${ic('info')}<div><p>${esc(G(iss, 'info' + iss.info.indexOf(x), x.text))}</p></div></div>`).join('')}
@@ -398,6 +400,16 @@ ${JSON.stringify(map)}`;
         <div class="row" style="margin-top:6px"><button class="btn text" data-go="answers">${esc(T('change'))}</button><button class="btn text" data-act="clear">${esc(T('delall'))}</button></div>
       </div>
     </div>`, { inJourney: true });
+  }
+  function standCard(iss, items, have) {
+    const st = E.stand(iss, S.answers);
+    const rows = { good: [], risk: [], next: [] };
+    st.forEach((x) => rows[x.k].push(G(iss, 'st' + x.idx, x.text)));
+    if (have) rows.good.push(T('have', { a: have, b: items.length }));
+    if (!rows.next.length) { const a = items.find((e) => e.action && S.status[e.id] !== 'have'); if (a) rows.next.push(G(iss, a.id + '.n', a.name)); }
+    if (!rows.good.length && !rows.risk.length && !rows.next.length) return '';
+    const sec = (k, icon) => rows[k].length ? `<div class="srow s-${k}"><span class="sic">${ic(icon, 18)}</span><div><b>${esc(T('k_' + k))}</b><ul>${rows[k].map((t) => `<li>${esc(t)}</li>`).join('')}</ul></div></div>` : '';
+    return `<section class="standcard" aria-labelledby="standh"><h2 id="standh">${esc(T('stand'))}</h2>${sec('good', 'check')}${sec('risk', 'alert')}${sec('next', 'chev')}</section>`;
   }
   function evCard(e, flagged, iss) {
     iss = iss || issue();

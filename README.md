@@ -8,7 +8,9 @@ A free, open-source preparation tool for people in India facing a legal problem.
 
 ## What's in it
 
-- **40 guided problems** with branching questions, chosen from what most often reaches Indian courts (cheque bounce, matrimonial, motor accident, rent, property), the National Consumer Helpline (e-commerce, durables, banking, telecom, travel) and the RBI Ombudsman (loans and credit cards lead).
+- **56 guided problems** with branching questions, chosen from what most often reaches Indian courts and Lok Adalats (cheque bounce, matrimonial, motor accident, traffic challans, bank recovery, electricity), the National Consumer Helpline (e-commerce, durables, banking, telecom, travel), the RBI Ombudsman (loans and credit cards lead) and NCRB cyber-crime data (fraud is 72.6% of cyber cases; "digital arrest" scams hit a record in 2024).
+- **Where you stand**: after the quick questions, each guide shows what helps you, what to watch out for, and the usual next step.
+- **23 languages**: English plus all 22 scheduled languages; 16 with a hand-written interface, the rest and all guide text machine-translated live and labelled.
   - Money & banking: cheque bounce (both sides), loan/EMI recovery and SARFAESI, credit cards, CIBIL errors, UPI/online fraud, frozen accounts, failed payments
   - Family: divorce, maintenance, domestic violence, child custody, dowry/498A (both sides), inheritance and partition
   - Shopping & services: refunds, defective products, insurance claims, builder delays
@@ -32,6 +34,10 @@ src/
   j-consumer.js  defective product, insurance claim, builder delay
   j-nri.js       NRI guides
   j-business.js  business and company guides
+  j-more.js      high-search gaps: scams, loan apps, e-commerce, travel, telecom, bank service, challans, electricity,
+                 court marriage, senior citizens, death claims, property purchase, PF/gratuity, medical, education
+  stand.js       "Where you stand" situation checks for existing guides
+  i18n.js        23 languages: UI strings and language metadata
   j-other.js     eviction, encroachment, termination, POSH, FIR, arrest, legal notice, road accident, online harassment
   qa.js          legal questions and myth/fact cards
   engine.js      deterministic interview engine (pure functions)

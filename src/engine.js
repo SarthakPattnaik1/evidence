@@ -51,6 +51,7 @@
   function urgent(issue, answers) { return (issue.urgent || []).filter((u) => evalWhen(u.when, answers)); }
   function info(issue, answers) { return (issue.info || []).filter((i) => evalWhen(i.when, answers)); }
   function lawyerQs(issue, answers) { return (issue.lawyerQs || []).filter((l) => evalWhen(l.when, answers)); }
+  function stand(issue, answers) { return (issue.stand || []).map((s, idx) => Object.assign({ idx }, s)).filter((s) => evalWhen(s.when, answers)); }
   function hasDeep(issue, answers) { return stageQuestions(issue, answers, 'deep').length > 0; }
 
   /* Collect every question/option ID referenced by conditions (for validation). */
@@ -63,6 +64,6 @@
     return out;
   }
 
-  const ER_ENGINE = { evalWhen, applicable, prune, stageQuestions, nextQuestion, progress, evidence, urgent, info, lawyerQs, hasDeep, refs };
+  const ER_ENGINE = { evalWhen, applicable, prune, stageQuestions, nextQuestion, progress, evidence, urgent, info, lawyerQs, stand, hasDeep, refs };
   root.ER_ENGINE = ER_ENGINE;
 })(globalThis);
