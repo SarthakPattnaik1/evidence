@@ -11,6 +11,7 @@
 // Only text that already exists in the app's own source is translated (checked against _corpus.js),
 // so nobody can use this as a free general-purpose translator on your quota.
 const CORPUS = require('./_corpus.js');
+const { body: readBody } = require('./_lib.js');
 
 const LANGS = {
   hi: ['Hindi', 'हिन्दी'], bn: ['Bengali', 'বাংলা'], te: ['Telugu', 'తెలుగు'], mr: ['Marathi', 'मराठी'], ta: ['Tamil', 'தமிழ்'],
@@ -24,7 +25,7 @@ const LANGS = {
 const BH = { kok: { code: 'gom' }, sat: { script: 'Olck' }, mni: { script: 'Mtei' }, ks: { script: 'Arab' }, sd: { script: 'Arab' } };
 
 const MAX_KEYS = 400, MAX_CHARS = 40000;
-const norm = (s) => String(s).replace(/\$\{[^}]*\}/g, '').replace(/[\\'"`\s]/g, '').toLowerCase();
+const norm = (s) => String(s).replace(/[\\'"`\s]/g, '').toLowerCase();
 const NC = norm(CORPUS);
 const mem = new Map(); // warm-instance cache: lang|text -> translation
 
@@ -85,32 +86,54 @@ ${JSON.stringify(obj)}`;
 }
 const parseJSON = (txt) => { const m = String(txt).match(/\{[\s\S]*\}/); return m ? JSON.parse(m[0]) : {}; };
 async function viaLLM(lang, texts, call) {
-  const out = new Array(texts.length);
-  for (let i = 0; i < texts.length; i += 60) {
-    const obj = {}; texts.slice(i, i + 60).forEach((s, k) => { obj['k' + (i + k)] = s; });
-    const res = await call(prompt(lang, obj));
-    Object.keys(obj).forEach((k) => { if (typeof res[k] === 'string' && res[k].trim()) out[Number(k.slice(1))] = res[k]; });
+  // Small batches in parallel: keeps each model call short so the whole request finishes well inside Vercel's time limit.
+  const out = new Array(texts.length); const SIZE = 30; const batches = [];
+  for (let i = 0; i < texts.length; i += SIZE) batches.push(i);
+  let idx = 0; let lastErr = null; let okCount = 0;
+  async function worker() {
+    while (idx < batches.length) {
+      const i = batches[idx++]; const obj = {}; texts.slice(i, i + SIZE).forEach((s, k) => { obj['k' + (i + k)] = s; });
+      try { const res = await call(prompt(lang, obj)); okCount++; Object.keys(obj).forEach((k) => { if (typeof res[k] === 'string' && res[k].trim()) out[Number(k.slice(1))] = res[k]; }); }
+      catch (e) { lastErr = e; }
+    }
   }
+  await Promise.all(Array.from({ length: Math.min(4, batches.length) }, worker));
+  if (!okCount && lastErr) throw lastErr;
   return out;
 }
-async function gemini(lang, texts) {
-  const models = [process.env.GEMINI_MODEL, 'gemini-flash-latest', 'gemini-flash-lite-latest'].filter(Boolean);
-  return viaLLM(lang, texts, async (p) => {
-    let last;
-    for (const model of models) {
+// Gemini model IDs change often; try current ones in order and remember the first that works.
+let GEM_OK = null;
+const GEM_MODELS = () => [...new Set([process.env.GEMINI_MODEL, GEM_OK, 'gemini-flash-latest', 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-flash-lite-latest', 'gemini-3.5-flash-lite'].filter(Boolean))];
+async function geminiCall(p) {
+  let last;
+  for (const model of GEM_MODELS()) {
+    for (const thinking of [true, false]) {
+      const gc = { responseMimeType: 'application/json', temperature: 0.2 };
+      if (thinking) gc.thinkingConfig = { thinkingLevel: 'low' };
       const t = withTimeout(45000);
-      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-        method: 'POST', signal: t.signal, headers: { 'content-type': 'application/json', 'x-goog-api-key': process.env.GEMINI_API_KEY },
-        body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: p }] }], generationConfig: { responseMimeType: 'application/json', temperature: 0.2 } })
-      }).finally(t.done);
-      if (r.status === 404) { last = new Error('gemini model ' + model); continue; }
-      if (!r.ok) throw new Error('gemini ' + r.status);
-      const j = await r.json();
-      return parseJSON((((j.candidates || [])[0] || {}).content || { parts: [] }).parts.map((x) => x.text || '').join(''));
+      let r;
+      try {
+        r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+          method: 'POST', signal: t.signal, headers: { 'content-type': 'application/json', 'x-goog-api-key': process.env.GEMINI_API_KEY },
+          body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: p }] }], generationConfig: gc })
+        });
+      } catch (e) { t.done(); last = new Error('gemini ' + model + ' network/timeout'); break; }
+      t.done();
+      if (r.ok) {
+        const j = await r.json(); GEM_OK = model;
+        const parts = (((j.candidates || [])[0] || {}).content || { parts: [] }).parts || [];
+        return parseJSON(parts.filter((x) => !x.thought).map((x) => x.text || '').join(''));
+      }
+      const txt = (await r.text()).slice(0, 300).replace(/\s+/g, ' ');
+      last = new Error(`gemini ${model} ${r.status}: ${txt}`); last.status = r.status;
+      if (r.status === 429) throw last;                                   // quota: other models share it
+      if (r.status === 400 && thinking && /thinking/i.test(txt)) continue; // model doesn't take thinkingConfig: retry without
+      break;                                                               // 400/401/403/404: try the next model
     }
-    throw last || new Error('gemini');
-  });
+  }
+  throw last || new Error('gemini: no model available');
 }
+async function gemini(lang, texts) { return viaLLM(lang, texts, geminiCall); }
 async function anthropic(lang, texts) {
   return viaLLM(lang, texts, async (p) => {
     const t = withTimeout(55000);
@@ -137,13 +160,25 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'content-type');
   res.setHeader('Cache-Control', 'no-store');
   if (req.method === 'OPTIONS') return res.status(204).end();
-  if (req.method === 'GET') return res.status(200).json({ providers: providers().map((x) => x[0]) });
+  if (req.method === 'GET') {
+    const url = new URL(req.url, 'http://x'); const check = url.searchParams.get('check');
+    const info = { providers: providers().map((x) => x[0]) };
+    if (check && LANGS[check]) {
+      // Live test with one short phrase, so problems show up in the browser instead of only in server logs.
+      info.test = {};
+      for (const [name, fn] of providers()) {
+        const t0 = Date.now();
+        try { const r = await fn(check, ['Cheque bounce', 'What papers do I need?']); info.test[name] = { ok: !!(r && r[0]), sample: r && r[0], ms: Date.now() - t0, model: name === 'gemini' ? GEM_OK : undefined }; }
+        catch (e) { info.test[name] = { ok: false, error: String(e.message || e).replace(/(key|token)=[^&\s]+/gi, '$1=***').slice(0, 400), ms: Date.now() - t0 }; }
+      }
+    }
+    return res.status(200).json(info);
+  }
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
   const prov = providers();
   if (!prov.length) return res.status(501).json({ error: 'translation not configured' });
 
-  let body = req.body;
-  if (typeof body === 'string') { try { body = JSON.parse(body); } catch (e) { body = null; } }
+  const body = await readBody(req);
   const lang = body && body.lang; const map = body && body.map;
   if (!LANGS[lang] || !map || typeof map !== 'object' || Array.isArray(map)) return res.status(400).json({ error: 'bad request' });
   const entries = Object.entries(map).filter(([k, v]) => typeof k === 'string' && k.length < 80 && typeof v === 'string');

@@ -28,6 +28,17 @@ process.env.ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'test-pass-123';
 let pg = null; if (process.env.STORE === 'supabase') { const { Pool } = require(process.env.PG_MODULE || 'pg'); pg = new Pool({ connectionString: process.env.PG_URL }); }
 const SIG = { pa_ingest: ['p_day', 'p_inc', 'p_uniq', 'p_logs'], pa_stats: ['p_days', 'p_prev'], pa_login_hit: ['p_ip'], pa_login_clear: ['p_ip'] };
 const CAST = { p_day: 'date', p_inc: 'jsonb', p_uniq: 'jsonb', p_logs: 'jsonb', p_days: 'date[]', p_prev: 'date[]', p_ip: 'text' };
+if (process.env.FAKE_TRANSLATE) {
+  // Pretend to be Gemini: prefix every string so tests can see what got translated. Delay simulates a slow model.
+  process.env.GEMINI_API_KEY = 'AQ.fake'; const realFetch = global.fetch;
+  global.fetch = async (u, o) => {
+    if (!String(u).includes('generativelanguage.googleapis.com')) return realFetch(u, o);
+    const b = JSON.parse(o.body); const p = b.contents[0].parts[0].text; const obj = JSON.parse(p.slice(p.lastIndexOf('\n\n') + 2)); const r = {};
+    for (const k in obj) r[k] = '«' + obj[k] + '»';
+    await new Promise((res) => setTimeout(res, +process.env.FAKE_TRANSLATE || 300));
+    return { ok: true, status: 200, json: async () => ({ candidates: [{ content: { parts: [{ text: JSON.stringify(r) }] } }] }), text: async () => '' };
+  };
+}
 const handlers = {}; const load = (n) => handlers[n] || (handlers[n] = require(path.join(ROOT, 'api', n + '.js')));
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.json': 'application/json', '.webp': 'image/webp', '.png': 'image/png', '.xml': 'application/xml', '.txt': 'text/plain', '.webmanifest': 'application/manifest+json' };
 http.createServer(async (req, res) => {

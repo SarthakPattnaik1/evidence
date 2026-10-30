@@ -601,7 +601,7 @@ footer.foot .flink{color:var(--go-d);padding:6px 0;text-decoration:underline;fon
 
 /* v14: hero matches the brand board — sage panel bleeds to the right edge, illustration anchored to it */
 @media (min-width:820px){
-  .hero2{--hh:clamp(620px,50vw,840px);--iw:calc(var(--hh) * .6606);background:var(--paper);position:relative;overflow:hidden;min-height:var(--hh)}
+  .hero2{--hh:clamp(560px,42vw,700px);--iw:calc(var(--hh) * .6606);background:var(--paper);position:relative;overflow:hidden;min-height:var(--hh)}
   .hero2::before{display:block;content:"";position:absolute;inset:0 0 0 auto;width:calc(var(--iw) + 150px);background:linear-gradient(180deg,#EAF0E7 0%,#E8EEE4 100%);border-radius:70% 0 0 30% / 56% 0 0 44%}
   html[dir=rtl] .hero2::before{inset:0 auto 0 0;border-radius:0 62% 38% 0 / 0 54% 46% 0}
   .hero2in{position:static;display:block;min-height:var(--hh)}
@@ -709,6 +709,25 @@ footer.foot .wrap{position:relative}
 .adminlink{position:absolute;right:18px;bottom:0;font-size:11px;color:var(--ink2);opacity:.55;text-decoration:none;padding:4px 2px}
 .adminlink:hover,.adminlink:focus-visible{opacity:1;text-decoration:underline}
 @media (max-width:760px){.adminlink{right:16px}}
+
+/* v17: laptops and big screens — scale the whole UI up so it doesn't look small */
+@media (min-width:1280px){ body{zoom:1.08} }
+@media (min-width:1440px){ body{zoom:1.14} }
+@media (min-width:1680px){ body{zoom:1.22} }
+@media (min-width:1920px){ body{zoom:1.3} }
+@media (min-width:2400px){ body{zoom:1.5} }
+@media (min-width:1024px){ .narrow{max-width:740px} }
+@media print{ body{zoom:1!important} }
+
+/* v18: small-screen fixes from the layout audit */
+.helpcard{min-width:0}
+.helpcard>div{min-width:0;flex:1}
+.helpcard h3,.helpcard p{overflow-wrap:anywhere}
+.helpcard a.small{display:inline-block;padding:8px 0;min-height:36px;overflow-wrap:anywhere}
+.helpnum{flex:none;max-width:42%;overflow-wrap:anywhere;text-align:center}
+.check{min-width:0;flex-wrap:wrap}
+.check input{flex:none}
+@media (max-width:400px){ .helpcard{gap:10px;padding:12px} .helpnum{font-size:15px} .accg>.grid,.accg>.accb{padding:8px} }
 </style>
 </head>
 <body>
@@ -4462,17 +4481,18 @@ footer.foot .wrap{position:relative}
   }
   const SCRIPT_NOTE = { sat: 'Ol Chiki script', mni: 'Meitei Mayek script', ks: 'Perso-Arabic script', sd: 'Perso-Arabic script', brx: 'Devanagari script', sa: 'Devanagari script', ur: 'Urdu (Nastaliq/Naskh) script' };
   const pending = {};
-  let apiOff = false; const trFailed = {};
+  let apiOff = false; const trFailed = {}; const chunkFail = {};
   async function viaApi(map) {
     if (apiOff || !/^https?:$/.test(location.protocol)) return null;
+    const ac = new AbortController(); const to = setTimeout(() => ac.abort(), 58000);
     try {
-      const r = await fetch('/api/translate', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ lang: LANG, map }) });
+      const r = await fetch('/api/translate', { method: 'POST', signal: ac.signal, headers: { 'content-type': 'application/json' }, body: JSON.stringify({ lang: LANG, map }) });
       if (r.status === 501 || r.status === 404 || r.status === 405) { apiOff = true; return null; }
       if (!r.ok) return null;
       const j = await r.json(); const out = {};
       Object.keys(map).forEach((k) => { if (typeof j[k] === 'string' && j[k].trim()) out[k] = j[k]; });
       return Object.keys(out).length ? out : null;
-    } catch (e) { return null; }
+    } catch (e) { return null; } finally { clearTimeout(to); }
   }
   const devT = {};
   async function viaDevice(map) {
@@ -4496,10 +4516,14 @@ footer.foot .wrap{position:relative}
     const lk = 'er_tr_' + LANG + '_' + KB.version + '_' + cacheKey;
     const cached = lsGet(lk); if (cached) { store(cached); return true; }
     if (pending[lk]) return pending[lk];
+    if (chunkFail[lk] && Date.now() - chunkFail[lk] < 45000) return false;
     if (!sampler) {
+      const L0 = LANG;
       pending[lk] = viaApi(map).then((out) => out || viaDevice(map)).then((out) => {
-        if (out && Object.keys(out).length) { lsSet(lk, out); store(out); trFailed[LANG] = false; TRACK.once('tr', { x: LANG, ok: 1 }); return true; } trFailed[LANG] = true; TRACK.once('tr', { x: LANG, ok: 0 }); return false;
-      }).catch(() => { trFailed[LANG] = true; return false; }).finally(() => { delete pending[lk]; });
+        if (out && Object.keys(out).length) { lsSet(lk, out); if (LANG === L0) store(out); trFailed[L0] = false; delete chunkFail[lk]; TRACK.once('tr', { x: L0, ok: 1 }); return true; }
+        trFailed[L0] = true; chunkFail[lk] = Date.now(); TRACK.once('tr', { x: L0, ok: 0 }); return false;
+      }).catch(() => { trFailed[L0] = true; chunkFail[lk] = Date.now(); return false; }).finally(() => { delete pending[lk]; trPill(); });
+      trPill();
       return pending[lk];
     }
     const m = LMETA[LANG];
@@ -4514,8 +4538,65 @@ ${JSON.stringify(map)}`;
     pending[lk] = sampler.json(prompt, { modelTier: 'default', cache: { gcTime: 86400000 } }).then((res) => {
       const out = {}; if (res && typeof res === 'object') Object.keys(map).forEach((k) => { if (typeof res[k] === 'string' && res[k].trim()) out[k] = res[k]; });
       if (Object.keys(out).length) { lsSet(lk, out); store(out); return true; } return false;
-    }).catch(() => false).finally(() => { delete pending[lk]; });
+    }).catch(() => false).finally(() => { delete pending[lk]; trPill(); });
+    trPill();
     return pending[lk];
+  }
+  function trPill() {
+    let el = document.getElementById('trpill'); const n = Object.keys(pending).length;
+    if (!el) { el = document.createElement('div'); el.id = 'trpill'; el.className = 'trpill'; el.setAttribute('role', 'status'); document.body.appendChild(el); }
+    el.hidden = !(n && LANG !== 'en'); if (n && LANG !== 'en') el.textContent = T('trans', { l: LMETA[LANG].native });
+  }
+  /* X(): any fixed English text on screen. Missing translations are collected while rendering and fetched together afterwards. */
+  let XMAP = {}; let XLANG = null; const XQ = new Set(); const xFail = {}; const xFly = new Set();
+  const XKEY = () => 'er_x_' + LANG + '_' + KB.version;
+  function X(en) {
+    if (LANG === 'en' || !en) return en;
+    if (XLANG !== LANG) { XLANG = LANG; XMAP = lsGet(XKEY()) || {}; }
+    const t = XMAP[en]; if (t) return t;
+    if (!xFail[LANG + '|' + en] && !xFly.has(LANG + '|' + en)) XQ.add(en);
+    return en;
+  }
+  const hashStr = (str) => { let h = 5381; for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0; return (h >>> 0).toString(36); };
+  function xFlush() {
+    if (LANG === 'en' || !XQ.size) return;
+    const all = [...XQ]; XQ.clear(); const L0 = LANG; all.forEach((t) => xFly.add(L0 + '|' + t));
+    const batches = []; let cur = []; let chars = 0;
+    for (const t of all) { if (cur.length >= 90 || chars + t.length > 12000) { batches.push(cur); cur = []; chars = 0; } cur.push(t); chars += t.length; }
+    if (cur.length) batches.push(cur);
+    batches.forEach((b) => {
+      const map = {}; b.forEach((t, i) => { map['x' + i] = t; });
+      translateMap(map, 'x:' + hashStr(b.join('\u0001')), (o) => {
+        if (LANG !== L0) return;
+        if (XLANG !== LANG) { XLANG = LANG; XMAP = lsGet(XKEY()) || {}; }
+        Object.keys(o).forEach((k) => { if (map[k]) XMAP[map[k]] = o[k]; }); lsSet(XKEY(), XMAP);
+      }).then((ok) => { b.forEach((t) => xFly.delete(L0 + '|' + t)); if (!ok) b.forEach((t) => { xFail[L0 + '|' + t] = 1; setTimeout(() => { delete xFail[L0 + '|' + t]; }, 60000); }); else if (LANG === L0) safeRender(); });
+    });
+  }
+  let srT = null;
+  function safeRender() {
+    clearTimeout(srT);
+    const a = document.activeElement;
+    if (a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && a.type !== 'radio' && a.type !== 'checkbox') { srT = setTimeout(safeRender, 1200); return; }
+    if (document.querySelector('.overlay')) { srT = setTimeout(safeRender, 1200); return; }
+    const now = Date.now(); if (now - (safeRender.last || 0) < 250) { srT = setTimeout(safeRender, 260); return; }
+    safeRender.last = now;
+    const y = window.scrollY; render(); window.scrollTo(0, y);
+  }
+  /* Start whatever translations the current screen needs, without blocking it. */
+  function autoTranslate(view, arg) {
+    if (LANG === 'en') return;
+    const bg = (p) => Promise.resolve(p).then((ok) => { if (ok) safeRender(); });
+    if (!uiReady(LANG)) bg(ensureUI());
+    if ((view === 'home' || view === '') && !RT.tr[LANG + '|home']) bg(ensureHome());
+    if (view === 'cat' && CAT[arg] && !RT.tr[LANG + '|c:' + arg]) bg(ensureCat(arg));
+    if (view === 'start' && BY_ID[arg]) { const i = BY_ID[arg]; if (!RT.tr[LANG + '|g:' + i.id + ':a']) bg(ensureGuide(i, 'a')); }
+    if (S.issueId && /^(quiz|list|brk|urgent|answers|timeline|report)$/.test(view)) {
+      const i = issue();
+      if (i && !RT.tr[LANG + '|g:' + i.id + ':a']) bg(ensureGuide(i, 'a'));
+      if (i && !RT.tr[LANG + '|g:' + i.id + ':b']) bg(ensureGuide(i, 'b'));
+    }
+    setTimeout(xFlush, 30);
   }
   const ensureUI = () => (uiReady(LANG) ? Promise.resolve(true) : translateMap(Object.fromEntries(I18N.KEYS.map((k, i) => [k, I18N.STRINGS.en[i]])), 'ui', (o) => { RT.ui[LANG] = o; }));
   function guideChunks(iss) {
@@ -4542,19 +4623,18 @@ ${JSON.stringify(map)}`;
   }
   const C = (cid, key, en) => trGet('c:' + cid, key, en);
   const translated = () => LANG !== 'en';
-  const canTranslate = () => LANG === 'en' || !!sampler || !apiOff || !!(window.Translator && !trFailed[LANG]);
+  const canTranslate = () => LANG === 'en' || !!sampler || !apiOff || !!window.Translator;
   let busy = null;  // { label } while a translation is loading
-  async function withTranslation(promises, then) {
-    if (LANG === 'en') { then(); return; }
-    busy = { label: T('trans', { l: LMETA[LANG].native }) }; render();
-    await Promise.all(promises.map((p) => (typeof p === 'function' ? p() : p)));
-    busy = null; then();
+  function withTranslation(promises, then) {
+    // Never block the screen on translation: show it now, swap in the translation when it arrives.
+    promises.forEach((p) => Promise.resolve(typeof p === 'function' ? p() : p).then((ok) => { if (ok) safeRender(); }));
+    then();
   }
   function setLang(code) {
     LANG = code; lsSet('er_lang', code); applyLangDom(); TRACK.ev('lang', { x: code });
-    if (!uiReady(code)) withTranslation([ensureUI], () => render()); else render();
+    render();
   }
-  function trNote() { return translated() ? `<p class="trnote">${ic('globe', 16)} ${esc(trFailed[LANG] ? T('enonly') : T('auto'))} <button class="btn text" data-act="toen">${esc(T('en'))}</button></p>` : ''; }
+  function trNote() { return translated() ? `<p class="trnote">${ic('globe', 16)} ${esc(trFailed[LANG] && !Object.keys(pending).length ? T('enonly') : T('auto'))} <button class="btn text" data-act="toen">${esc(T('en'))}</button></p>` : ''; }
 
   /* ---------- routing ---------- */
   function go(v) { if (location.hash === '#' + v) render(); else location.hash = v; }
@@ -4584,7 +4664,7 @@ ${JSON.stringify(map)}`;
   }
   const FOOT = {"f_disc": "Pehlo helps you prepare for a meeting with an advocate. It is not legal advice, does not replace an advocate, and cannot tell you whether a court will accept any document.", "f_about": "How this works & privacy", "f_adv": "For advocates", "f_myth": "Myth or fact", "f_help": "Legal aid & urgent help", "f_clear": "Clear my answers"};
   function slimFooter() {
-    return `<footer class="foot slim"><div class="wrap"><span class="small muted">${esc(T('draft'))} · Not legal advice</span><span class="row"><button data-go="help">${esc(H('nav_help', 'Help'))}</button><button data-go="about">${esc(H('f_about', FOOT.f_about))}</button>${S.issueId ? `<button data-act="clear">${esc(H('f_clear', FOOT.f_clear))}</button>` : ''}</span></div></footer>`;
+    return `<footer class="foot slim"><div class="wrap"><span class="small muted">${esc(T('draft'))} · ${esc(X('Not legal advice'))}</span><span class="row"><button data-go="help">${esc(H('nav_help', 'Help'))}</button><button data-go="about">${esc(H('f_about', FOOT.f_about))}</button>${S.issueId ? `<button data-act="clear">${esc(H('f_clear', FOOT.f_clear))}</button>` : ''}</span></div></footer>`;
   }
   function footer() {
     const f = (k) => esc(H(k, FOOT[k]));
@@ -4592,8 +4672,8 @@ ${JSON.stringify(map)}`;
       <img class="flogo" src="${window.ER_BRAND.logoFull}" alt="Pehlo — Samajh. Tayyari. Apna Haq." width="210" height="96">
       <p><span class="tag draft">${esc(T('draft'))}</span></p>
       <p style="max-width:62em">${f('f_disc')} v${esc(KB.version)}.</p>
-      <div class="row"><button data-go="about">${f('f_about')}</button><button data-go="advocates">${f('f_adv')}</button><button data-go="myths">${f('f_myth')}</button><button data-go="help">${f('f_help')}</button>${S.issueId ? `<button data-act="clear">${f('f_clear')}</button>` : ''}${/^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname) ? `<a class="flink" href="/guide">All guides</a><a class="flink" href="/privacy">Privacy</a><a class="flink" href="/terms">Terms</a>` : ''}</div>
-      <p class="small muted" style="margin:8px 0 0">Law last checked ${esc(new Date((KB.lawChecked || '2026-10-30') + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }))} against official sources.</p>
+      <div class="row"><button data-go="about">${f('f_about')}</button><button data-go="advocates">${f('f_adv')}</button><button data-go="myths">${f('f_myth')}</button><button data-go="help">${f('f_help')}</button>${S.issueId ? `<button data-act="clear">${f('f_clear')}</button>` : ''}${/^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname) ? `<a class="flink" href="/guide">${esc(X('All guides'))}</a><a class="flink" href="/privacy">${esc(X('Privacy'))}</a><a class="flink" href="/terms">${esc(X('Terms'))}</a>` : ''}</div>
+      <p class="small muted" style="margin:8px 0 0">${esc(X('Law last checked {d} against official sources.').replace('{d}', new Date((KB.lawChecked || '2026-10-30') + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })))}</p>
       ${/^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname) && /^#?(home)?$/.test(location.hash) ? '<a class="adminlink" href="/admin" rel="nofollow">Admin</a>' : ''}
     </div></footer>`;
   }
@@ -4614,6 +4694,7 @@ ${JSON.stringify(map)}`;
     const h = app.querySelector('h1');
     if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
     try { trackRender(); } catch (e) { /* never break the app for analytics */ }
+    try { autoTranslate(view || 'home', arg); } catch (e) { /* translation is best-effort */ }
     if (view === 'q') document.getElementById('qa-' + arg)?.scrollIntoView();
     else window.scrollTo(0, 0);
     afterRender(view);
@@ -4629,15 +4710,14 @@ ${JSON.stringify(map)}`;
     return deep.map((i) => `<button class="prob" data-play="${i.id}"><b>${esc(C(cid, i.id + '.s', i.short))}</b><span>${esc(C(cid, i.id + '.t', i.title))}</span>${ic('chev', 22)}</button>`).join('')
       + gen.map((d) => `<button class="prob" data-play="general" data-topic="${d.idx}"><b>${esc(C(cid, 'd' + d.idx, d.title))}</b><span>${esc(T('basic'))}</span>${ic('chev', 22)}</button>`).join('');
   }
-  const H = (k, en) => trGet('home', k, en);
+  const H = (k, en) => { if (LANG === 'en') return en; const m = RT.tr[LANG + '|home']; return (m && m[k]) || X(en); };
   const HERO = { nav_help: 'Help', hero_h: 'Legal preparation made simple for every Indian', hero_s1: 'Ask. Understand. Prepare.', hero_s2: 'All in your language.', hero_go: 'Get Started', hero_f: 'Free • Simple • Multilingual', tagline: 'Samajh. Tayyari. Apna Haq.', f1: 'Ask', f1s: 'In your language', f2: 'Prepare', f2s: 'Step by step', f3: 'Organize', f3s: 'Your evidence', f4: 'Be Ready', f4s: 'With confidence' };
   function ensureHome() {
     if (LANG === 'en' || RT.tr[LANG + '|home']) return Promise.resolve(true);
-    const map = {}; KB.categories.forEach((c) => { map['b_' + c.id] = c.blurb; }); SUGGEST.forEach((x, i) => { map['s' + i] = x; }); Object.assign(map, FOOT, HERO); delete map.tagline;
-    return translateMap(map, 'home4', (o) => { RT.tr[LANG + '|home'] = o; });
+    const map = {}; KB.categories.forEach((c) => { map['b_' + c.id] = c.blurb; }); SUGGEST.forEach((x, i) => { map['s' + i] = x; }); Object.assign(map, FOOT, HERO); delete map.tagline; [['f1', 'Ask'], ['f1s', 'In your language'], ['f2', 'Prepare'], ['f2s', 'Step by step'], ['f3', 'Organize'], ['f3s', 'Your evidence'], ['f4', 'Be Ready'], ['f4s', 'With confidence']].forEach(([k, v]) => { map[k] = v; });
+    return translateMap(map, 'home5', (o) => { RT.tr[LANG + '|home'] = o; });
   }
   function viewHome() {
-    if (translated() && canTranslate() && !trFailed[LANG] && !RT.tr[LANG + '|home']) setTimeout(() => ensureHome().then((ok) => { if (ok && /^#?(home)?$/.test(location.hash.replace('#', '')) ) render(); }), 0);
     const saved = !S.issueId && loadSaved();
     const FEAT = [['chat', 'f1', 'Ask', 'f1s', 'In your language', 'sage'], ['file', 'f2', 'Prepare', 'f2s', 'Step by step', 'sky'], ['folder', 'f3', 'Organize', 'f3s', 'Your evidence', 'sand'], ['circlecheck', 'f4', 'Be Ready', 'f4s', 'With confidence', 'rose']];
     return shell(`<section class="hero2"><div class="wrap hero2in">
@@ -4673,7 +4753,6 @@ ${JSON.stringify(map)}`;
   }
   function viewCat(cid) {
     const c = CAT[cid]; if (!c) return viewHome();
-    if (translated() && canTranslate() && !trFailed[LANG] && !RT.tr[LANG + '|c:' + cid] && !busy) { setTimeout(() => withTranslation([ensureCat(cid)], render), 0); }
     return shell(`<div class="wrap narrow" style="padding-top:18px;padding-bottom:40px">
       <button class="btn text" data-go="home">${ic('back', 20)} ${esc(T('home'))}</button>
       <h1 class="pageh"><span class="tic big">${ic(c.icon, 30)}</span>${esc(catTitle(c))}</h1>
@@ -4703,7 +4782,7 @@ ${JSON.stringify(map)}`;
     if (!q.trim()) { box.innerHTML = ''; return; }
     const r = searchAll(q);
     box.innerHTML = r.length ? r.map((x) => `<button class="prob" ${x.play ? `data-play="${x.play}" ${x.topic != null ? `data-topic="${x.topic}"` : ''}` : `data-go="${x.go}"`}><b>${esc(x.title)}</b><span>${x.play ? 'Start' : 'Read the answer'}</span>${ic('chev', 22)}</button>`).join('')
-      : `<button class="prob" data-play="general"><b>Not sure what this is?</b><span>Answer a few simple questions</span>${ic('chev', 22)}</button>`;
+      : `<button class="prob" data-play="general"><b>${esc(X('Not sure what this is?'))}</b><span>${esc(X('Answer a few simple questions'))}</span>${ic('chev', 22)}</button>`;
   }
 
   /* ============ INTRO ============ */
@@ -4714,19 +4793,19 @@ ${JSON.stringify(map)}`;
     const chaps = [...new Set(iss.questions.map(chapOf))];
     const adv = S.adv && S.adv.issueId === id ? S.adv : null;
     return shell(`<div class="wrap narrow"><section style="padding:20px 0 40px">
-      <button class="btn text" data-go="${topic ? 'cat-' + topic.cat : 'cat-' + iss.cat}">${ic('back', 18)} Back to the shelf</button>
+      <button class="btn text" data-go="${topic ? 'cat-' + topic.cat : 'cat-' + iss.cat}">${ic('back', 18)} ${esc(X('Back to the shelf'))}</button>
       ${adv ? advBanner(adv) : ''}
-      <div class="filehead"><span class="tape" aria-hidden="true"></span><p class="typed">In the matter of:</p><h1>${esc(topic ? topic.title : iss.short)}</h1></div>
-      ${topic && topic.urgentNote ? `<div class="banner soon">${ic('alert')}<div><h3>Before you start</h3><p>${esc(topic.urgentNote)}</p></div></div>` : ''}
-      <p class="lead">${esc(iss.intro)}</p>
+      <div class="filehead"><span class="tape" aria-hidden="true"></span><p class="typed">${esc(X('In the matter of:'))}</p><h1>${esc(topic ? X(topic.title) : G(iss, 's', iss.short))}</h1></div>
+      ${topic && topic.urgentNote ? `<div class="banner soon">${ic('alert')}<div><h3>${esc(X('Before you start'))}</h3><p>${esc(X(topic.urgentNote))}</p></div></div>` : ''}
+      <p class="lead">${esc(G(iss, 'i', iss.intro))}</p>
       <div class="panel">
-        <h3>${chaps.length} chapters, about ${qs.length} quick questions to start</h3>
-        <p class="muted small" style="margin:6px 0 0">${chaps.map(esc).join(' → ')}</p>
-        <p class="small" style="margin:10px 0 0">Your first list appears after the quick round. You can go deeper after that, or stop.</p>
+        <h3>${esc(X('{c} chapters, about {q} quick questions to start').replace('{c}', chaps.length).replace('{q}', qs.length))}</h3>
+        <p class="muted small" style="margin:6px 0 0">${chaps.map((c) => esc(X(c))).join(' → ')}</p>
+        <p class="small" style="margin:10px 0 0">${esc(X('Your first list appears after the quick round. You can go deeper after that, or stop.'))}</p>
       </div>
-      <p class="small muted" style="margin-top:14px"><span class="tag draft">${esc(KB.reviewed.label)}</span> ${esc(iss.juris)}</p>
+      <p class="small muted" style="margin-top:14px"><span class="tag draft">${esc(X(KB.reviewed.label))}</span> ${esc(X(iss.juris))}</p>
       ${srcBlock(iss)}
-      <div class="row" style="margin-top:18px"><button class="btn go" data-act="begin" data-id="${iss.id}" ${topic ? `data-topic="${KB.directory.indexOf(topic)}"` : ''}>Open my file</button><span class="small muted">${ic('lock', 14)} Skip any question. Stop any time.</span></div>
+      <div class="row" style="margin-top:18px"><button class="btn go" data-act="begin" data-id="${iss.id}" ${topic ? `data-topic="${KB.directory.indexOf(topic)}"` : ''}>${esc(X('Open my file'))}</button><span class="small muted">${ic('lock', 14)} ${esc(X('Skip any question. Stop any time.'))}</span></div>
     </section></div>`);
   }
   function advBanner(adv) {
@@ -4764,7 +4843,7 @@ ${JSON.stringify(map)}`;
   function urgentBanner(u, iss) {
     iss = iss || issue();
     const help = (u.help || []).map((h) => KB.help[h]).filter(Boolean);
-    return `<div class="banner ${u.level}" role="${u.level === 'now' ? 'alert' : 'note'}">${ic(u.level === 'info' ? 'info' : 'alert')}<div><h3>${esc(G(iss, u.id + '.t', u.title))}</h3><p>${esc(G(iss, u.id + '.x', u.text))}</p>${help.length ? `<p class="small" style="margin-top:6px">${help.map((h) => `<b>${esc(h.label)}</b> ${esc(h.name)}`).join(' | ')}</p>` : ''}</div></div>`;
+    return `<div class="banner ${u.level}" role="${u.level === 'now' ? 'alert' : 'note'}">${ic(u.level === 'info' ? 'info' : 'alert')}<div><h3>${esc(G(iss, u.id + '.t', u.title))}</h3><p>${esc(G(iss, u.id + '.x', u.text))}</p>${help.length ? `<p class="small" style="margin-top:6px">${help.map((h) => `<b>${esc(h.label)}</b> ${esc(X(h.name))}`).join(' | ')}</p>` : ''}</div></div>`;
   }
   function answer(q, val) {
     const iss = issue();
@@ -4792,12 +4871,12 @@ ${JSON.stringify(map)}`;
     return shell(`<div class="wrap narrow" style="padding:26px 0 60px">
       <div class="banner now" role="alert">${ic('alert', 24)}<div><h1 style="font-size:clamp(24px,4vw,32px);margin:0 0 6px">${esc(u.title)}</h1><p>${esc(u.text)}</p></div></div>
       <div class="grid" style="margin:16px 0">${help.map(helpCard).join('')}</div>
-      <p class="muted">Your answers are kept on this page. Come back and finish when you can.</p>
+      <p class="muted">${esc(X('Your answers are kept on this page. Come back and finish when you can.'))}</p>
       <div class="row"><button class="btn go" data-act="ackurgent">Continue</button></div>
     </div>`, { inJourney: true });
   }
   function helpCard(h) {
-    return `<div class="helpcard">${/^\d{3,6}$/.test(h.label) ? `<a class="helpnum" href="tel:${esc(h.label)}" aria-label="Call ${esc(h.label)}">${esc(h.label)}</a>` : `<span class="helpnum">${esc(h.label)}</span>`}<div><h3>${esc(h.name)}</h3><p class="small muted" style="margin:2px 0 0">${esc(h.detail)}</p>${h.href ? `<a class="small" href="${esc(h.href)}" target="_blank" rel="noopener">${esc(h.href.replace('https://', ''))}</a>` : ''}</div></div>`;
+    return `<div class="helpcard">${/^\d{3,6}$/.test(h.label) ? `<a class="helpnum" href="tel:${esc(h.label)}" aria-label="Call ${esc(h.label)}">${esc(h.label)}</a>` : `<span class="helpnum">${esc(h.label)}</span>`}<div><h3>${esc(X(h.name))}</h3><p class="small muted" style="margin:2px 0 0">${esc(X(h.detail))}</p>${h.href ? `<a class="small" href="${esc(h.href)}" target="_blank" rel="noopener">${esc(h.href.replace('https://', ''))}</a>` : ''}</div></div>`;
   }
 
   /* ============ THE LIST: papers to carry ============ */
@@ -4830,7 +4909,7 @@ ${JSON.stringify(map)}`;
       ${infos.map((x) => `<div class="banner info">${ic('info')}<div><p>${esc(G(iss, 'info' + iss.info.indexOf(x), x.text))}</p></div></div>`).join('')}
       ${standCard(iss, papers, have)}
       ${srcBlock(iss)}
-      <div class="fbk noprint" id="fbk">${UI.fb && UI.fb[iss.id] ? `<p class="small muted">${ic('check', 16)} Thanks — that helps us improve this guide.</p>` : `<span>Was this list useful?</span><button class="btn line sm" data-act="fb" data-v="y">Yes</button><button class="btn line sm" data-act="fb" data-v="n">Not really</button>`}</div>
+      <div class="fbk noprint" id="fbk">${UI.fb && UI.fb[iss.id] ? `<p class="small muted">${ic('check', 16)} ${esc(X('Thanks — that helps us improve this guide.'))}</p>` : `<span>${esc(X('Was this list useful?'))}</span><button class="btn line sm" data-act="fb" data-v="y">${esc(X('Yes'))}</button><button class="btn line sm" data-act="fb" data-v="n">${esc(X('Not really'))}</button>`}</div>
       <div class="actbar noprint"><button class="btn go" data-act="print">${ic('file', 18)} ${esc(T('print'))}</button><button class="btn line" data-go="report">${esc(T('makepage'))}</button></div>
       ${deepLeft ? `<button class="deeper noprint" data-act="deep"><span><b>${esc(T('better'))}</b>${esc(T('more', { n: deepN }))}</span>${ic('chev', 24)}</button>` : ''}
       <div class="panel noprint">
@@ -4857,24 +4936,24 @@ ${JSON.stringify(map)}`;
   function viewAnswers() {
     const iss = issue(); const qs = iss.questions.filter((q) => S.answers[q.id] != null || S.skipped[q.id]);
     return shell(`<div class="wrap narrow" style="padding:20px 0 40px"><button class="btn text" data-go="list">${ic('back', 18)} ${esc(T('listh'))}</button>
-      <h1 style="font-size:clamp(28px,5vw,42px);margin:8px 0 10px">Your answers</h1>
-      <p class="muted">Change any answer. Questions that depend on it will be asked again. Documents you named are kept.</p>
-      <div class="grid">${qs.map((q) => `<div class="helpcard" style="justify-content:space-between;align-items:center"><div><p class="small muted" style="margin:0">${esc(q.text)}</p><p style="margin:2px 0 0;font-weight:700">${S.skipped[q.id] ? '<span class="muted">Skipped</span>' : esc(answerText(q, S.answers[q.id]))}</p></div><button class="btn line" data-act="change" data-q="${q.id}">Change</button></div>`).join('') || '<p class="muted">No answers yet.</p>'}</div>
+      <h1 style="font-size:clamp(28px,5vw,42px);margin:8px 0 10px">${esc(X('Your answers'))}</h1>
+      <p class="muted">${esc(X('Change any answer. Questions that depend on it will be asked again. Documents you named are kept.'))}</p>
+      <div class="grid">${qs.map((q) => `<div class="helpcard" style="justify-content:space-between;align-items:center"><div><p class="small muted" style="margin:0">${esc(q.text)}</p><p style="margin:2px 0 0;font-weight:700">${S.skipped[q.id] ? '<span class="muted">Skipped</span>' : esc(answerText(q, S.answers[q.id]))}</p></div><button class="btn line" data-act="change" data-q="${q.id}">Change</button></div>`).join('') || '<p class="muted">' + esc(X('No answers yet.')) + '</p>'}</div>
     </div>`, { inJourney: true });
   }
 
   function viewTimeline() {
     const items = [...S.chrono].sort((a, b) => (a.date || '9999').localeCompare(b.date || '9999'));
     return shell(`<div class="wrap narrow" style="padding:20px 0 40px"><button class="btn text" data-go="list">${ic('back', 18)} ${esc(T('listh'))}</button>
-      <h1 style="font-size:clamp(28px,5vw,42px);margin:8px 0 10px">Your timeline</h1>
-      <p class="muted">List the main events in your own words. Approximate dates are fine — mark them.</p>
-      ${items.length ? `<ol class="tl">${items.map((t) => `<li><div class="d">${t.date ? esc(fmtDate(t.date)) + (t.approx ? ' (approx.)' : '') : 'Date unknown'}</div><div>${esc(t.text)}</div><button class="btn text small" data-delchrono="${t.id}">Remove</button></li>`).join('')}</ol>` : '<p class="panel muted">No events yet. Add the first one below.</p>'}
+      <h1 style="font-size:clamp(28px,5vw,42px);margin:8px 0 10px">${esc(X('Your timeline'))}</h1>
+      <p class="muted">${esc(X('List the main events in your own words. Approximate dates are fine — mark them.'))}</p>
+      ${items.length ? `<ol class="tl">${items.map((t) => `<li><div class="d">${t.date ? esc(fmtDate(t.date)) + (t.approx ? ' (approx.)' : '') : 'Date unknown'}</div><div>${esc(t.text)}</div><button class="btn text small" data-delchrono="${t.id}">Remove</button></li>`).join('')}</ol>` : '<p class="panel muted">' + esc(X('No events yet. Add the first one below.')) + '</p>'}
       <form class="panel" id="chronoform">
-        <h2>Add an event</h2>
+        <h2>${esc(X('Add an event'))}</h2>
         <div class="grid" style="grid-template-columns:1fr 1fr;align-items:end"><label class="f">Date<input class="t" type="date" name="date" max="${today()}"></label><label class="check"><input type="checkbox" name="approx"> Approximate</label></div>
-        <label class="f" style="margin-top:10px">What happened?<textarea class="t" name="text" rows="2" maxlength="300" required placeholder="e.g. Paid ₹40,000 deposit by UPI"></textarea></label>
-        <p class="small muted">Stick to what happened. Leave out private details you don't need.</p>
-        <button class="btn go" type="submit">Add to timeline</button>
+        <label class="f" style="margin-top:10px">${esc(X('What happened?'))}<textarea class="t" name="text" rows="2" maxlength="300" required placeholder="e.g. Paid ₹40,000 deposit by UPI"></textarea></label>
+        <p class="small muted">${esc(X('Stick to what happened. Leave out private details you don\'t need.'))}</p>
+        <button class="btn go" type="submit">${esc(X('Add to timeline'))}</button>
       </form>
       <div class="row" style="margin-top:18px"><button class="btn go" data-go="report">${ic('file', 18)} Make my lawyer page</button></div>
     </div>`, { inJourney: true });
@@ -4884,7 +4963,7 @@ ${JSON.stringify(map)}`;
   function srcBlock(iss) {
     if (!iss || !iss.sources || !iss.sources.length) return '';
     const d = iss.checked ? new Date(iss.checked + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
-    return `<details class="srcs"><summary>${ic('file', 14)} Law checked ${esc(d)} · ${iss.sources.length} official source${iss.sources.length > 1 ? 's' : ''}</summary><ul>${iss.sources.map((x) => `<li><a href="${esc(x.u)}" target="_blank" rel="noopener">${esc(x.t)}</a></li>`).join('')}</ul><p class="small muted">Law changes. Confirm the current position with an advocate before you act.</p></details>`;
+    return `<details class="srcs"><summary>${ic('file', 14)} ${esc(X('Law checked {d} · {n} official sources').replace('{d}', d).replace('{n}', iss.sources.length))}</summary><ul>${iss.sources.map((x) => `<li><a href="${esc(x.u)}" target="_blank" rel="noopener">${esc(x.t)}</a></li>`).join('')}</ul><p class="small muted">${esc(X('Law changes. Confirm the current position with an advocate before you act.'))}</p></details>`;
   }
   function standCard(iss, items, have) {
     const st = E.stand(iss, S.answers);
@@ -4936,7 +5015,7 @@ ${JSON.stringify(map)}`;
   }
   function viewReport() {
     return shell(`<div class="wrap narrow" style="padding-bottom:30px">
-      <div class="toolbar noprint"><button class="btn text" data-go="list">${ic('back', 18)} ${esc(T('listh'))}</button><button class="btn go" data-act="print">${ic('file', 18)} Print or save as PDF</button>${downloads ? '<button class="btn line" data-act="download">Download</button>' : ''}<button class="btn line" data-act="copytext">Copy as text</button></div>
+      <div class="toolbar noprint"><button class="btn text" data-go="list">${ic('back', 18)} ${esc(T('listh'))}</button><button class="btn go" data-act="print">${ic('file', 18)} Print or save as PDF</button>${downloads ? '<button class="btn line" data-act="download">Download</button>' : ''}<button class="btn line" data-act="copytext">${esc(X('Copy as text'))}</button></div>
       <div class="panel noprint" style="margin:0 0 16px">
         <label class="check"><input type="checkbox" data-act="excl" ${S.excludeSensitive ? 'checked' : ''}> Leave out my answers to sensitive questions</label>
         <label class="f" style="margin-top:12px">Anything else your advocate should know? (optional)<textarea class="t" id="notes" rows="2" maxlength="500">${esc(S.notes)}</textarea></label>
@@ -4960,20 +5039,20 @@ ${JSON.stringify(map)}`;
     const s = UI.qsearch.toLowerCase();
     const list = KB.questions.filter((q) => (UI.qcat === 'all' || q.cat === UI.qcat || q.id === openId) && (!s || (q.q + ' ' + q.a + ' ' + q.kw.join(' ')).toLowerCase().includes(s)));
     return shell(`<div class="wrap narrow" style="padding:26px 0 40px">
-      <h1 style="font-size:clamp(30px,5.4vw,48px)">Legal questions, answered plainly</h1>
-      <p class="lead" style="margin-top:12px">Short answers to what people ask most. Each one says what can change the answer — and links to a guide if you need to prepare for a lawyer.</p>
+      <h1 style="font-size:clamp(30px,5.4vw,48px)">${esc(X('Legal questions, answered plainly'))}</h1>
+      <p class="lead" style="margin-top:12px">${esc(X('Short answers to what people ask most. Each one says what can change the answer — and links to a guide if you need to prepare for a lawyer.'))}</p>
       <label class="sr" for="qsearch">Search questions</label>
-      <input id="qsearch" class="t" type="search" placeholder="Search, e.g. bail, deposit, gratuity" value="${esc(UI.qsearch)}" style="margin-top:14px">
-      <div class="filters">${cats.map(([id, t]) => `<button class="fchip" data-qcat="${id}" aria-pressed="${UI.qcat === id}">${esc(t)}</button>`).join('')}</div>
+      <input id="qsearch" class="t" type="search" placeholder="${esc(X('Search, e.g. bail, deposit, gratuity'))}" value="${esc(UI.qsearch)}" style="margin-top:14px">
+      <div class="filters">${cats.map(([id, t]) => `<button class="fchip" data-qcat="${id}" aria-pressed="${UI.qcat === id}">${esc(X(t))}</button>`).join('')}</div>
       <div id="qalist">${(() => {
-        const qa = (q) => `<details class="qa" id="qa-${q.id}" ${q.id === openId ? 'open' : ''}><summary>${esc(q.q)}</summary><div class="body">
-        <p>${esc(q.a)}</p><p class="small" style="margin:0"><b>What can change the answer</b></p><ul>${q.depends.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
+        const qa = (q) => `<details class="qa" id="qa-${q.id}" ${q.id === openId ? 'open' : ''}><summary>${esc(X(q.q))}</summary><div class="body">
+        <p>${esc(X(q.a))}</p><p class="small" style="margin:0"><b>${esc(X('What can change the answer'))}</b></p><ul>${q.depends.map((x) => `<li>${esc(X(x))}</li>`).join('')}</ul>
         <p class="law">Law: ${esc(q.law)}. ${esc(KB.reviewed.label)}.</p>
-        ${q.journey && BY_ID[q.journey] ? `<button class="btn line" data-play="${q.journey}">Prepare for a lawyer: ${esc(BY_ID[q.journey].short)}</button>` : ''}
+        ${q.journey && BY_ID[q.journey] ? `<button class="btn line" data-play="${q.journey}">${esc(X('Prepare for a lawyer:'))} ${esc(BY_ID[q.journey].short)}</button>` : ''}
       </div></details>`;
-        if (!list.length) return '<p class="panel muted">No match. Try other words, or <button class="btn text" data-go="start-general">use general preparation</button>.</p>';
+        if (!list.length) return '<p class="panel muted">' + esc(X('No match. Try other words, or ')) + '<button class="btn text" data-go="start-general">use general preparation</button>.</p>';
         if (UI.qcat !== 'all' || s) return list.map(qa).join('');
-        return `<div class="acc">${cats.filter(([id]) => id !== 'all').map(([id, t]) => { const qs = list.filter((q) => q.cat === id); const c = CAT[id]; return qs.length ? `<details class="accg" ${qs.some((q) => q.id === openId) ? 'open' : ''}><summary>${ic(c ? c.icon : 'q', 20)}<b>${esc(t)}</b><span class="cnt">${qs.length}</span>${ic('down', 18)}</summary><div class="accb">${qs.map(qa).join('')}</div></details>` : ''; }).join('')}</div>`;
+        return `<div class="acc">${cats.filter(([id]) => id !== 'all').map(([id, t]) => { const qs = list.filter((q) => q.cat === id); const c = CAT[id]; return qs.length ? `<details class="accg" ${qs.some((q) => q.id === openId) ? 'open' : ''}><summary>${ic(c ? c.icon : 'q', 20)}<b>${esc(X(t))}</b><span class="cnt">${qs.length}</span>${ic('down', 18)}</summary><div class="accb">${qs.map(qa).join('')}</div></details>` : ''; }).join('')}</div>`;
       })()}</div>
     </div>`);
   }
@@ -4981,20 +5060,21 @@ ${JSON.stringify(map)}`;
   /* ============ MYTH OR FACT ============ */
   function viewMyths() {
     const mf = UI.mf; if (!mf.order) mf.order = KB.myths.map((_, i) => i).sort(() => Math.random() - 0.5);
+    const tx = (t, o) => { let r = X(t); Object.entries(o || {}).forEach(([k, v]) => { r = r.replace('{' + k + '}', v); }); return esc(r); };
     if (mf.i >= mf.order.length) {
-      return shell(`<div class="wrap mf"><h1 style="font-size:clamp(30px,5vw,44px)">You got ${mf.score} of ${mf.order.length}</h1>
-        <p class="lead" style="margin-top:12px">${mf.score >= mf.order.length * 0.8 ? 'You know your rights better than most.' : 'Now you know a few things most people get wrong.'}</p>
-        <div class="row" style="margin-top:18px"><button class="btn go" data-act="mfrestart">Play again</button><button class="btn line" data-go="questions">Read the legal questions</button></div></div>`);
+      return shell(`<div class="wrap mf"><h1 style="font-size:clamp(30px,5vw,44px)">${tx('You got {s} of {n}', { s: mf.score, n: mf.order.length })}</h1>
+        <p class="lead" style="margin-top:12px">${mf.score >= mf.order.length * 0.8 ? tx('You know your rights better than most.') : tx('Now you know a few things most people get wrong.')}</p>
+        <div class="row" style="margin-top:18px"><button class="btn go" data-act="mfrestart">${tx('Play again')}</button><button class="btn line" data-go="questions">${tx('Read the legal questions')}</button></div></div>`);
     }
     const m = KB.myths[mf.order[mf.i]]; const a = mf.ans;
     return shell(`<div class="wrap mf">
-      <h1 style="font-size:clamp(28px,4.6vw,40px);margin-bottom:6px">Myth or fact?</h1>
-      <p class="muted">Card ${mf.i + 1} of ${mf.order.length} <span class="score" style="margin-left:10px">Score ${mf.score}</span></p>
-      <div class="mfcard"><span class="n">Card ${mf.i + 1}</span><p class="s">${esc(m.s)}</p></div>
-      ${a == null ? `<div class="mfbtns"><button class="btn line" data-mf="myth">Myth</button><button class="btn go" data-mf="fact">Fact</button></div>`
-        : `<div class="mfresult ${a === m.fact ? 'right' : 'wrong'}" role="status"><b>${a === m.fact ? 'Right' : 'Not quite'}: it's a ${m.fact ? 'fact' : 'myth'}.</b><p style="margin:6px 0 0">${esc(m.why)}</p></div>
-           <div class="row" style="margin-top:14px"><button class="btn go" data-act="mfnext">${mf.i + 1 < mf.order.length ? 'Next card' : 'See my score'}</button></div>`}
-      <p class="small muted" style="margin-top:20px">General information, not legal advice. ${esc(KB.reviewed.label)}.</p>
+      <h1 style="font-size:clamp(28px,4.6vw,40px);margin-bottom:6px">${tx('Myth or fact?')}</h1>
+      <p class="muted">${tx('Card {i} of {n}', { i: mf.i + 1, n: mf.order.length })} <span class="score" style="margin-left:10px">${tx('Score {s}', { s: mf.score })}</span></p>
+      <div class="mfcard"><span class="n">${tx('Card {i}', { i: mf.i + 1 })}</span><p class="s">${esc(X(m.s))}</p></div>
+      ${a == null ? `<div class="mfbtns"><button class="btn line" data-mf="myth">${tx('Myth')}</button><button class="btn go" data-mf="fact">${tx('Fact')}</button></div>`
+        : `<div class="mfresult ${a === m.fact ? 'right' : 'wrong'}" role="status"><b>${a === m.fact ? (m.fact ? tx('Right: it\'s a fact.') : tx('Right: it\'s a myth.')) : (m.fact ? tx('Not quite: it\'s a fact.') : tx('Not quite: it\'s a myth.'))}</b><p style="margin:6px 0 0">${esc(X(m.why))}</p></div>
+           <div class="row" style="margin-top:14px"><button class="btn go" data-act="mfnext">${mf.i + 1 < mf.order.length ? tx('Next card') : tx('See my score')}</button></div>`}
+      <p class="small muted" style="margin-top:20px">${tx('General information, not legal advice.')} ${esc(X(KB.reviewed.label))}.</p>
     </div>`);
   }
 
@@ -5044,27 +5124,27 @@ ${JSON.stringify(map)}`;
     ].map(([t, icn, ks]) => [t, icn, ks.filter((k) => KB.help[k])]).filter((g) => g[2].length);
     const num = (h) => h.label.replace(/\D/g, '');
     return shell(`<div class="wrap narrow" style="padding:22px 0 36px">
-      <h1 style="font-size:clamp(28px,5vw,44px)">Urgent help and free legal aid</h1>
-      <div class="banner now" style="margin-top:14px">${ic('alert')}<div><h3>In immediate danger?</h3><p>Call <b>112</b>. You don't need this tool first.</p></div></div>
-      <h2 class="lh" style="margin-top:20px">Call now</h2>
-      <div class="callgrid">${CALL.filter(([k]) => KB.help[k]).map(([k, short]) => { const h = KB.help[k]; return `<a class="callbtn${h.label.length > 6 ? ' long' : ''}" href="tel:${num(h)}" title="${esc(h.name)}">${ic('phone', 18)}<b>${esc(h.label)}</b><span>${esc(short)}</span></a>`; }).join('')}</div>
-      <p class="small muted" style="margin:8px 0 0">Free legal aid covers women, children, people with disabilities, people in custody and those below the income limit — call <b>15100</b> to ask.</p>
-      <h2 class="lh" style="margin-top:22px">Complaint portals</h2>
-      <p class="small muted" style="margin:0 0 8px">Tap an area to see the official place to complain.</p>
-      <div class="acc">${GROUPS.map(([t, icn, ks]) => `<details class="accg"><summary>${ic(icn, 20)}<b>${esc(t)}</b><span class="cnt">${ks.length}</span>${ic('down', 18)}</summary><div class="grid">${ks.map((k) => helpCard(KB.help[k])).join('')}</div></details>`).join('')}</div>
-      <p class="small muted" style="margin-top:14px">If a number doesn't open, dial it yourself. Checked October 2026.</p>
+      <h1 style="font-size:clamp(28px,5vw,44px)">${esc(X('Urgent help and free legal aid'))}</h1>
+      <div class="banner now" style="margin-top:14px">${ic('alert')}<div><h3>${esc(X('In immediate danger?'))}</h3><p>${esc(X('Call 112. You don\'t need this tool first.'))}</p></div></div>
+      <h2 class="lh" style="margin-top:20px">${esc(X('Call now'))}</h2>
+      <div class="callgrid">${CALL.filter(([k]) => KB.help[k]).map(([k, short]) => { const h = KB.help[k]; return `<a class="callbtn${h.label.length > 6 ? ' long' : ''}" href="tel:${num(h)}" title="${esc(h.name)}">${ic('phone', 18)}<b>${esc(h.label)}</b><span>${esc(X(short))}</span></a>`; }).join('')}</div>
+      <p class="small muted" style="margin:8px 0 0">${esc(X('Free legal aid covers women, children, people with disabilities, people in custody and those below the income limit — call 15100 to ask.'))}</p>
+      <h2 class="lh" style="margin-top:22px">${esc(X('Complaint portals'))}</h2>
+      <p class="small muted" style="margin:0 0 8px">${esc(X('Tap an area to see the official place to complain.'))}</p>
+      <div class="acc">${GROUPS.map(([t, icn, ks]) => `<details class="accg"><summary>${ic(icn, 20)}<b>${esc(X(t))}</b><span class="cnt">${ks.length}</span>${ic('down', 18)}</summary><div class="grid">${ks.map((k) => helpCard(KB.help[k])).join('')}</div></details>`).join('')}</div>
+      <p class="small muted" style="margin-top:14px">${esc(X('If a number doesn\'t open, dial it yourself. Checked October 2026.'))}</p>
     </div>`);
   }
   function viewAbout() {
     const counts = KB.categories.map((c) => `${c.title}: ${BUILT.filter((i) => i.cat === c.id).length}`).join(', ');
     return shell(`<div class="wrap narrow" style="padding:26px 0 40px">
-      <h1 style="font-size:clamp(30px,5vw,46px)">How this works</h1>
-      <details class="panel accp" open><summary><h2>What it does</h2>${ic('down', 18)}</summary><div class="accb"><p>Pick your problem and answer a few one-tap questions. Each answer changes which papers you need. The rules come from a written, tested set of guides — not from a chatbot making things up.</p><p style="margin:0">At the end you get one list: what to do first, the papers to take to your advocate, and where you stand. You can print it, or make a page for your advocate with your answers and a dated timeline.</p></div></details>
-      <details class="panel accp"><summary><h2>What it doesn't do</h2>${ic('down', 18)}</summary><div class="accb"><ul style="margin:0;padding-left:20px"><li>Give legal advice or predict results.</li><li>Say a record is legally required or admissible.</li><li>Prepare court filings.</li><li>Ask you to upload documents.</li></ul></div></details>
-      <details class="panel accp"><summary><h2>Why these problems</h2>${ic('down', 18)}</summary><div class="accb"><p style="margin:0">Guides are chosen from what most often reaches Indian courts and Lok Adalats (cheque bounce, family, motor accident, traffic challans, property), the National Consumer Helpline (e-commerce, banking, telecom, travel), the RBI Ombudsman (loans and credit cards lead) and police cyber-crime data (online fraud and fake-police "digital arrest" calls). Guides by area — ${esc(counts)}.</p></div></details>
-      <details class="panel accp"><summary><h2>Privacy</h2>${ic('down', 18)}</summary><div class="accb"><p>Your answers stay in this browser tab — they are never sent to us. On the public website, the app counts anonymous events (for example, "a list was made for the cheque-bounce guide", or which language was used) to improve the guides; no cookies, no IP addresses, nothing you typed into a question. If you switch on "Keep my file on this device", it is saved only in this browser. Advocate links contain only the guide choice and the advocate's note.</p><p style="margin:0">Exit clears the page and opens a neutral website. It does not erase browser history.</p></div></details>
-      <details class="panel accp"><summary><h2>Review status</h2>${ic('down', 18)}</summary><div class="accb"><p style="margin:0">All guides are <b>drafts</b>, not yet reviewed by a practising advocate. Each guide will show its reviewer and date once reviewed. Languages: all 22 scheduled languages of India plus English. 16 have a hand-written interface; Santali, Kashmiri, Sindhi, Manipuri, Bodo and Sanskrit, and all guide content in every language, are machine-translated on the fly and labelled so. Translations need native-speaker and advocate review. The page for your lawyer always stays in English. Content v${esc(KB.version)}: ${BUILT.length} guided problems, ${KB.questions.length} answered questions, ${KB.myths.length} myth cards.</p></div></details>
-      ${S.issueId || loadSaved() ? '<button class="btn line" data-act="clear" style="margin-top:16px">Clear everything on this device</button>' : ''}
+      <h1 style="font-size:clamp(30px,5vw,46px)">${esc(X('How this works'))}</h1>
+      <details class="panel accp" open><summary><h2>${esc(X('What it does'))}</h2>${ic('down', 18)}</summary><div class="accb"><p>Pick your problem and answer a few one-tap questions. Each answer changes which papers you need. The rules come from a written, tested set of guides — not from a chatbot making things up.</p><p style="margin:0">At the end you get one list: what to do first, the papers to take to your advocate, and where you stand. You can print it, or make a page for your advocate with your answers and a dated timeline.</p></div></details>
+      <details class="panel accp"><summary><h2>${esc(X('What it doesn\'t do'))}</h2>${ic('down', 18)}</summary><div class="accb"><ul style="margin:0;padding-left:20px"><li>Give legal advice or predict results.</li><li>Say a record is legally required or admissible.</li><li>Prepare court filings.</li><li>Ask you to upload documents.</li></ul></div></details>
+      <details class="panel accp"><summary><h2>${esc(X('Why these problems'))}</h2>${ic('down', 18)}</summary><div class="accb"><p style="margin:0">Guides are chosen from what most often reaches Indian courts and Lok Adalats (cheque bounce, family, motor accident, traffic challans, property), the National Consumer Helpline (e-commerce, banking, telecom, travel), the RBI Ombudsman (loans and credit cards lead) and police cyber-crime data (online fraud and fake-police "digital arrest" calls). Guides by area — ${esc(counts)}.</p></div></details>
+      <details class="panel accp"><summary><h2>${esc(X('Privacy'))}</h2>${ic('down', 18)}</summary><div class="accb"><p>Your answers stay in this browser tab — they are never sent to us. On the public website, the app counts anonymous events (for example, "a list was made for the cheque-bounce guide", or which language was used) to improve the guides; no cookies, no IP addresses, nothing you typed into a question. If you switch on "Keep my file on this device", it is saved only in this browser. Advocate links contain only the guide choice and the advocate's note.</p><p style="margin:0">${esc(X('Exit clears the page and opens a neutral website. It does not erase browser history.'))}</p></div></details>
+      <details class="panel accp"><summary><h2>${esc(X('Review status'))}</h2>${ic('down', 18)}</summary><div class="accb"><p style="margin:0">All guides are <b>drafts</b>, not yet reviewed by a practising advocate. Each guide will show its reviewer and date once reviewed. Languages: all 22 scheduled languages of India plus English. 16 have a hand-written interface; Santali, Kashmiri, Sindhi, Manipuri, Bodo and Sanskrit, and all guide content in every language, are machine-translated on the fly and labelled so. Translations need native-speaker and advocate review. The page for your lawyer always stays in English. Content v${esc(KB.version)}: ${BUILT.length} guided problems, ${KB.questions.length} answered questions, ${KB.myths.length} myth cards.</p></div></details>
+      ${S.issueId || loadSaved() ? '<button class="btn line" data-act="clear" style="margin-top:16px">' + esc(X('Clear everything on this device')) + '</button>' : ''}
     </div>`);
   }
   function showLang() {
@@ -5137,10 +5217,7 @@ ${JSON.stringify(map)}`;
     const y = window.scrollY; app.innerHTML = viewList(); afterRender('list'); window.scrollTo(0, y);
     const a = document.getElementById(anchor); if (a) { const b = a.querySelector(sel) || a.querySelector('[aria-pressed=true]'); if (b) b.focus({ preventScroll: true }); }
   }
-  function enterGuide() {
-    const iss = issue(); const h0 = location.hash;
-    if (translated() && canTranslate() && !trFailed[LANG]) { withTranslation([ensureGuide(iss, 'a')], () => { if (location.hash !== h0 || S.issueId !== iss.id) { render(); return; } goQuiz(); ensureGuide(iss, 'b').then(() => { if (/^#(quiz|list|urgent)/.test(location.hash)) render(); }); }); } else goQuiz();
-  }
+  function enterGuide() { goQuiz(); }
   document.addEventListener('click', async (e) => {
     const sr = e.target.closest('#results [data-play], #results [data-go]'); if (sr) { const m = document.getElementById('matter'); TRACK.ev('pick', { g: sr.dataset.play === 'general' && sr.dataset.topic != null ? 'topic-' + sr.dataset.topic : (sr.dataset.play || sr.dataset.go), x: m ? m.value : '' }); }
     const pl = e.target.closest('[data-play]');
@@ -5149,7 +5226,7 @@ ${JSON.stringify(map)}`;
     const lc = e.target.closest('[data-lang]'); if (lc) { setLang(lc.dataset.lang); document.querySelector('.overlay')?.remove(); return; }
     const t = e.target.closest('[data-go],[data-act],[data-status],[data-delrec],[data-delchrono],[data-ex],[data-copy],[data-club],[data-qcat],[data-mf]'); if (!t) return;
     if (t.dataset.go) { e.preventDefault(); go(t.dataset.go); return; }
-    if (t.dataset.club) { UI.club = t.dataset.club; document.querySelectorAll('.tab').forEach((x) => x.setAttribute('aria-selected', x === t)); const d = document.getElementById('drawer'); d.setAttribute('aria-labelledby', t.id); d.innerHTML = clubRows(UI.club) + '<button class="issue gen" data-play="general"><b>Something else, or not sure</b><span>Answer a few general questions</span><em>general</em></button>'; return; }
+    if (t.dataset.club) { UI.club = t.dataset.club; document.querySelectorAll('.tab').forEach((x) => x.setAttribute('aria-selected', x === t)); const d = document.getElementById('drawer'); d.setAttribute('aria-labelledby', t.id); d.innerHTML = clubRows(UI.club) + '<button class="issue gen" data-play="general"><b>' + esc(X('Something else, or not sure')) + '</b><span>' + esc(X('Answer a few general questions')) + '</span><em>general</em></button>'; return; }
     if (t.dataset.qcat) { UI.qcat = t.dataset.qcat; render(); return; }
     if (t.dataset.ex) { const m = document.getElementById('matter'); m.value = t.dataset.ex; renderResults(m.value); m.focus(); return; }
     if (t.dataset.copy) { try { await navigator.clipboard.writeText(t.dataset.copy); toast('Copied'); } catch (err) { toast('Copy blocked — select and copy manually'); } return; }
@@ -5251,7 +5328,7 @@ ${JSON.stringify(map)}`;
     searchT = setTimeout(() => { let n = 0; try { n = searchAll(v).length; } catch (e) { /* ignore */ } TRACK.ev('search', { n, x: v }); }, 1500);
   }
   try { const fi = document.createElement('link'); fi.rel = 'icon'; fi.href = window.ER_BRAND.icon; document.head.appendChild(fi); } catch (e) { /* none */ }
-  applyLangDom(); if (!uiReady(LANG)) setTimeout(() => withTranslation([ensureUI], render), 600);
+  applyLangDom();
   render();
 })();
 </script>

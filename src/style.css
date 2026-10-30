@@ -585,7 +585,7 @@ footer.foot .flink{color:var(--go-d);padding:6px 0;text-decoration:underline;fon
 
 /* v14: hero matches the brand board — sage panel bleeds to the right edge, illustration anchored to it */
 @media (min-width:820px){
-  .hero2{--hh:clamp(620px,50vw,840px);--iw:calc(var(--hh) * .6606);background:var(--paper);position:relative;overflow:hidden;min-height:var(--hh)}
+  .hero2{--hh:clamp(560px,42vw,700px);--iw:calc(var(--hh) * .6606);background:var(--paper);position:relative;overflow:hidden;min-height:var(--hh)}
   .hero2::before{display:block;content:"";position:absolute;inset:0 0 0 auto;width:calc(var(--iw) + 150px);background:linear-gradient(180deg,#EAF0E7 0%,#E8EEE4 100%);border-radius:70% 0 0 30% / 56% 0 0 44%}
   html[dir=rtl] .hero2::before{inset:0 auto 0 0;border-radius:0 62% 38% 0 / 0 54% 46% 0}
   .hero2in{position:static;display:block;min-height:var(--hh)}
@@ -693,3 +693,22 @@ footer.foot .wrap{position:relative}
 .adminlink{position:absolute;right:18px;bottom:0;font-size:11px;color:var(--ink2);opacity:.55;text-decoration:none;padding:4px 2px}
 .adminlink:hover,.adminlink:focus-visible{opacity:1;text-decoration:underline}
 @media (max-width:760px){.adminlink{right:16px}}
+
+/* v17: laptops and big screens — scale the whole UI up so it doesn't look small */
+@media (min-width:1280px){ body{zoom:1.08} }
+@media (min-width:1440px){ body{zoom:1.14} }
+@media (min-width:1680px){ body{zoom:1.22} }
+@media (min-width:1920px){ body{zoom:1.3} }
+@media (min-width:2400px){ body{zoom:1.5} }
+@media (min-width:1024px){ .narrow{max-width:740px} }
+@media print{ body{zoom:1!important} }
+
+/* v18: small-screen fixes from the layout audit */
+.helpcard{min-width:0}
+.helpcard>div{min-width:0;flex:1}
+.helpcard h3,.helpcard p{overflow-wrap:anywhere}
+.helpcard a.small{display:inline-block;padding:8px 0;min-height:36px;overflow-wrap:anywhere}
+.helpnum{flex:none;max-width:42%;overflow-wrap:anywhere;text-align:center}
+.check{min-width:0;flex-wrap:wrap}
+.check input{flex:none}
+@media (max-width:400px){ .helpcard{gap:10px;padding:12px} .helpnum{font-size:15px} .accg>.grid,.accg>.accb{padding:8px} }
