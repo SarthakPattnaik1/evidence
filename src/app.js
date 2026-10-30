@@ -305,7 +305,7 @@ ${JSON.stringify(map)}`;
     return `<footer class="foot"><div class="wrap">
       <div class="fmark"><img src="${window.ER_BRAND.icon}" alt="" width="40" height="49"><div><b>Saboot</b><span>${esc(X('Know what to bring. Meet your lawyer prepared.'))}</span></div></div>
       <p style="max-width:62em">${f('f_disc')}</p>
-      <p class="small muted madeby">${esc(X('Made by'))} <a class="plink" href="https://www.linkedin.com/in/sarthakad" target="_blank" rel="noopener">Sarthak Pattnaik</a> ${esc(X('and'))} <a class="plink" href="https://www.linkedin.com/in/subhankar-das-311030b1/" target="_blank" rel="noopener">Subhankar Das</a>. ${esc(X('Saboot does not take cases, referrals or fees.'))}</p>
+      <p class="small muted madeby">${esc(X('Made by'))} <a class="plink" href="https://www.linkedin.com/in/sarthakad" target="_blank" rel="noopener">Sarthak Pattnaik</a> ${esc(X('and'))} <a class="plink" href="https://www.linkedin.com/in/subhankar-das-311030b1/" target="_blank" rel="noopener">Subhankar Das</a>.</p>
       <div class="row"><button data-go="about">${f('f_about')}</button><button data-go="advocates">${f('f_adv')}</button><button data-go="myths">${f('f_myth')}</button><button data-go="help">${f('f_help')}</button><button data-act="reportissue">${esc(X('Report a problem'))}</button>${S.issueId ? `<button data-act="clear">${f('f_clear')}</button>` : ''}${/^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname) ? `<a class="flink" href="/guide">${esc(X('All guides'))}</a><a class="flink" href="/privacy">${esc(X('Privacy'))}</a><a class="flink" href="/terms">${esc(X('Terms'))}</a>` : ''}</div>
       <p class="small muted" style="margin:8px 0 0">${esc(X('Law last checked {d} against official sources.').replace('{d}', new Date((KB.lawChecked || '2026-10-30') + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })))}</p>
       ${/^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname) && /^#?(home)?$/.test(location.hash) ? '<a class="adminlink" href="/admin" rel="nofollow">Admin</a>' : ''}
@@ -384,31 +384,22 @@ ${JSON.stringify(map)}`;
         </div>
         <div class="hart"><img src="${window.ER_BRAND.hero}" alt="" width="872" height="1320"></div>
       </div></section>
-      <section class="feats"><div class="wrap featsin">${FEAT.map(([icn, k, en, ks, ens, tone]) => `<div class="feat"><span class="fic ${tone}">${ic(icn, 30)}</span><div><b>${esc(H(k, en))}</b><span>${esc(H(ks, ens))}</span></div></div>`).join('')}</div></section>
       <div class="wrap home" id="start">
-        <section class="nowstrip" aria-labelledby="nowh"><h2 id="nowh">${ic('alert', 18)} ${esc(X('Happening right now?'))}</h2>
-          <div class="nowrow">${URGENT_NOW.map(([id, hk, t, fact]) => { const h = KB.help[hk]; return `<div class="nowcard"><b>${esc(X(t))}</b><p>${esc(X(fact))}</p><div class="nowact">${h ? `<a class="btn call" href="tel:${esc(h.label.replace(/\D/g, ''))}">${ic('phone', 18)} ${esc(h.label)}</a>` : ''}<button class="btn line" data-play="${id}">${esc(X('First steps'))}</button></div></div>`; }).join('')}</div>
-        </section>
+        ${saved && saved.issueId ? `<div class="resume">${ic('folder', 20)}<span><b>${esc(T('listh'))}</b> ${esc((BY_ID[saved.issueId] || {}).short || '')}</span><button class="btn go sm" data-act="resume">${esc(T('seelist'))}</button><button class="btn text sm" data-act="forget" aria-label="${esc(T('delall'))}">${ic('x', 18)}</button></div>` : ''}
+        <div class="sosbar" role="note">${ic('alert', 18)}<span>${esc(X('In danger, arrested, or money just stolen?'))}</span><span class="sosnums">${[['e112', 'Emergency'], ['cy1930', 'Cyber fraud'], ['l15100', 'Legal aid']].filter(([k]) => KB.help[k]).map(([k, t]) => `<a class="sosnum" href="tel:${KB.help[k].label.replace(/\D/g, '')}" aria-label="${esc(X(t))} ${esc(KB.help[k].label)}">${ic('phone', 14)} ${esc(KB.help[k].label)} <small>${esc(X(t))}</small></a>`).join('')}</span></div>
+        <h2 class="lh homeh">${esc(X('What happened to you?'))}</h2>
         <div class="searchbox" role="search">
           <label class="sr" for="matter">${esc(T('search'))}</label>
           ${ic('search', 22)}<input id="matter" type="search" autocomplete="off" placeholder="${esc(T('search'))}">
         </div>
         <div id="results" class="results" aria-live="polite"></div>
-        <section class="situ" id="suggest" aria-labelledby="situh">
-          <h2 id="situh" class="lh">${esc(X('What happened to you?'))}</h2>
-          <div class="siturow" role="list">${SITU.map(([id, icn, t, fact, tone]) => `<button class="situcard" role="listitem" data-play="${id}"><span class="fic ${tone}">${ic(icn, 22)}</span><b>${esc(X(t))}</b><span>${esc(X(fact))}</span><em>${esc(X('Get my list'))} ${ic('arrow', 16)}</em></button>`).join('')}</div>
+        <section class="situ" id="suggest" aria-label="${esc(X('Common situations'))}">
+          <div class="siturow" role="list">${SITU.map(([id, icn, t, fact, tone]) => `<button class="situcard" role="listitem" data-play="${id}"><span class="fic ${tone}">${ic(icn, 20)}</span><b>${esc(X(t))}</b><span>${esc(X(fact))}</span></button>`).join('')}</div>
         </section>
-      ${saved && saved.issueId ? `<div class="banner info" style="margin-top:18px">${ic('folder')}<div><h3>${esc(T('listh'))}</h3><p>${esc((BY_ID[saved.issueId] || {}).short || '')}. <button class="btn text" data-act="resume">${esc(T('seelist'))}</button> <button class="btn text" data-act="forget">${esc(T('delall'))}</button></p></div></div>` : ''}
-      <section aria-labelledby="areah">
-        <h2 id="areah">${esc(T('area'))}</h2>
-        <div class="tiles">${KB.categories.map((c) => `<button class="tile" data-go="cat-${c.id}"><span class="tic">${ic(c.icon, 26)}</span><b>${esc(catTitle(c))}</b><span>${esc(H('b_' + c.id, c.blurb))}</span></button>`).join('')}
-          <button class="tile" data-play="general"><span class="tic">${ic('q', 26)}</span><b>${esc(T('notsure'))}</b><span>${esc(T('notsure_s'))}</span></button></div>
-      </section>
-      <section class="minirow">
-        <button class="mini" data-go="questions">${ic('q', 22)}<span><b>${esc(T('q'))}</b>${esc(T('q_s'))}</span></button>
-        <button class="mini" data-go="myths">${ic('check', 22)}<span><b>${esc(T('myth'))}</b>${esc(T('myth_s'))}</span></button>
-        <button class="mini" data-go="help">${ic('phone', 22)}<span><b>${esc(T('help'))}</b>${esc(T('help_s'))}</span></button>
-      </section>
+        <section aria-labelledby="areah" class="areas">
+          <h2 id="areah" class="lh">${esc(T('area'))}</h2>
+          <div class="arealist">${KB.categories.map((c) => `<button class="arow" data-go="cat-${c.id}"><span class="tic">${ic(c.icon, 20)}</span><b>${esc(catTitle(c))}</b>${ic('chev', 18)}</button>`).join('')}<button class="arow" data-play="general"><span class="tic">${ic('q', 20)}</span><b>${esc(T('notsure'))}</b>${ic('chev', 18)}</button></div>
+        </section>
     </div>`);
   }
   function viewCat(cid) {
@@ -453,19 +444,16 @@ ${JSON.stringify(map)}`;
     const chaps = [...new Set(iss.questions.map(chapOf))];
     const adv = S.adv && S.adv.issueId === id ? S.adv : null;
     return shell(`<div class="wrap narrow"><section style="padding:20px 0 40px">
-      <button class="btn text" data-go="${topic ? 'cat-' + topic.cat : 'cat-' + iss.cat}">${ic('back', 18)} ${esc(X('Back to the shelf'))}</button>
+      <button class="btn text" data-go="${topic ? 'cat-' + topic.cat : 'cat-' + iss.cat}">${ic('back', 18)} ${esc(T('back'))}</button>
       ${adv ? advBanner(adv) : ''}
       <div class="filehead"><span class="tape" aria-hidden="true"></span><p class="typed">${esc(X('In the matter of:'))}</p><h1>${esc(topic ? X(topic.title) : G(iss, 's', iss.short))}</h1></div>
       ${topic && topic.urgentNote ? `<div class="banner soon">${ic('alert')}<div><h3>${esc(X('Before you start'))}</h3><p>${esc(X(topic.urgentNote))}</p></div></div>` : ''}
       <p class="lead">${esc(G(iss, 'i', iss.intro))}</p>
-      <div class="panel">
-        <h3>${esc(X('{c} chapters, about {q} quick questions to start').replace('{c}', chaps.length).replace('{q}', qs.length))}</h3>
-        <p class="muted small" style="margin:6px 0 0">${chaps.map((c) => esc(X(c))).join(' → ')}</p>
-        <p class="small" style="margin:10px 0 0">${esc(X('Your first list appears after the quick round. You can go deeper after that, or stop.'))}</p>
+      <div class="startbox">
+        <button class="btn go big" data-act="begin" data-id="${iss.id}" ${topic ? `data-topic="${KB.directory.indexOf(topic)}"` : ''}>${esc(X('Start'))} ${ic('arrow', 20)}</button>
+        <p class="small muted">${esc(X('About {q} quick questions · 2 minutes · skip any').replace('{q}', qs.length))}</p>
       </div>
-      <p class="small muted" style="margin-top:14px">${revTag(iss)} ${esc(X(iss.juris))}</p>
-      ${srcBlock(iss)}
-      <div class="row" style="margin-top:18px"><button class="btn go" data-act="begin" data-id="${iss.id}" ${topic ? `data-topic="${KB.directory.indexOf(topic)}"` : ''}>${esc(X('Open my file'))}</button><span class="small muted">${ic('lock', 14)} ${esc(X('Skip any question. Stop any time.'))}</span></div>
+      <details class="lawbox"><summary>${ic('file', 16)} ${esc(X('What the law says'))}${ic('down', 16)}</summary><p class="small">${revTag(iss)} ${esc(X(iss.juris))}</p>${srcBlock(iss)}</details>
     </section></div>`);
   }
   function advBanner(adv) {
@@ -805,7 +793,7 @@ ${JSON.stringify(map)}`;
     const counts = KB.categories.map((c) => `${c.title}: ${BUILT.filter((i) => i.cat === c.id).length}`).join(', ');
     return shell(`<div class="wrap narrow" style="padding:26px 0 40px">
       <h1 style="font-size:clamp(30px,5vw,46px)">${esc(X('How this works'))}</h1>
-      <details class="panel accp" open><summary><h2>${esc(X('Who made Saboot'))}</h2>${ic('down', 18)}</summary><div class="accb"><p>${esc(X('Made by'))} <a class="plink" href="https://www.linkedin.com/in/sarthakad" target="_blank" rel="noopener">Sarthak Pattnaik</a> ${esc(X('and'))} <a class="plink" href="https://www.linkedin.com/in/subhankar-das-311030b1/" target="_blank" rel="noopener">Subhankar Das</a>, ${esc(X('in Bhubaneswar.'))}</p><p style="margin:0">${esc(X('Saboot is a free preparation tool. It does not recommend, refer you to, or advertise any advocate — including us. We do not take cases, referrals or fees through Saboot. Choose any advocate you trust, or call 15100 for free legal aid.'))}</p></div></details>
+      <details class="panel accp" open><summary><h2>${esc(X('Who made Saboot'))}</h2>${ic('down', 18)}</summary><div class="accb"><p>${esc(X('Made by'))} <a class="plink" href="https://www.linkedin.com/in/sarthakad" target="_blank" rel="noopener">Sarthak Pattnaik</a> ${esc(X('and'))} <a class="plink" href="https://www.linkedin.com/in/subhankar-das-311030b1/" target="_blank" rel="noopener">Subhankar Das</a>.</p><p style="margin:0">${esc(X('Saboot is a free preparation tool. It does not recommend or advertise any advocate. Choose any advocate you trust, or call 15100 for free legal aid.'))}</p></div></details>
       <details class="panel accp"><summary><h2>${esc(X('What it does'))}</h2>${ic('down', 18)}</summary><div class="accb"><p>Pick your problem and answer a few one-tap questions. Each answer changes which papers you need. The rules come from a written, tested set of guides — not from a chatbot making things up.</p><p style="margin:0">At the end you get one list: what to do first, the papers to take to your advocate, and where you stand. You can print it, or make a page for your advocate with your answers and a dated timeline.</p></div></details>
       <details class="panel accp"><summary><h2>${esc(X('What it doesn\'t do'))}</h2>${ic('down', 18)}</summary><div class="accb"><ul style="margin:0;padding-left:20px"><li>Give legal advice or predict results.</li><li>Say a record is legally required or admissible.</li><li>Prepare court filings.</li><li>Ask you to upload documents.</li></ul></div></details>
       <details class="panel accp"><summary><h2>${esc(X('Why these problems'))}</h2>${ic('down', 18)}</summary><div class="accb"><p style="margin:0">Guides are chosen from what most often reaches Indian courts and Lok Adalats (cheque bounce, family, motor accident, traffic challans, property), the National Consumer Helpline (e-commerce, banking, telecom, travel), the RBI Ombudsman (loans and credit cards lead) and police cyber-crime data (online fraud and fake-police "digital arrest" calls). Guides by area — ${esc(counts)}.</p></div></details>

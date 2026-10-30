@@ -14,7 +14,7 @@ const url = 'file://' + require('path').resolve(__dirname, '../build/index.html'
   for (const [n, vp] of [['m', { width: 390, height: 844 }], ['d', { width: 1280, height: 860 }]]) {
     const p = await page(vp); await p.goto(url); await p.waitForTimeout(500);
     await shot(p, n + '-home', true);
-    await p.click('.tile >> nth=0'); await p.waitForTimeout(200); await shot(p, n + '-area');
+    await p.click('.arow >> nth=0'); await p.waitForTimeout(200); await shot(p, n + '-area');
     await p.goto(url); await p.fill('#matter', 'my cheque bounced'); await p.waitForTimeout(150); await shot(p, n + '-search');
     await p.click('#results .prob >> nth=0'); await p.waitForTimeout(250); await shot(p, n + '-q1');
     const pick = async (t) => { await p.click(`.opt:has-text("${t}")`); await p.waitForTimeout(550); };
@@ -41,14 +41,14 @@ const url = 'file://' + require('path').resolve(__dirname, '../build/index.html'
     await lp.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: css }));
     await lp.addInitScript(() => { window.claude = { use: async () => ({ json: async (prompt) => { const m = JSON.parse(prompt.slice(prompt.indexOf('\n\n{') + 2)); const o = {}; for (const k in m) o[k] = '᱕ ' + m[k]; return o; } }) }; });
     await lp.goto(url); await lp.waitForTimeout(300);
-    const shape = () => lp.evaluate(() => [...document.querySelectorAll('.tile')].map((t) => t.children.length).join(',') + '|' + document.querySelectorAll('.slipchip').length);
+    const shape = () => lp.evaluate(() => [...document.querySelectorAll('.arow')].map((t) => t.children.length).join(',') + '|' + document.querySelectorAll('.situcard').length);
     const enShape = await shape();
     await lp.click('.langsel'); await lp.click('.langopt[data-lang=hi]'); await lp.waitForTimeout(600);
     if (await shape() !== enShape) errs.push('hi: home layout differs from English');
     if (!/[\u0900-\u097F]/.test(await lp.textContent('#areah'))) errs.push('hi: heading not Hindi');
     if (!(await lp.textContent('.hcopy h1')).includes('᱕')) errs.push('hi: hero not translated');
     await shot(lp, 'm-home-hi', true);
-    await lp.click('.tile >> nth=0'); await lp.waitForTimeout(600);
+    await lp.click('.arow >> nth=0'); await lp.waitForTimeout(600);
     if (!(await lp.textContent('.probs')).includes('᱕')) errs.push('hi: area list not translated');
     await lp.click('.prob >> nth=0'); await lp.waitForTimeout(700);
     if (!(await lp.textContent('.qtext')).includes('᱕')) errs.push('hi: question not translated');

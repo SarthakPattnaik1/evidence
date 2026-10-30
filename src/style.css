@@ -785,3 +785,52 @@ footer.foot .wrap{position:relative}
 /* v23: Saboot logo (mark from the brand board) — colours unchanged */
 .bicon{width:31px;height:38px;border-radius:0}
 .fmark img{width:40px;height:49px;border-radius:0}
+
+/* v24: minimal home — resume, one-line SOS bar, search + situations, compact area list */
+.feats,.minirow,.nowstrip{display:none!important}
+.home{padding-top:22px;padding-bottom:30px}
+.resume{display:flex;align-items:center;gap:10px;background:var(--go-l);border:1px solid #CFE0D6;border-radius:14px;padding:10px 12px;margin:0 0 14px;color:var(--ink)}
+.resume>span{flex:1;min-width:0;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.resume .btn.sm{min-height:40px;padding:6px 14px;font-size:14px;border-radius:999px}
+.sosbar{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;background:#FDF3F1;border:1px solid #EFC9C2;color:#7A2418;border-radius:14px;padding:10px 14px;font-size:15px;font-weight:600}
+.sosbar>svg{flex:none}
+.sosbar>span:first-of-type{flex:1 1 220px}
+.sosnums{display:flex;gap:8px;flex-wrap:wrap}
+.sosnum{display:inline-flex;align-items:center;gap:5px;background:#B3261E;color:#fff;text-decoration:none;border-radius:999px;padding:6px 12px;font-weight:700;font-size:15px;min-height:38px}
+.sosnum small{font-weight:500;opacity:.9;font-size:12.5px}
+.sosnum:hover{background:#951f18}
+.homeh{margin:22px 0 10px}
+.home .searchbox{margin:0 0 12px}
+.situcard{min-height:0!important;gap:6px!important;padding:13px 14px!important}
+.situcard>span:not(.fic){flex:0!important}
+.situcard em{display:none}
+.areas{margin-top:24px}
+.areas h2{margin:0 0 10px}
+.arealist{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.arow{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 10px;min-height:54px;cursor:pointer;font:inherit;color:var(--ink);text-align:left}
+.arow:hover{border-color:var(--go);background:#FBFDFB}
+.arow .tic{width:34px!important;height:34px!important;border-radius:9px!important;flex:none;display:grid;place-items:center}
+.arow b{flex:1;font-size:15px;line-height:1.25;font-weight:650}
+.arow>svg:last-child{flex:none;color:var(--muted)}
+@media (max-width:1023px){ .arealist{grid-template-columns:repeat(3,minmax(0,1fr))} }
+@media (max-width:760px){
+  .home{padding-top:14px}
+  .sosbar{font-size:14px;padding:10px 12px}
+  .sosnum{padding:6px 10px;font-size:14px}
+  .sosnum small{display:none}
+  .arealist{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .arow{min-height:52px;padding:8px}
+  .arow b{font-size:14.5px}
+  .arow .tic{width:30px!important;height:30px!important}
+}
+
+/* v24b: simple start page */
+.startbox{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:18px 0 8px}
+.startbox .btn.big{min-width:200px}
+.startbox p{margin:0}
+.lawbox{margin-top:18px;border-top:1px solid var(--line);padding-top:10px}
+.lawbox>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;font-weight:600;color:var(--ink2);font-size:15px;min-height:40px}
+.lawbox>summary::-webkit-details-marker{display:none}
+.lawbox>summary svg:last-child{margin-left:auto;transition:transform .2s}
+.lawbox[open]>summary svg:last-child{transform:rotate(180deg)}
+@media (max-width:760px){ .startbox .btn.big{width:100%} }
