@@ -882,3 +882,15 @@ footer.foot{background:#F6F1E8}
 @media (max-width:640px){.bicon{height:30px;width:auto}.bwordimg{height:21px;width:auto}}
 @media (max-width:420px){.bicon{height:27px}.bwordimg{height:19px}.nav.lang{padding:6px 9px}.nav.exit span{display:none}.nav.exit{padding:8px 9px}}
 @media (max-width:350px){.bwordimg{display:none}}
+/* v26 — areas = one quiet list panel, distinct from the pastel situation cards */
+.areas{margin-top:34px}
+.areas .lh{font-size:15px!important;font-weight:700;color:var(--ink2);text-transform:none;letter-spacing:0;margin-bottom:10px}
+.arealist{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;gap:0!important;display:grid;grid-template-columns:1fr 1fr}
+.arow,.arow.pc0,.arow.pc1,.arow.pc2,.arow.pc3,.arow.pc4,.arow.pc5{background:#fff!important;border:0!important;border-radius:0!important;border-bottom:1px solid var(--line)!important;min-height:58px;filter:none!important}
+.arealist .arow:nth-child(odd){border-right:1px solid var(--line)!important}
+.arow:hover{background:#FBF8F3!important}
+.arow b{font-weight:600}
+.arow.pc0 .tic{background:var(--p-mint)!important}.arow.pc1 .tic{background:var(--p-sky)!important}.arow.pc2 .tic{background:var(--p-peach)!important}
+.arow.pc3 .tic{background:var(--p-lav)!important}.arow.pc4 .tic{background:var(--p-butter)!important}.arow.pc5 .tic{background:var(--p-rose)!important}
+@media (max-width:560px){.arealist{grid-template-columns:1fr}.arealist .arow:nth-child(odd){border-right:0!important}.arow{min-height:54px}}
+@media (max-width:560px){.arealist{grid-template-columns:1fr 1fr}.arealist .arow:nth-child(odd){border-right:1px solid var(--line)!important}.arow{min-height:56px;padding:8px 8px!important;gap:8px!important}.arow b{font-size:13.5px}.arow>svg:last-child{display:none}}
