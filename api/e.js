@@ -1,14 +1,13 @@
 // Anonymous, aggregate usage events. No answers, no names, no cookies, no IP stored.
 // Each batch only increments daily counters; unique visitors are counted with a HyperLogLog over a
 // hash of (IP + browser + a salt that changes every day), so nobody can be followed across days.
-const { hasStore, pipe, dayKey, ip, hmac, body, send } = require('./_lib.js');
+const { hasStore, store, dayKey, ip, hmac, body, send } = require('./_lib.js');
 
 const ID = /^[a-z0-9][a-z0-9_-]{0,47}$/;
 const ROUTES = new Set(['home', 'cat', 'start', 'topic', 'quiz', 'brk', 'urgent', 'list', 'answers', 'timeline', 'report', 'questions', 'q', 'myths', 'advocates', 'help', 'about', 'a', 'other']);
 const GUIDE_EV = new Set(['intro', 'start', 'list', 'deep', 'done', 'print', 'report', 'save']);
 const LANGS = new Set('en hi bn te mr ta ur gu kn or ml pa as mai sat ks ne sd doi kok mni brx sa'.split(' '));
 const BOT = /bot|crawl|spider|slurp|preview|headless|lighthouse|pingdom|monitor|curl|wget|python|axios|node-fetch/i;
-const TTL = 400 * 86400;
 
 const clip = (s, n) => String(s == null ? '' : s).slice(0, n);
 // Strip anything that could identify a person from free-text search misses.
@@ -26,7 +25,7 @@ module.exports = async function handler(req, res) {
   const ev = Array.isArray(b.e) ? b.e.slice(0, 60) : [];
   if (!ev.length) return send(res, 400, { error: 'no events' });
 
-  const day = dayKey(); const key = 'pa:d:' + day; const inc = new Map(); const lists = [];
+  const day = dayKey(); const inc = new Map(); const lists = [];
   const add = (f, n = 1) => inc.set(f, (inc.get(f) || 0) + n);
   const lang = LANGS.has(b.l) ? b.l : 'en';
   const sid = typeof b.s === 'string' && /^[a-z0-9]{8,24}$/.test(b.s) ? b.s : '';
@@ -49,26 +48,22 @@ module.exports = async function handler(req, res) {
       case 'urg': if (g && ID.test(e.x || '')) add('urg:' + g + ':' + e.x); break;
       case 'call': if (/^\d{3,12}$/.test(String(e.x))) add('call:' + e.x); break;
       case 'out': { const d = clip(e.x, 60).toLowerCase(); if (/^[a-z0-9.-]+\.[a-z]{2,}$/.test(d)) add('out:' + d); break; }
-      case 'search': { const n = Number.isInteger(e.n) ? Math.max(0, Math.min(e.n, 9)) : 0; add(n > 0 ? 'search:hit' : 'search:miss'); const q = scrub(e.x); if (q.length >= 3) lists.push(['LPUSH', 'pa:search', JSON.stringify({ t: Date.now(), q, n, l: lang })]); break; }
-      case 'pick': { if (!ID.test(e.g || '')) break; add('search:pick'); const q = scrub(e.x); if (q.length >= 3) lists.push(['LPUSH', 'pa:search', JSON.stringify({ t: Date.now(), q, g: e.g, l: lang })]); break; }
+      case 'search': { const n = Number.isInteger(e.n) ? Math.max(0, Math.min(e.n, 9)) : 0; add(n > 0 ? 'search:hit' : 'search:miss'); const q = scrub(e.x); if (q.length >= 3) lists.push(['search', { t: Date.now(), q, n, l: lang }]); break; }
+      case 'pick': { if (!ID.test(e.g || '')) break; add('search:pick'); const q = scrub(e.x); if (q.length >= 3) lists.push(['search', { t: Date.now(), q, g: e.g, l: lang }]); break; }
       case 'lang': if (LANGS.has(e.x)) add('lang:' + e.x); break;
       case 'tr': if (LANGS.has(e.x)) add('tr:' + (e.ok ? 'ok' : 'fail') + ':' + e.x); break;
       case 'fb': if (g && (e.x === 'y' || e.x === 'n')) add('fb:' + g + ':' + e.x); break;
-      case 'err': add('err'); lists.push(['LPUSH', 'pa:err', JSON.stringify({ t: Date.now(), m: clip(e.x, 160), v: clip(e.v, 20) })]); break;
+      case 'err': add('err'); lists.push(['err', { t: Date.now(), m: clip(e.x, 160), v: clip(e.v, 20) }]); break;
       default: if (GUIDE_EV.has(e.t) && g) { add(e.t + ':' + g); add('all:' + e.t); }
     }
   }
   if (!inc.size && !lists.length) return send(res, 202, { ok: false });
   add('ev', ev.length);
 
-  const cmds = [...inc].map(([f, n]) => ['HINCRBY', key, f, n]);
-  cmds.push(['EXPIRE', key, TTL]);
   const vis = hmac(day + '|' + ip(req) + '|' + ua).slice(0, 16);
-  cmds.push(['PFADD', 'pa:u:' + day, vis], ['EXPIRE', 'pa:u:' + day, TTL]);
-  if (sid) cmds.push(['PFADD', 'pa:s:' + day, sid], ['EXPIRE', 'pa:s:' + day, TTL]);
-  if (sid && ev.some((e) => e && e.t === 'list')) cmds.push(['PFADD', 'pa:sl:' + day, sid], ['EXPIRE', 'pa:sl:' + day, TTL]);
-  if (lists.some((l) => l[1] === 'pa:search')) cmds.push(...lists.filter((l) => l[1] === 'pa:search'), ['LTRIM', 'pa:search', 0, 999]);
-  if (lists.some((l) => l[1] === 'pa:err')) cmds.push(...lists.filter((l) => l[1] === 'pa:err'), ['LTRIM', 'pa:err', 0, 199]);
-  try { await pipe(cmds); } catch (e) { console.error('[e] store', e.message); return send(res, 202, { ok: false }); }
+  const uniq = [['u', vis]];
+  if (sid) uniq.push(['s', sid]);
+  if (sid && ev.some((x) => x && x.t === 'list')) uniq.push(['sl', sid]);
+  try { await store.ingest(day, inc, uniq, lists); } catch (err) { console.error('[e] store', err.message); return send(res, 202, { ok: false }); }
   return send(res, 202, { ok: true });
 };

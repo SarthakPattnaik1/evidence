@@ -218,8 +218,12 @@ select{border:1px solid var(--line);border-radius:8px;padding:5px 8px;background
     if (status === 401) { show('login'); return; }
     DATA = j;
     if (!j.store) {
-      $('#setup').innerHTML = `<div class="note"><b>Analytics storage isn't connected yet.</b> In Vercel, open your project → Storage → Create Database → <b>Upstash for Redis</b> (free) → connect it to this project, then redeploy. Vercel adds <code>KV_REST_API_URL</code> and <code>KV_REST_API_TOKEN</code> automatically. Until then, nothing is counted.</div>`;
+      $('#setup').innerHTML = `<div class="note"><b>Analytics storage isn't connected yet.</b> Connect <b>Supabase</b> (Vercel → Storage → Supabase, or add <code>SUPABASE_URL</code> and <code>SUPABASE_SERVICE_ROLE_KEY</code>) and run <code>supabase/schema.sql</code> once in the Supabase SQL Editor — or connect <b>Upstash for Redis</b>. Then redeploy. Until then, nothing is counted.</div>`;
       $('#range').textContent = ''; renderStatic(); return;
+    }
+    if (j.error) {
+      $('#setup').innerHTML = `<div class="note"><b>${j.error === 'schema' ? 'One step left.' : 'Storage problem.'}</b> ${esc(j.message)}${j.error === 'schema' ? ' Open Supabase → SQL Editor → paste the file from the GitHub repo (<code>supabase/schema.sql</code>) → Run. Then press Refresh.' : ''}</div>`;
+      $('#range').textContent = ''; DATA = j; renderStatic(); return;
     }
     $('#setup').innerHTML = '';
     const f = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -388,7 +392,7 @@ select{border:1px solid var(--line);border-radius:8px;padding:5px 8px;background
     let tp = []; try { tp = (await (await fetch('/api/translate')).json()).providers || []; } catch (e) { /* none */ }
     const today = DATA && DATA.days ? DATA.days[DATA.days.length - 1] : null;
     $('#sys').innerHTML = `<table><tbody>
-      <tr><td>Analytics storage</td><td>${DATA && DATA.store ? '<span class="tag good">✓ Connected</span>' : '<span class="tag crit">✕ Not connected</span>'}</td></tr>
+      <tr><td>Analytics storage</td><td>${DATA && DATA.store && !DATA.error ? `<span class="tag good">✓ ${esc(DATA.backend === 'supabase' ? 'Supabase' : 'Upstash Redis')}</span>` : DATA && DATA.error ? `<span class="tag warn">! ${esc(DATA.backend || '')} — ${DATA.error === 'schema' ? 'run schema.sql' : 'read error'}</span>` : '<span class="tag crit">✕ Not connected</span>'}</td></tr>
       <tr><td>Translation services</td><td>${tp.length ? tp.map((x) => `<span class="tag good">✓ ${esc(x)}</span>`).join(' ') : '<span class="tag warn">! None — guides show in English</span>'}</td></tr>
       <tr><td>Content version</td><td class="mono">${esc(META.version || '—')}</td></tr>
       <tr><td>Guides</td><td>${(META.guides || []).length} · ${stale ? `<span class="tag warn">! ${stale} need a law re-check</span>` : '<span class="tag good">✓ All law checks under 90 days</span>'}</td></tr>

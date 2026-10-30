@@ -98,10 +98,10 @@ With no keys set, the app uses Chrome's on-device translator where available, an
 
 A private dashboard at `/admin` behind a password. It shows visitors, visits, the journey from opening a guide to printing a list, per-guide list rate and "where people stop" by question, languages, translation failures, helpline taps, urgent warnings shown, searches (no match / left without choosing / what they picked), traffic sources, states, devices, outbound official links, law freshness per guide, and browser errors.
 
-Set up once in Vercel:
-1. **Storage** → Create Database → **Upstash for Redis** (free) → connect to this project. Vercel adds `KV_REST_API_URL` and `KV_REST_API_TOKEN`.
+Set up once in Vercel — use **either** Supabase or Upstash for storage:
+1. **Supabase**: Vercel → Storage → Supabase (or add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` yourself), then in Supabase → SQL Editor run `supabase/schema.sql` once. **Or Upstash**: Vercel → Storage → Upstash for Redis (adds `KV_REST_API_URL`, `KV_REST_API_TOKEN`).
 2. **Settings → Environment Variables**: `ADMIN_PASSWORD` (long and unique), optionally `ADMIN_USER` (default `admin`) and `ADMIN_SECRET` (any long random string; signs the login session).
-3. Redeploy, then open `/admin`.
+3. Redeploy, then open `/api/health` to confirm everything shows `true`, and `/admin` to sign in.
 
 Privacy by design: answers, notes, names and dates are never sent. No cookies on the public site, no IP stored; unique visitors use a hash with a daily-rotating salt. Search text is scrubbed of numbers, emails and links and only the latest 1,000 are kept. Do Not Track is honoured. Daily counters expire after 400 days.
 

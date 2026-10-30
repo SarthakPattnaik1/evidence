@@ -21,12 +21,25 @@ function cmd([c, k, ...a]) {
     default: throw new Error('unsupported ' + c);
   }
 }
-Object.assign(process.env, { KV_REST_API_URL: 'http://127.0.0.1:' + PORT + '/__redis', KV_REST_API_TOKEN: 't', ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || 'test-pass-123' });
+if (process.env.STORE === 'supabase') Object.assign(process.env, { SUPABASE_URL: 'http://127.0.0.1:' + PORT, SUPABASE_SERVICE_ROLE_KEY: 'svc-test' });
+else Object.assign(process.env, { KV_REST_API_URL: 'http://127.0.0.1:' + PORT + '/__redis', KV_REST_API_TOKEN: 't' });
+process.env.ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'test-pass-123';
+// Fake PostgREST: /rest/v1/rpc/<fn> runs the function in a local Postgres (PG_URL), like Supabase does.
+let pg = null; if (process.env.STORE === 'supabase') { const { Pool } = require(process.env.PG_MODULE || 'pg'); pg = new Pool({ connectionString: process.env.PG_URL }); }
+const SIG = { pa_ingest: ['p_day', 'p_inc', 'p_uniq', 'p_logs'], pa_stats: ['p_days', 'p_prev'], pa_login_hit: ['p_ip'], pa_login_clear: ['p_ip'] };
+const CAST = { p_day: 'date', p_inc: 'jsonb', p_uniq: 'jsonb', p_logs: 'jsonb', p_days: 'date[]', p_prev: 'date[]', p_ip: 'text' };
 const handlers = {}; const load = (n) => handlers[n] || (handlers[n] = require(path.join(ROOT, 'api', n + '.js')));
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.json': 'application/json', '.webp': 'image/webp', '.png': 'image/png', '.xml': 'application/xml', '.txt': 'text/plain', '.webmanifest': 'application/manifest+json' };
 http.createServer(async (req, res) => {
   const u = new URL(req.url, 'http://x');
   if (u.pathname === '/__redis/pipeline') { let b = ''; req.on('data', (c) => (b += c)); req.on('end', () => { const out = JSON.parse(b).map((c) => { try { return { result: cmd(c) }; } catch (e) { return { error: e.message }; } }); res.setHeader('content-type', 'application/json'); res.end(JSON.stringify(out)); }); return; }
+  const rp = u.pathname.match(/^\/rest\/v1\/rpc\/([a-z_]+)$/);
+  if (rp && pg) { let b = ''; req.on('data', (c) => (b += c)); req.on('end', async () => {
+    if (req.headers.apikey !== 'svc-test') { res.statusCode = 401; return res.end('{"message":"bad key"}'); }
+    const fn = rp[1]; const sig = SIG[fn]; if (!sig) { res.statusCode = 404; return res.end('{"code":"PGRST202","message":"Could not find the function in the schema cache"}'); }
+    const a = JSON.parse(b || '{}'); const vals = sig.map((k) => (CAST[k] === 'jsonb' ? JSON.stringify(a[k]) : a[k]));
+    try { const q = await pg.query(`select ${fn}(${sig.map((k, i) => `$${i + 1}::${CAST[k]}`).join(',')}) as r`, vals); res.setHeader('content-type', 'application/json'); res.end(JSON.stringify(q.rows[0].r)); }
+    catch (e) { res.statusCode = 400; res.end(JSON.stringify({ code: e.code, message: e.message })); } }); return; }
   const m = u.pathname.match(/^\/api\/([a-z]+)$/);
   if (m && fs.existsSync(path.join(ROOT, 'api', m[1] + '.js'))) {
     res.status = (c) => { res.statusCode = c; return res; }; res.json = (o) => { res.setHeader('content-type', 'application/json'); res.end(JSON.stringify(o)); };
