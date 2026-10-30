@@ -11,7 +11,8 @@
 // Only text that already exists in the app's own source is translated (checked against _corpus.js),
 // so nobody can use this as a free general-purpose translator on your quota.
 const CORPUS = require('./_corpus.js');
-const { body: readBody } = require('./_lib.js');
+const { body: readBody, store, hasStore, crypto } = require('./_lib.js');
+const H = (s) => crypto.createHash('sha1').update(s).digest('base64url').slice(0, 20);
 
 const LANGS = {
   hi: ['Hindi', 'हिन्दी'], bn: ['Bengali', 'বাংলা'], te: ['Telugu', 'తెలుగు'], mr: ['Marathi', 'मराठी'], ta: ['Tamil', 'தமிழ்'],
@@ -93,11 +94,11 @@ async function viaLLM(lang, texts, call) {
   async function worker() {
     while (idx < batches.length) {
       const i = batches[idx++]; const obj = {}; texts.slice(i, i + SIZE).forEach((s, k) => { obj['k' + (i + k)] = s; });
-      try { const res = await call(prompt(lang, obj)); okCount++; Object.keys(obj).forEach((k) => { if (typeof res[k] === 'string' && res[k].trim()) out[Number(k.slice(1))] = res[k]; }); }
+      try { let res; try { res = await call(prompt(lang, obj)); } catch (e) { if (e.status !== 429) throw e; await new Promise((r) => setTimeout(r, 2500)); res = await call(prompt(lang, obj)); } okCount++; Object.keys(obj).forEach((k) => { if (typeof res[k] === 'string' && res[k].trim()) out[Number(k.slice(1))] = res[k]; }); }
       catch (e) { lastErr = e; }
     }
   }
-  await Promise.all(Array.from({ length: Math.min(4, batches.length) }, worker));
+  await Promise.all(Array.from({ length: Math.min(3, batches.length) }, worker));
   if (!okCount && lastErr) throw lastErr;
   return out;
 }
@@ -193,6 +194,12 @@ module.exports = async function handler(req, res) {
   const isPh = (p) => /^\{[^}]*\}$/.test(p);
   let need = [...new Set(clean.map(([, v]) => v).filter((v) => !mem.has(lang + '|' + v)))];
   let used = 'cache';
+  // 1) Shared cache in the analytics store, so each string is translated only once for everyone.
+  if (need.length && hasStore()) {
+    try { const got = await store.trGet(lang, need.map(H)); need.forEach((v) => { const t = got[H(v)]; if (t) mem.set(lang + '|' + v, t); }); used = 'shared-cache'; } catch (e) { console.error('[translate] cache read', e.message); }
+    need = need.filter((v) => !mem.has(lang + '|' + v));
+  }
+  const fresh = new Set(need);
   for (const [name, fn] of prov) {
     if (!need.length) break;
     try {
@@ -210,8 +217,12 @@ module.exports = async function handler(req, res) {
       }
       used = name;
       need = need.filter((v) => !mem.has(lang + '|' + v));
-    } catch (e) { console.error('[translate]', name, lang, e.message); }
+    } catch (e) {
+      console.error('[translate]', name, lang, e.message);
+      if (hasStore()) { try { await store.ingest(new Date(Date.now() + 330 * 60000).toISOString().slice(0, 10), new Map([['trerr:' + name, 1]]), [], [['err', { t: Date.now(), m: ('translate ' + name + ' ' + lang + ': ' + e.message).slice(0, 300), v: 'server' }]]); } catch (er) { /* ignore */ } }
+    }
   }
+  if (hasStore()) { const items = [...fresh].filter((v) => mem.has(lang + '|' + v)).map((v) => [H(v), v.slice(0, 2000), mem.get(lang + '|' + v)]); if (items.length) { try { await store.trPut(lang, items); } catch (e) { console.error('[translate] cache write', e.message); } } }
   if (mem.size > 20000) mem.clear();
   const out = {};
   for (const [k, v] of clean) if (mem.has(lang + '|' + v)) out[k] = mem.get(lang + '|' + v);

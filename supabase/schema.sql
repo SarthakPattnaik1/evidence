@@ -105,3 +105,33 @@ do $$ begin
     grant execute on function public.pa_login_clear(text)               to service_role;
   end if;
 end $$;
+
+-- Shared translation cache: each app string is translated once per language, then reused for everyone.
+create table if not exists public.pa_tr (
+  lang text not null,
+  h    text not null,
+  src  text not null,
+  tr   text not null,
+  at   timestamptz not null default now(),
+  primary key (lang, h)
+);
+alter table public.pa_tr enable row level security;
+
+create or replace function public.pa_tr_get(p_lang text, p_h text[])
+returns jsonb language sql stable set search_path = public as $$
+  select coalesce(jsonb_object_agg(h, tr), '{}'::jsonb) from pa_tr where lang = p_lang and h = any(p_h)
+$$;
+create or replace function public.pa_tr_put(p_lang text, p_items jsonb)
+returns void language sql set search_path = public as $$
+  insert into pa_tr (lang, h, src, tr)
+    select p_lang, x->>0, x->>1, x->>2 from jsonb_array_elements(coalesce(p_items, '[]'::jsonb)) x
+  on conflict (lang, h) do update set tr = excluded.tr, src = excluded.src, at = now()
+$$;
+revoke all on function public.pa_tr_get(text, text[]) from public, anon, authenticated;
+revoke all on function public.pa_tr_put(text, jsonb)  from public, anon, authenticated;
+do $$ begin
+  if exists (select 1 from pg_roles where rolname = 'service_role') then
+    grant execute on function public.pa_tr_get(text, text[]) to service_role;
+    grant execute on function public.pa_tr_put(text, jsonb)  to service_role;
+  end if;
+end $$;

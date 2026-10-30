@@ -75,6 +75,18 @@ const store = {
     if (backend() === 'supabase') return rpc('pa_login_clear', { p_ip: ip });
     return pipe([['DEL', 'pa:login:' + ip]]);
   },
+  // Shared translation cache (best effort: callers ignore failures).
+  async trGet(lang, hashes) {
+    if (!hashes.length) return {};
+    if (backend() === 'supabase') return (await rpc('pa_tr_get', { p_lang: lang, p_h: hashes })) || {};
+    if (backend() === 'upstash') { const [vals] = await pipe([['HMGET', 'pa:tr:' + lang, ...hashes]]); const o = {}; (vals || []).forEach((v, i) => { if (v) o[hashes[i]] = v; }); return o; }
+    return {};
+  },
+  async trPut(lang, items) {
+    if (!items.length) return;
+    if (backend() === 'supabase') return rpc('pa_tr_put', { p_lang: lang, p_items: items });
+    if (backend() === 'upstash') return pipe([['HSET', 'pa:tr:' + lang, ...items.flatMap(([h, , t]) => [h, t])]]);
+  },
   // Cheap round trip used by /api/health and the admin "System" box.
   async ping() {
     if (backend() === 'supabase') { await rpc('pa_stats', { p_days: [], p_prev: [] }); return true; }

@@ -397,9 +397,20 @@ select{border:1px solid var(--line);border-radius:8px;padding:5px 8px;background
       <tr><td>Content version</td><td class="mono">${esc(META.version || '—')}</td></tr>
       <tr><td>Guides</td><td>${(META.guides || []).length} · ${stale ? `<span class="tag warn">! ${stale} need a law re-check</span>` : '<span class="tag good">✓ All law checks under 90 days</span>'}</td></tr>
       <tr><td>Events counted in this period</td><td>${DATA && DATA.cur ? fmt(DATA.cur.ev || 0) : '—'}</td></tr>
-    </tbody></table><p class="small" style="margin:10px 0 0">Stored: daily counts only, kept 400 days. No answers, names, IP addresses or cookies on the public site.</p>`;
+    </tbody></table>
+    <div style="margin-top:10px"><button class="btn" id="trtest">Test translation now (Hindi)</button><div id="trres" class="small" style="margin-top:8px;white-space:pre-wrap;overflow-wrap:anywhere"></div></div>
+    <p class="small" style="margin:10px 0 0">Stored: daily counts only, kept 400 days. No answers, names, IP addresses or cookies on the public site.</p>`;
   }
 
+  document.addEventListener('click', async (e) => {
+    if (e.target.id !== 'trtest') return;
+    const out = $('#trres'); out.textContent = 'Testing… (can take up to 30 seconds)';
+    try {
+      const j = await (await fetch('/api/translate?check=hi', { cache: 'no-store' })).json();
+      if (!j.providers || !j.providers.length) { out.innerHTML = '<span class="tag crit">✕ No translation service configured</span> Add GEMINI_API_KEY in Vercel and redeploy.'; return; }
+      out.innerHTML = Object.entries(j.test || {}).map(([k, r]) => r.ok ? `<span class="tag good">✓ ${esc(k)} works</span> “${esc(r.sample)}” in ${r.ms} ms${r.model ? ' · model ' + esc(r.model) : ''}` : `<span class="tag crit">✕ ${esc(k)} failed</span> ${esc(r.error)}`).join('<br>');
+    } catch (er) { out.textContent = 'Could not reach /api/translate: ' + er.message; }
+  });
   boot();
 })();
 </script>

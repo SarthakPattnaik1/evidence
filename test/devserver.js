@@ -26,15 +26,15 @@ else Object.assign(process.env, { KV_REST_API_URL: 'http://127.0.0.1:' + PORT + 
 process.env.ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'test-pass-123';
 // Fake PostgREST: /rest/v1/rpc/<fn> runs the function in a local Postgres (PG_URL), like Supabase does.
 let pg = null; if (process.env.STORE === 'supabase') { const { Pool } = require(process.env.PG_MODULE || 'pg'); pg = new Pool({ connectionString: process.env.PG_URL }); }
-const SIG = { pa_ingest: ['p_day', 'p_inc', 'p_uniq', 'p_logs'], pa_stats: ['p_days', 'p_prev'], pa_login_hit: ['p_ip'], pa_login_clear: ['p_ip'] };
-const CAST = { p_day: 'date', p_inc: 'jsonb', p_uniq: 'jsonb', p_logs: 'jsonb', p_days: 'date[]', p_prev: 'date[]', p_ip: 'text' };
+const SIG = { pa_ingest: ['p_day', 'p_inc', 'p_uniq', 'p_logs'], pa_stats: ['p_days', 'p_prev'], pa_login_hit: ['p_ip'], pa_login_clear: ['p_ip'], pa_tr_get: ['p_lang', 'p_h'], pa_tr_put: ['p_lang', 'p_items'] };
+const CAST = { p_day: 'date', p_inc: 'jsonb', p_uniq: 'jsonb', p_logs: 'jsonb', p_days: 'date[]', p_prev: 'date[]', p_ip: 'text', p_lang: 'text', p_h: 'text[]', p_items: 'jsonb' };
 if (process.env.FAKE_TRANSLATE) {
   // Pretend to be Gemini: prefix every string so tests can see what got translated. Delay simulates a slow model.
   process.env.GEMINI_API_KEY = 'AQ.fake'; const realFetch = global.fetch;
   global.fetch = async (u, o) => {
     if (!String(u).includes('generativelanguage.googleapis.com')) return realFetch(u, o);
     const b = JSON.parse(o.body); const p = b.contents[0].parts[0].text; const obj = JSON.parse(p.slice(p.lastIndexOf('\n\n') + 2)); const r = {};
-    for (const k in obj) r[k] = '«' + obj[k] + '»';
+    global.GEMCALLS = (global.GEMCALLS || 0) + 1; for (const k in obj) r[k] = '«' + obj[k] + '»';
     await new Promise((res) => setTimeout(res, +process.env.FAKE_TRANSLATE || 300));
     return { ok: true, status: 200, json: async () => ({ candidates: [{ content: { parts: [{ text: JSON.stringify(r) }] } }] }), text: async () => '' };
   };
@@ -43,6 +43,7 @@ const handlers = {}; const load = (n) => handlers[n] || (handlers[n] = require(p
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.json': 'application/json', '.webp': 'image/webp', '.png': 'image/png', '.xml': 'application/xml', '.txt': 'text/plain', '.webmanifest': 'application/manifest+json' };
 http.createServer(async (req, res) => {
   const u = new URL(req.url, 'http://x');
+  if (u.pathname === '/__gemcalls') { res.end(String(global.GEMCALLS || 0)); return; }
   if (u.pathname === '/__redis/pipeline') { let b = ''; req.on('data', (c) => (b += c)); req.on('end', () => { const out = JSON.parse(b).map((c) => { try { return { result: cmd(c) }; } catch (e) { return { error: e.message }; } }); res.setHeader('content-type', 'application/json'); res.end(JSON.stringify(out)); }); return; }
   const rp = u.pathname.match(/^\/rest\/v1\/rpc\/([a-z_]+)$/);
   if (rp && pg) { let b = ''; req.on('data', (c) => (b += c)); req.on('end', async () => {
