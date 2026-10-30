@@ -8,7 +8,7 @@ A free, open-source preparation tool for people in India facing a legal problem.
 
 ## What's in it
 
-- **41 guided problems** with branching questions, chosen from what most often reaches Indian courts (cheque bounce, matrimonial, motor accident, rent, property), the National Consumer Helpline (e-commerce, durables, banking, telecom, travel) and the RBI Ombudsman (loans and credit cards lead).
+- **40 guided problems** with branching questions, chosen from what most often reaches Indian courts (cheque bounce, matrimonial, motor accident, rent, property), the National Consumer Helpline (e-commerce, durables, banking, telecom, travel) and the RBI Ombudsman (loans and credit cards lead).
   - Money & banking: cheque bounce (both sides), loan/EMI recovery and SARFAESI, credit cards, CIBIL errors, UPI/online fraud, frozen accounts, failed payments
   - Family: divorce, maintenance, domestic violence, child custody, dowry/498A (both sides), inheritance and partition
   - Shopping & services: refunds, defective products, insurance claims, builder delays
