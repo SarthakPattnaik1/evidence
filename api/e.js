@@ -51,6 +51,7 @@ module.exports = async function handler(req, res) {
       case 'search': { const n = Number.isInteger(e.n) ? Math.max(0, Math.min(e.n, 9)) : 0; add(n > 0 ? 'search:hit' : 'search:miss'); const q = scrub(e.x); if (q.length >= 3) lists.push(['search', { t: Date.now(), q, n, l: lang }]); break; }
       case 'pick': { if (!ID.test(e.g || '')) break; add('search:pick'); const q = scrub(e.x); if (q.length >= 3) lists.push(['search', { t: Date.now(), q, g: e.g, l: lang }]); break; }
       case 'lang': if (LANGS.has(e.x)) add('lang:' + e.x); break;
+      case 'voice': add('voice:all'); if (LANGS.has(e.l)) add('voice:' + e.l); break;
       case 'tr': if (LANGS.has(e.x)) add('tr:' + (e.ok ? 'ok' : 'fail') + ':' + e.x); break;
       case 'fb': if (g && (e.x === 'y' || e.x === 'n')) add('fb:' + g + ':' + e.x); break;
       case 'report': { if (!g) break; const k = ['law', 'paper', 'confusing', 'translation', 'other'].includes(e.x) ? e.x : 'other'; add('rep:' + g); add('rep:all'); lists.push(['report', { t: Date.now(), g, k, m: scrub(e.m).slice(0, 400), l: lang, v: clip(e.v, 20) }]); break; }

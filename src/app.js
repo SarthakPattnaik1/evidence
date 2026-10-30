@@ -11,6 +11,8 @@
 
   /* ---------- icons ---------- */
   const P = {
+    mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3M8.5 21h7"/>',
+    stop: '<rect x="7" y="7" width="10" height="10" rx="2"/>',
     family: '<circle cx="8" cy="7" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M2.5 20c.5-3.6 2.8-6 5.5-6s5 2.4 5.5 6"/><path d="M14 20c.3-2.6 1.6-4.5 3.2-4.5S20.6 17.4 21 20"/>',
     bank: '<path d="M3 10 12 4l9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 20h18"/>',
     bag: '<path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
@@ -323,6 +325,7 @@ ${JSON.stringify(map)}`;
       questions: () => viewQuestions(), q: () => viewQuestions(arg), myths: () => viewMyths(), advocates: () => viewAdvocates(), help: () => viewHelp(), about: () => viewAbout()
     };
     app.innerHTML = busy ? viewBusy() : (map[view] || (() => viewHome()))();
+    try { VOICE.sync(); } catch (e) { /* voice is optional */ }
     const h = app.querySelector('h1');
     if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
     try { trackRender(); } catch (e) { /* never break the app for analytics */ }
@@ -389,7 +392,9 @@ ${JSON.stringify(map)}`;
         <div class="searchbox" role="search">
           <label class="sr" for="matter">${esc(T('search'))}</label>
           ${ic('search', 22)}<input id="matter" type="search" autocomplete="off" placeholder="${esc(T('search'))}">
+          ${VOICE.can() ? `<button class="mic" type="button" data-act="mic" aria-label="${esc(X('Speak your problem'))}" title="${esc(X('Speak your problem'))}">${ic('mic', 22)}</button>` : ''}
         </div>
+        <p class="voicehint" id="voicehint" aria-live="polite" hidden></p>
         <div id="results" class="results" aria-live="polite"></div>
         <section class="situ" id="suggest" aria-label="${esc(X('Common situations'))}">
           <div class="siturow" role="list">${SITU.map(([id, icn, t, fact, tone]) => `<button class="situcard" role="listitem" data-play="${id}"><span class="fic ${tone}">${ic(icn, 20)}</span><b>${esc(X(t))}</b><span>${esc(X(fact))}</span></button>`).join('')}</div>
@@ -413,19 +418,138 @@ ${JSON.stringify(map)}`;
   function viewBusy() {
     return shell(`<div class="wrap narrow busy" role="status" aria-live="polite"><div class="spinner" aria-hidden="true"></div><h1>${esc(busy.label)}</h1><p class="muted">${esc(T('auto'))}</p></div>`, { noFooter: true });
   }
-  function searchAll(q) {
+
+  /* ============ VOICE ============ */
+  // English: the browser's own speech recognition when it has one (no server).
+  // Every other language (and browsers without recognition): record ≤ 20 s, convert to 16 kHz WAV, and send to /api/voice,
+  // which returns what was said and a short English meaning. Nothing is stored.
+  const API_OK = () => /^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname);
+  const VOICE = (() => {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const canRecord = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder && (window.AudioContext || window.webkitAudioContext));
+    let st = null; let mode = ''; let lastHint = ''; // st: { kind, rec, stream, chunks, timer }
+    const box = () => document.querySelector('.searchbox'); const btn = () => document.querySelector('[data-act=mic]');
+    const hint = (t) => { lastHint = t || ''; const h = document.getElementById('voicehint'); if (!h) return; h.hidden = !t; h.textContent = t || ''; };
+    const setUI = (m) => {
+      mode = m || ''; const b = btn(); const sb = box(); if (!b || !sb) return;
+      sb.classList.toggle('listening', mode === 'listen'); sb.classList.toggle('thinking', mode === 'think');
+      b.innerHTML = ic(mode === 'listen' ? 'stop' : 'mic', 22);
+      b.setAttribute('aria-label', mode === 'listen' ? X('Stop and search') : X('Speak your problem'));
+      b.setAttribute('aria-pressed', mode === 'listen' ? 'true' : 'false');
+      b.disabled = mode === 'think';
+    };
+    const fail = (msg) => { stop(true); setUI(''); hint(msg); };
+    const finish = (text, en) => {
+      setUI(''); const m = document.getElementById('matter'); if (!m) return;
+      if (!text) { hint(X('We could not hear anything. Please try again, or type.')); return; }
+      m.value = text; hint(''); renderResults(text, en || ''); trackSearch(text);
+      const r = document.getElementById('results'); if (r && r.firstElementChild) r.firstElementChild.focus({ preventScroll: false });
+    };
+    function stop(silent) {
+      if (!st) return; const s = st; st = null; clearTimeout(s.timer);
+      try { if (s.kind === 'sr') s.rec.abort(); else if (s.rec.state !== 'inactive') { s.silent = silent; s.rec.stop(); } } catch (e) { /* already stopped */ }
+      if (silent && s.stream) s.stream.getTracks().forEach((t) => t.stop());
+    }
+    function withBrowser() {
+      const rec = new SR(); rec.lang = 'en-IN'; rec.interimResults = true; rec.maxAlternatives = 1; rec.continuous = false;
+      let finalText = ''; st = { kind: 'sr', rec, timer: setTimeout(() => { try { rec.stop(); } catch (e) {} }, 15000) };
+      rec.onresult = (e) => { let t = ''; for (const r of e.results) t += r[0].transcript; const m = document.getElementById('matter'); if (m) m.value = t; if (e.results[e.results.length - 1].isFinal) finalText = t; };
+      rec.onerror = (e) => {
+        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') return fail(X('Microphone permission is off. Allow it in your browser settings, or type instead.'));
+        if (e.error === 'no-speech' || e.error === 'aborted') return fail(X('We could not hear anything. Please try again, or type.'));
+        st = null; setUI(''); if (canRecord && API_OK()) withServer(); else fail(X('Voice is not available in this browser. Please type instead.'));
+      };
+      rec.onend = () => { if (st && st.kind === 'sr') { clearTimeout(st.timer); st = null; } const m = document.getElementById('matter'); finish((finalText || (m && m.value) || '').trim(), ''); };
+      rec.start(); setUI('listen'); hint(X('Listening… tap the square to stop.'));
+    }
+    async function withServer() {
+      let stream;
+      try { stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } }); }
+      catch (e) { return fail(X('Microphone permission is off. Allow it in your browser settings, or type instead.')); }
+      const rec = new MediaRecorder(stream); const chunks = [];
+      st = { kind: 'rec', rec, stream, chunks, timer: setTimeout(() => stop(false), 20000) };
+      rec.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
+      rec.onstop = async () => {
+        stream.getTracks().forEach((t) => t.stop());
+        if (rec._silent || (st === null && chunks.length === 0)) { setUI(''); return; }
+        if (!chunks.length) return fail(X('We could not hear anything. Please try again, or type.'));
+        setUI('think'); hint(X('Understanding what you said…'));
+        try {
+          const wav = await toWav(new Blob(chunks, { type: rec.mimeType || 'audio/webm' }));
+          const r = await fetch('/api/voice', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ mode: 'audio', lang: LANG, audio: wav }) });
+          const j = await r.json().catch(() => ({}));
+          if (!r.ok) return fail(j.error ? X(j.error) : X('Voice is not available right now. Please type instead.'));
+          finish((j.text || '').trim(), j.en || '');
+        } catch (e) { fail(X('Voice is not available right now. Please type instead.')); }
+      };
+      rec.start(); setUI('listen'); hint(X('Listening… speak in any language, then tap the square.'));
+    }
+    // decode whatever the browser recorded (webm/opus, mp4/aac, ogg) and re-encode as 16 kHz mono 16-bit WAV, base64
+    async function toWav(blob) {
+      const AC = window.AudioContext || window.webkitAudioContext; const ac = new AC();
+      const buf = await new Promise((res, rej) => { blob.arrayBuffer().then((ab) => ac.decodeAudioData(ab, res, rej)).catch(rej); });
+      ac.close && ac.close();
+      const rate = 16000; const len = Math.max(1, Math.ceil(buf.duration * rate));
+      const off = new OfflineAudioContext(1, len, rate); const src = off.createBufferSource(); src.buffer = buf; src.connect(off.destination); src.start();
+      const pcm = (await off.startRendering()).getChannelData(0);
+      const out = new DataView(new ArrayBuffer(44 + pcm.length * 2));
+      const w = (o, str) => { for (let i = 0; i < str.length; i++) out.setUint8(o + i, str.charCodeAt(i)); };
+      w(0, 'RIFF'); out.setUint32(4, 36 + pcm.length * 2, true); w(8, 'WAVE'); w(12, 'fmt '); out.setUint32(16, 16, true); out.setUint16(20, 1, true); out.setUint16(22, 1, true);
+      out.setUint32(24, rate, true); out.setUint32(28, rate * 2, true); out.setUint16(32, 2, true); out.setUint16(34, 16, true); w(36, 'data'); out.setUint32(40, pcm.length * 2, true);
+      for (let i = 0; i < pcm.length; i++) { const v = Math.max(-1, Math.min(1, pcm[i])); out.setInt16(44 + i * 2, v < 0 ? v * 0x8000 : v * 0x7fff, true); }
+      const bytes = new Uint8Array(out.buffer); let bin = ''; for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+      return btoa(bin);
+    }
+    return {
+      can: () => API_OK() && ((LANG === 'en' && !!SR) || canRecord),
+      toggle() {
+        if (st) { if (st.kind === 'sr') { try { st.rec.stop(); } catch (e) {} } else stop(false); return; }
+        hint('');
+        if (LANG === 'en' && SR) { try { return withBrowser(); } catch (e) { /* fall through */ } }
+        if (canRecord && API_OK()) return withServer();
+        fail(X('Voice is not available in this browser. Please type instead.'));
+      },
+      cancel: () => stop(true),
+      sync() { if (!document.getElementById('matter')) { if (st) stop(true); mode = ''; lastHint = ''; return; } if (mode) setUI(mode); if (lastHint) hint(lastHint); }
+    };
+  })();
+
+  function searchAll(q, en) {
+    if (en) q = q + ' ' + en;
     const items = [];
     BUILT.forEach((i) => items.push({ text: i.title + ' ' + i.short, syn: i.synonyms, ref: { bonus: 1, play: i.id, title: i.short } }));
     KB.directory.forEach((d, idx) => items.push({ text: d.title, syn: d.synonyms, ref: { bonus: 0, play: 'general', topic: idx, title: d.title } }));
     KB.questions.forEach((x) => items.push({ text: x.q, syn: x.kw, ref: { bonus: -1, min: 3, go: 'q-' + x.id, title: x.q, kind: 'Answer' } }));
     return window.ER_ENGINE.search(items, q).filter((r) => !r.ref.min || r.s >= r.ref.min).map((r) => Object.assign({ s: r.s + r.ref.bonus }, r.ref)).sort((a, b) => b.s - a.s).filter((r, i, a) => i === 0 || r.s >= a[0].s * 0.4).slice(0, 5);
   }
-  function renderResults(q) {
+  // Text in a non-Latin script (Hindi, Odia, Tamil…) is turned into a short English meaning so it can be matched.
+  const EN_OF = new Map(); let enTimer = null;
+  const nonLatin = (q) => /[^\u0000-\u024F\s\d.,!?'"()\-–—₹/]/u.test(q);
+  function meaningFor(q) {
+    const k = LANG + '|' + q.trim().toLowerCase();
+    if (EN_OF.has(k)) return EN_OF.get(k);
+    clearTimeout(enTimer);
+    enTimer = setTimeout(async () => {
+      if (EN_OF.has(k)) return;
+      EN_OF.set(k, '');
+      try {
+        const r = await fetch('/api/voice', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ mode: 'text', lang: LANG, text: q.trim().slice(0, 200) }) });
+        const j = r.ok ? await r.json() : {}; EN_OF.set(k, j.en || '');
+      } catch (e) { /* offline or no API: plain matching still runs */ }
+      const m = document.getElementById('matter'); if (m && m.value.trim().toLowerCase() === q.trim().toLowerCase()) renderResults(m.value);
+    }, 650);
+    return '';
+  }
+  function renderResults(q, enGiven) {
     const box = document.getElementById('results'); if (!box) return;
     document.getElementById('suggest').hidden = !!q.trim();
     if (!q.trim()) { box.innerHTML = ''; return; }
-    const r = searchAll(q);
-    box.innerHTML = r.length ? r.map((x) => `<button class="prob" ${x.play ? `data-play="${x.play}" ${x.topic != null ? `data-topic="${x.topic}"` : ''}` : `data-go="${x.go}"`}><b>${esc(x.title)}</b><span>${x.play ? 'Start' : 'Read the answer'}</span>${ic('chev', 22)}</button>`).join('')
+    const en = enGiven != null ? enGiven : (nonLatin(q) && API_OK() ? meaningFor(q) : '');
+    if (enGiven) EN_OF.set(LANG + '|' + q.trim().toLowerCase(), enGiven);
+    const r = searchAll(q, en);
+    const waiting = !r.length && nonLatin(q) && API_OK() && !EN_OF.get(LANG + '|' + q.trim().toLowerCase());
+    if (waiting) { box.innerHTML = `<p class="muted small" style="margin:10px 4px">${esc(X('Looking for the right guide…'))}</p>`; return; }
+    box.innerHTML = r.length ? r.map((x) => `<button class="prob" ${x.play ? `data-play="${x.play}" ${x.topic != null ? `data-topic="${x.topic}"` : ''}` : `data-go="${x.go}"`}><b>${esc(X(x.title))}</b><span>${esc(x.play ? X('Start') : X('Read the answer'))}</span>${ic('chev', 22)}</button>`).join('')
       : `<button class="prob" data-play="general"><b>${esc(X('Not sure what this is?'))}</b><span>${esc(X('Answer a few simple questions'))}</span>${ic('chev', 22)}</button>`;
   }
 
@@ -790,7 +914,7 @@ ${JSON.stringify(map)}`;
       <details class="panel accp"><summary><h2>${esc(X('What it does'))}</h2>${ic('down', 18)}</summary><div class="accb"><p>Pick your problem and answer a few one-tap questions. Each answer changes which papers you need. The rules come from a written, tested set of guides — not from a chatbot making things up.</p><p style="margin:0">At the end you get one list: what to do first, the papers to take to your advocate, and where you stand. You can print it, or make a page for your advocate with your answers and a dated timeline.</p></div></details>
       <details class="panel accp"><summary><h2>${esc(X('What it doesn\'t do'))}</h2>${ic('down', 18)}</summary><div class="accb"><ul style="margin:0;padding-left:20px"><li>Give legal advice or predict results.</li><li>Say a record is legally required or admissible.</li><li>Prepare court filings.</li><li>Ask you to upload documents.</li></ul></div></details>
       <details class="panel accp"><summary><h2>${esc(X('Why these problems'))}</h2>${ic('down', 18)}</summary><div class="accb"><p style="margin:0">Guides are chosen from what most often reaches Indian courts and Lok Adalats (cheque bounce, family, motor accident, traffic challans, property), the National Consumer Helpline (e-commerce, banking, telecom, travel), the RBI Ombudsman (loans and credit cards lead) and police cyber-crime data (online fraud and fake-police "digital arrest" calls). Guides by area — ${esc(counts)}.</p></div></details>
-      <details class="panel accp"><summary><h2>${esc(X('Privacy'))}</h2>${ic('down', 18)}</summary><div class="accb"><p>Your answers stay in this browser tab — they are never sent to us. On the public website, the app counts anonymous events (for example, "a list was made for the cheque-bounce guide", or which language was used) to improve the guides; no cookies, no IP addresses, nothing you typed into a question. If you switch on "Keep my file on this device", it is saved only in this browser. Advocate links contain only the guide choice and the advocate's note.</p><p style="margin:0">${esc(X('Exit clears the page and opens a neutral website. It does not erase browser history.'))}</p></div></details>
+      <details class="panel accp"><summary><h2>${esc(X('Privacy'))}</h2>${ic('down', 18)}</summary><div class="accb"><p>Your answers stay in this browser tab — they are never sent to us. If you use the microphone, or search in a language other than English, that recording or search text is sent to Google Gemini only to turn it into text and find the right guide; it is not stored. On the public website, the app counts anonymous events (for example, "a list was made for the cheque-bounce guide", or which language was used) to improve the guides; no cookies, no IP addresses, nothing you typed into a question. If you switch on "Keep my file on this device", it is saved only in this browser. Advocate links contain only the guide choice and the advocate's note.</p><p style="margin:0">${esc(X('Exit clears the page and opens a neutral website. It does not erase browser history.'))}</p></div></details>
       <details class="panel accp"><summary><h2>${esc(X('Review status'))}</h2>${ic('down', 18)}</summary><div class="accb"><p style="margin:0">All guides are <b>drafts</b>, not yet reviewed by a practising advocate. Each guide will show its reviewer and date once reviewed. Languages: all 22 scheduled languages of India plus English. 16 have a hand-written interface; Santali, Kashmiri, Sindhi, Manipuri, Bodo and Sanskrit, and all guide content in every language, are machine-translated on the fly and labelled so. Translations need native-speaker and advocate review. The page for your lawyer always stays in English. Content v${esc(KB.version)}: ${BUILT.length} guided problems, ${KB.questions.length} answered questions, ${KB.myths.length} myth cards.</p></div></details>
       ${S.issueId || loadSaved() ? '<button class="btn line" data-act="clear" style="margin-top:16px">' + esc(X('Clear everything on this device')) + '</button>' : ''}
     </div>`);
@@ -928,6 +1052,7 @@ ${JSON.stringify(map)}`;
       case 'resume': { const v = loadSaved(); if (v) { S = Object.assign(blank(), v); saveOn = true; go('list'); } break; }
       case 'exit': S = blank(); saveOn = false; clearSaved(); app.innerHTML = ''; history.replaceState(null, '', '#home'); render(); break;
       case 'excl': S.excludeSensitive = t.checked; persist(); render(); break;
+      case 'mic': TRACK.once('voice', { l: LANG }); VOICE.toggle(); break;
       case 'print': TRACK.once('print', { g: S.issueId }); try { window.print(); } catch (err) { /* blocked */ } document.getElementById('printhint').hidden = false; break;
       case 'copytext': try { await navigator.clipboard.writeText(reportText()); toast('Report copied as text'); } catch (err) { toast('Copy was blocked by the browser'); } break;
       case 'download': if (!downloads) break;

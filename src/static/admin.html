@@ -372,7 +372,8 @@ select{border:1px solid var(--line);border-radius:8px;padding:5px 8px;background
     $('#urg').innerHTML = urg.length ? `<thead><tr><th>Warning</th><th>Guide</th><th class="n">Shown</th></tr></thead><tbody>${urg.map(([k, v]) => { const [gt, ut] = uTitle(k); return `<tr><td>${esc(ut)}</td><td class="small">${esc(gt)}</td><td class="n">${fmt(v)}</td></tr>`; }).join('')}</tbody>` : '<tbody><tr><td class="empty">No urgent warnings shown in this period.</td></tr></tbody>';
 
     const hit = c['search:hit'] || 0, miss = c['search:miss'] || 0, picks = c['search:pick'] || 0;
-    $('#searchrate').textContent = hit + miss ? `${fmt(hit + miss)} searches · ${pct(miss, hit + miss)} found nothing · ${fmt(picks)} led to a guide` : 'What people typed, and what they chose';
+    const vo = c['voice:all'] || 0;
+    $('#searchrate').textContent = (hit + miss ? `${fmt(hit + miss)} searches · ${pct(miss, hit + miss)} found nothing · ${fmt(picks)} led to a guide` : 'What people typed, and what they chose') + (vo ? ` · ${fmt(vo)} used the microphone` : '');
     const since = DATA.days && DATA.days.length ? new Date(DATA.from + 'T00:00:00').getTime() - 330 * 60000 : 0;
     const Q = {}; (DATA.nomatch || []).filter((x) => x.t >= since).forEach((x) => { const o = Q[x.q] || (Q[x.q] = { q: x.q, times: 0, n: null, picks: {}, l: x.l, t: x.t }); if (x.g) o.picks[x.g] = (o.picks[x.g] || 0) + 1; else { o.times++; o.n = o.n == null ? x.n : Math.max(o.n, x.n || 0); } o.t = Math.max(o.t, x.t); });
     const pickName = (g) => g.startsWith('topic-') ? 'General help' : g.startsWith('q-') ? 'A legal question answer' : gTitle(g);

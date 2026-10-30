@@ -99,7 +99,7 @@ def run():
 
     upd = 'Last updated 31 October 2026'
     privacy = legal('Privacy', 'Your answers stay with you', upd + '. Saboot is built to help you without collecting your personal story.', [
-        ('🔒', 'Your answers stay on your phone or computer. They are <b>never sent to us</b>.'),
+        ('🔒', 'Your answers stay on your phone or computer. They are <b>never sent to us</b>. Voice and non-English searches are turned into text by Google and not stored.'),
         ('🚫', 'No account, no sign-up, no ads, and no tracking cookies.'),
         ('📊', 'We count anonymous things — like which guides are used — to make Saboot better.'),
         ('🗑️', 'Delete everything any time with one tap: <b>Delete all</b>.')], [
@@ -107,6 +107,7 @@ def run():
         ('counts', 'What we count, anonymously', '<p>To improve the guides we count events such as “a list was made for the cheque-bounce guide”, which language was used, which helpline number was tapped, and which page someone left from.</p><ul><li>We never receive your answers, notes, names, dates or documents.</li><li>We do not store IP addresses. Unique visitors are counted with a code that changes every day, so no one can be followed over time.</li><li>Daily counts are deleted after 400 days.</li></ul>'),
         ('search', 'What you type in search', '<p>Search text is kept so we can add missing guides. Numbers, email addresses and links are removed automatically, and only the latest 1,000 searches are kept.</p><p><b>Please don’t type names or personal details into search.</b></p>'),
         ('translate', 'Translation', '<p>If you choose a language other than English, the app’s own text — never your answers — may be sent to a translation service (Google Gemini) to show it in your language. Translations are saved on your device and on our server so the next person gets them instantly.</p>'),
+        ('voice', 'Voice and searches in other languages', '<p>If you tap the microphone, or type your problem in a language other than English, what you said or typed is sent through our server to Google Gemini only to turn it into text and a short English meaning, so we can find the right guide. In English, your browser’s own speech service (for example Google in Chrome) may be used instead. We do not store the recording or the text, and it is not linked to you. Your answers to the questions are never sent. If you prefer, just type in English or tap a situation.</p>'),
         ('reports', 'Mistakes you report', '<p>If you use <b>Report a mistake</b>, we receive the guide, the type of problem and what you wrote, with numbers removed. Please don’t include personal details.</p>'),
         ('choices', 'Your choices', '<ul><li>Use Saboot without saving anything — nothing is kept after you close the page.</li><li>Tap <b>Delete all</b> to remove a saved list.</li><li>If your browser sends “Do Not Track”, nothing is counted.</li></ul>'),
         ('changes', 'Changes to this page', '<p>If we change how Saboot handles information, we will update this page and the date at the top.</p>')])

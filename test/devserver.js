@@ -33,7 +33,15 @@ if (process.env.FAKE_TRANSLATE) {
   process.env.GEMINI_API_KEY = 'AQ.fake'; const realFetch = global.fetch;
   global.fetch = async (u, o) => {
     if (!String(u).includes('generativelanguage.googleapis.com')) return realFetch(u, o);
-    const b = JSON.parse(o.body); const p = b.contents[0].parts[0].text; const obj = JSON.parse(p.slice(p.lastIndexOf('\n\n') + 2)); const r = {};
+    const b = JSON.parse(o.body);
+    const vp = b.contents[0].parts; const vt = vp.map((x) => x.text || '').join(' ');
+    if (vp.some((x) => x.inlineData) || vt.includes('legal-help search box')) {
+      global.VOICECALLS = (global.VOICECALLS || 0) + 1;
+      const audio = vp.find((x) => x.inlineData); const okWav = !audio || Buffer.from(audio.inlineData.data.slice(0, 16), 'base64').toString('latin1').startsWith('RIFF');
+      const out = audio ? { text: okWav ? 'कुत्ते ने मेरे बेटे को काट लिया' : '', en: okWav ? 'stray dog bit my son' : '' } : { en: /फोन|फ़ोन|ফোন/.test(vt) ? 'mobile phone stolen' : /कुत्त|ନୁକୁର|କୁକୁର/.test(vt) ? 'dog bite' : /जमीन|ज़मीन|ଜମି/.test(vt) ? 'land encroachment by neighbour' : 'legal problem' };
+      return { ok: true, status: 200, json: async () => ({ candidates: [{ content: { parts: [{ text: JSON.stringify(out) }] } }] }), text: async () => '' };
+    }
+    const p = b.contents[0].parts[0].text; const obj = JSON.parse(p.slice(p.lastIndexOf('\n\n') + 2)); const r = {};
     global.GEMCALLS = (global.GEMCALLS || 0) + 1; for (const k in obj) r[k] = '«' + obj[k] + '»';
     await new Promise((res) => setTimeout(res, +process.env.FAKE_TRANSLATE || 300));
     return { ok: true, status: 200, json: async () => ({ candidates: [{ content: { parts: [{ text: JSON.stringify(r) }] } }] }), text: async () => '' };
