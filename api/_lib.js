@@ -48,24 +48,24 @@ const store = {
     if (backend() === 'supabase') return rpc('pa_ingest', { p_day: day, p_inc: Object.fromEntries(inc), p_uniq: uniq, p_logs: logs });
     const key = 'pa:d:' + day; const cmds = [...inc].map(([f, n]) => ['HINCRBY', key, f, n]); cmds.push(['EXPIRE', key, TTL]);
     for (const [k, h] of uniq) cmds.push(['PFADD', 'pa:' + k + ':' + day, h], ['EXPIRE', 'pa:' + k + ':' + day, TTL]);
-    for (const kind of ['search', 'err']) { const L = logs.filter((l) => l[0] === kind); if (L.length) cmds.push(...L.map((l) => ['LPUSH', 'pa:' + kind, JSON.stringify(l[1])]), ['LTRIM', 'pa:' + kind, 0, kind === 'search' ? 999 : 199]); }
+    for (const kind of ['search', 'err', 'report']) { const L = logs.filter((l) => l[0] === kind); if (L.length) cmds.push(...L.map((l) => ['LPUSH', 'pa:' + kind, JSON.stringify(l[1])]), ['LTRIM', 'pa:' + kind, 0, kind === 'search' ? 999 : kind === 'report' ? 499 : 199]); }
     return pipe(cmds);
   },
   async stats(cur, prev) {
     if (backend() === 'supabase') {
       const j = await rpc('pa_stats', { p_days: cur, p_prev: prev });
-      return { days: j.days.map((x) => ({ d: x.d, h: x.h || {}, u: +x.u, s: +x.s, sl: +x.sl })), prevH: j.prev || {}, uCur: +j.ucur, uPrev: +j.uprev, sCur: +j.scur, sPrev: +j.sprev, slCur: +j.slcur, slPrev: +j.slprev, search: parse(j.search), errors: parse(j.err) };
+      return { days: j.days.map((x) => ({ d: x.d, h: x.h || {}, u: +x.u, s: +x.s, sl: +x.sl })), prevH: j.prev || {}, uCur: +j.ucur, uPrev: +j.uprev, sCur: +j.scur, sPrev: +j.sprev, slCur: +j.slcur, slPrev: +j.slprev, search: parse(j.search), errors: parse(j.err), reports: parse(j.rep) };
     }
     const cmds = [];
     cur.forEach((d) => cmds.push(['HGETALL', 'pa:d:' + d], ['PFCOUNT', 'pa:u:' + d], ['PFCOUNT', 'pa:s:' + d], ['PFCOUNT', 'pa:sl:' + d]));
     prev.forEach((d) => cmds.push(['HGETALL', 'pa:d:' + d]));
     for (const k of ['u', 's', 'sl']) cmds.push(['PFCOUNT', ...cur.map((d) => 'pa:' + k + ':' + d)], ['PFCOUNT', ...prev.map((d) => 'pa:' + k + ':' + d)]);
-    cmds.push(['LRANGE', 'pa:search', 0, 999], ['LRANGE', 'pa:err', 0, 59]);
+    cmds.push(['LRANGE', 'pa:search', 0, 999], ['LRANGE', 'pa:err', 0, 59], ['LRANGE', 'pa:report', 0, 199]);
     const r = await pipe(cmds); let i = 0;
     const days = cur.map((d) => ({ d, h: hashOf(r[i++]), u: r[i++] || 0, s: r[i++] || 0, sl: r[i++] || 0 }));
     const prevH = sum(prev.map(() => hashOf(r[i++])));
     const [uCur, uPrev, sCur, sPrev, slCur, slPrev] = [r[i++], r[i++], r[i++], r[i++], r[i++], r[i++]].map((x) => x || 0);
-    return { days, prevH, uCur, uPrev, sCur, sPrev, slCur, slPrev, search: parse(r[i++]), errors: parse(r[i++]) };
+    return { days, prevH, uCur, uPrev, sCur, sPrev, slCur, slPrev, search: parse(r[i++]), errors: parse(r[i++]), reports: parse(r[i++]) };
   },
   async loginHit(ip) {
     if (backend() === 'supabase') return Number(await rpc('pa_login_hit', { p_ip: ip })) || 0;

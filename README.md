@@ -106,3 +106,16 @@ Set up once in Vercel — use **either** Supabase or Upstash for storage:
 Privacy by design: answers, notes, names and dates are never sent. No cookies on the public site, no IP stored; unique visitors use a hash with a daily-rotating salt. Search text is scrubbed of numbers, emails and links and only the latest 1,000 are kept. Do Not Track is honoured. Daily counters expire after 400 days.
 
 Local test: `node test/devserver.js` (fake Redis, password `test-pass-123`), then `node test/analytics.js`.
+
+## Pre-translated text (recommended)
+
+Runtime translation depends on Gemini's free quota. To make every language load instantly and work even when the quota runs out, the GitHub Action **Pre-translate app text** translates all ~5,000 app strings into all 22 languages and commits them to `src/tr/<lang>.json` (served as `/tr/<lang>.json`).
+
+1. GitHub → repo → Settings → Secrets and variables → Actions → New repository secret: `GEMINI_API_KEY`.
+2. Actions → *Pre-translate app text* → Run workflow. It saves progress after every batch and runs again daily until all languages are done (the free quota is per day).
+
+The app uses the pre-translated file first, then the shared Supabase cache, then live Gemini for anything new.
+
+## Advocate reviews
+
+When an advocate reviews a guide, add them to `src/reviews.js` (name, enrolment number, date). The guide then shows "Reviewed by …" instead of "Draft", on the app and on its `/guide/<id>` page, and `/admin` tracks how many guides are reviewed.

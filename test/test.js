@@ -1,5 +1,5 @@
 /* Automated checks: KB invariants + branch behaviour. Run: node test/test.js */
-['kb','j-money','j-family','j-consumer','j-other','j-nri','j-business','j-more','j-genz','stand','law-2026','qa','engine'].forEach((f) => require('../src/' + f + '.js'));
+['kb','j-money','j-family','j-consumer','j-other','j-nri','j-business','j-more','j-genz','stand','law-2026','reviews','qa','engine'].forEach((f) => require('../src/' + f + '.js'));
 const KB = globalThis.ER_KB, E = globalThis.ER_ENGINE;
 let fails = 0, passes = 0;
 const ok = (c, m) => { if (c) passes++; else { fails++; console.log('FAIL:', m); } };

@@ -39,6 +39,9 @@ def run():
     import shutil
     for f in (ROOT / 'src' / 'static').glob('*'):
         shutil.copy(f, OUT / f.name)
+    trd = OUT / 'tr'; trd.mkdir(exist_ok=True)
+    for f in (ROOT / 'src' / 'tr').glob('*.json'):
+        shutil.copy(f, trd / f.name)
     cats = {c['id']: c['title'] for c in data['cats']}
     gdir = OUT / 'guide'; gdir.mkdir(exist_ok=True)
     urls = [('/', '1.0')]
@@ -51,7 +54,7 @@ def run():
         qs = ''.join(f'<li>{e(q)}</li>' for q in i['questions'])
         body = f"""<p class="muted">{e(cats.get(i['cat'], ''))}</p><h1>{e(i['title'])}</h1><p>{e(i['intro'])}</p>
 <a class="cta" href="/#start-{e(i['id'])}">Answer a few questions and get your list →</a>
-<h2>What the law says</h2><div class="box"><p>{e(i['juris'])}</p><p class="muted"><span class="tag">Law checked {e(i.get('checked',''))}</span> Draft — not yet reviewed by a named advocate.</p></div>
+<h2>What the law says</h2><div class="box"><p>{e(i['juris'])}</p><p class="muted"><span class="tag">Law checked {e(i.get('checked',''))}</span> {('Reviewed by ' + e(i['review']['by']) + (' (' + e(i['review'].get('enrol','')) + ')' if i['review'].get('enrol') else '') + ' on ' + e(i['review']['date'])) if i.get('review') else 'Draft — not yet reviewed by a named advocate.'}</p></div>
 <h2>Papers that usually help</h2><ul>{ev}</ul>
 <h2>Questions Pehlo will ask you</h2><ul>{qs}</ul>
 <h2>Official sources</h2><ul>{srcs}</ul>
@@ -83,7 +86,7 @@ def run():
 
     (OUT / 'guides.json').write_text(json.dumps({'checked': data.get('checked'), 'version': data.get('version'), 'langs': data['langs'], 'cats': data['cats'],
         'help': {re.sub(r'\D', '', h['label']): h['name'] for h in data['help'].values() if re.sub(r'\D', '', h.get('label') or '')},
-        'guides': [{'id': i['id'], 'title': i['title'], 'cat': i['cat'], 'checked': i.get('checked'), 'sources': len(i.get('sources') or []), 'nq': i['nq'], 'urgent': i['urgent']} for i in data['issues']]}, ensure_ascii=False))
+        'guides': [{'id': i['id'], 'title': i['title'], 'cat': i['cat'], 'checked': i.get('checked'), 'sources': len(i.get('sources') or []), 'review': i.get('review'), 'nq': i['nq'], 'urgent': i['urgent']} for i in data['issues']]}, ensure_ascii=False))
     lastmod = data.get('checked') or ''
     (OUT / 'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + ''.join(f'<url><loc>{BASE}{u}</loc><lastmod>{lastmod}</lastmod><priority>{p}</priority></url>' for u, p in urls) + '</urlset>\n')
     (OUT / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nDisallow: /admin\nSitemap: {BASE}/sitemap.xml\n')

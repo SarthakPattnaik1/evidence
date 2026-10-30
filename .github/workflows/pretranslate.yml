@@ -1,0 +1,39 @@
+name: Pre-translate app text
+# Translates every app string into all 22 languages with Gemini and commits src/tr/*.json.
+# Needs repo secret GEMINI_API_KEY (Settings → Secrets and variables → Actions).
+# Runs daily until everything is translated (free-tier quota is daily), and on demand.
+on:
+  workflow_dispatch:
+    inputs:
+      langs:
+        description: 'Comma-separated language codes (blank = all)'
+        required: false
+  schedule:
+    - cron: '17 21 * * *'   # 02:47 India time
+  push:
+    branches: [main]
+    paths: ['src/**.js']
+permissions:
+  contents: write
+concurrency: { group: pretranslate, cancel-in-progress: false }
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Translate missing strings
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          MAX_MINUTES: '45'
+        run: |
+          if [ -z "$GEMINI_API_KEY" ]; then echo "Add the GEMINI_API_KEY repository secret first."; exit 0; fi
+          node tools/pretranslate.js "${{ github.event.inputs.langs }}"
+      - name: Commit translations
+        run: |
+          git config user.name "pehlo-translate-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add src/tr
+          git diff --cached --quiet && echo "No changes" || (git commit -m "Update pre-translated text [skip translate]" && git push)

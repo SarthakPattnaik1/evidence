@@ -712,3 +712,16 @@ footer.foot .wrap{position:relative}
 .check{min-width:0;flex-wrap:wrap}
 .check input{flex:none}
 @media (max-width:400px){ .helpcard{gap:10px;padding:12px} .helpnum{font-size:15px} .accg>.grid,.accg>.accb{padding:8px} }
+
+/* v19 share + report */
+.btn.wa{background:#1F9D55;color:#fff;border-color:#1F9D55}
+.btn.wa:hover{background:#188548}
+.btn.text.small{font-size:14px;min-height:40px;padding:6px 2px;color:var(--ink2)}
+@media (max-width:760px){ .actbar .btn.wa{flex:0 0 auto;padding:8px 14px} .actbar .btn.wa span{display:none} }
+
+/* v20: WCAG AA contrast */
+:root{--muted:#56645c}
+.typed,.cover .typed,.cover label{color:#3f320c!important}
+.adminlink{opacity:.85;color:var(--muted)}
+.adminlink{opacity:1;font-size:12px}
+.tag.reviewed{background:#E5F3EA;color:#14653a;display:inline-flex;align-items:center;gap:4px}

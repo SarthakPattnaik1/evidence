@@ -50,6 +50,7 @@ begin
   -- Housekeeping, about 1 call in 50: keep the latest 1,000 searches and 200 errors; drop counts older than 400 days.
   if random() < 0.02 then
     delete from pa_log where kind = 'search' and id < coalesce((select id from pa_log where kind = 'search' order by id desc offset 999 limit 1), 0);
+    delete from pa_log where kind = 'report' and id < coalesce((select id from pa_log where kind = 'report' order by id desc offset 499 limit 1), 0);
     delete from pa_log where kind = 'err' and id < coalesce((select id from pa_log where kind = 'err' order by id desc offset 199 limit 1), 0);
     delete from pa_daily where day < current_date - 400;
     delete from pa_uniq  where day < current_date - 400;
@@ -76,7 +77,8 @@ returns jsonb language sql stable set search_path = public as $$
     'slcur', (select count(distinct h) from pa_uniq where day = any(p_days) and kind = 'sl'),
     'slprev',(select count(distinct h) from pa_uniq where day = any(p_prev) and kind = 'sl'),
     'search',(select coalesce(jsonb_agg(data order by id desc), '[]'::jsonb) from (select id, data from pa_log where kind = 'search' order by id desc limit 1000) s),
-    'err',   (select coalesce(jsonb_agg(data order by id desc), '[]'::jsonb) from (select id, data from pa_log where kind = 'err' order by id desc limit 60) e)
+    'err',   (select coalesce(jsonb_agg(data order by id desc), '[]'::jsonb) from (select id, data from pa_log where kind = 'err' order by id desc limit 60) e),
+    'rep',   (select coalesce(jsonb_agg(data order by id desc), '[]'::jsonb) from (select id, data from pa_log where kind = 'report' order by id desc limit 200) r)
   )
 $$;
 

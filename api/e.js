@@ -5,7 +5,7 @@ const { hasStore, store, dayKey, ip, hmac, body, send } = require('./_lib.js');
 
 const ID = /^[a-z0-9][a-z0-9_-]{0,47}$/;
 const ROUTES = new Set(['home', 'cat', 'start', 'topic', 'quiz', 'brk', 'urgent', 'list', 'answers', 'timeline', 'report', 'questions', 'q', 'myths', 'advocates', 'help', 'about', 'a', 'other']);
-const GUIDE_EV = new Set(['intro', 'start', 'list', 'deep', 'done', 'print', 'report', 'save']);
+const GUIDE_EV = new Set(['intro', 'start', 'list', 'deep', 'done', 'print', 'report', 'save', 'share']);
 const LANGS = new Set('en hi bn te mr ta ur gu kn or ml pa as mai sat ks ne sd doi kok mni brx sa'.split(' '));
 const BOT = /bot|crawl|spider|slurp|preview|headless|lighthouse|pingdom|monitor|curl|wget|python|axios|node-fetch/i;
 
@@ -53,6 +53,7 @@ module.exports = async function handler(req, res) {
       case 'lang': if (LANGS.has(e.x)) add('lang:' + e.x); break;
       case 'tr': if (LANGS.has(e.x)) add('tr:' + (e.ok ? 'ok' : 'fail') + ':' + e.x); break;
       case 'fb': if (g && (e.x === 'y' || e.x === 'n')) add('fb:' + g + ':' + e.x); break;
+      case 'report': { if (!g) break; const k = ['law', 'paper', 'confusing', 'translation', 'other'].includes(e.x) ? e.x : 'other'; add('rep:' + g); add('rep:all'); lists.push(['report', { t: Date.now(), g, k, m: scrub(e.m).slice(0, 400), l: lang, v: clip(e.v, 20) }]); break; }
       case 'err': add('err'); lists.push(['err', { t: Date.now(), m: clip(e.x, 160), v: clip(e.v, 20) }]); break;
       default: if (GUIDE_EV.has(e.t) && g) { add(e.t + ':' + g); add('all:' + e.t); }
     }

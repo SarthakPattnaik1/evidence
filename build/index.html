@@ -728,6 +728,19 @@ footer.foot .wrap{position:relative}
 .check{min-width:0;flex-wrap:wrap}
 .check input{flex:none}
 @media (max-width:400px){ .helpcard{gap:10px;padding:12px} .helpnum{font-size:15px} .accg>.grid,.accg>.accb{padding:8px} }
+
+/* v19 share + report */
+.btn.wa{background:#1F9D55;color:#fff;border-color:#1F9D55}
+.btn.wa:hover{background:#188548}
+.btn.text.small{font-size:14px;min-height:40px;padding:6px 2px;color:var(--ink2)}
+@media (max-width:760px){ .actbar .btn.wa{flex:0 0 auto;padding:8px 14px} .actbar .btn.wa span{display:none} }
+
+/* v20: WCAG AA contrast */
+:root{--muted:#56645c}
+.typed,.cover .typed,.cover label{color:#3f320c!important}
+.adminlink{opacity:.85;color:var(--muted)}
+.adminlink{opacity:1;font-size:12px}
+.tag.reviewed{background:#E5F3EA;color:#14653a;display:inline-flex;align-items:center;gap:4px}
 </style>
 </head>
 <body>
@@ -3988,6 +4001,15 @@ footer.foot .wrap{position:relative}
   Object.entries(fill).forEach(([id, arr]) => { const x = by(id); if (x) x.stand = (x.stand || []).concat(arr); });
 })(typeof window !== 'undefined' ? window : globalThis);
 </script>
+<script>/* Advocate reviews, per guide. When an advocate checks a guide, add an entry here and redeploy:
+     'cheque-bounce': { by: 'Adv. Full Name', enrol: 'OD/1234/2015', date: '2026-11-15', note: 'Optional short note' },
+   The guide then shows "Reviewed by …" instead of "Draft". Only add a review the advocate has actually done. */
+(function (root) {
+  const REVIEWS = {
+  };
+  for (const iss of root.ER_KB.issues) if (REVIEWS[iss.id]) iss.review = REVIEWS[iss.id];
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
 <script>/* Legal questions (answer-first explainers) and Myth-or-Fact cards. Draft, not advocate-reviewed. */
 (function (root) {
   const KB = root.ER_KB;
@@ -4423,6 +4445,8 @@ footer.foot .wrap{position:relative}
     user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.2-7 8-7s7 2.5 8 7"/>',
     chev: '<path d="m9 5 7 7-7 7"/>',
     search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>',
+    wa: '<path d="M4 20l1.3-4A8 8 0 1 1 8.4 19z"/><path d="M9 9.5c.3 2.2 2.2 4.2 4.5 4.6l1-1.1 1.6.7-.3 1.6c-3.6.3-7.5-3.6-7.2-7.2l1.6-.3.7 1.6z"/>',
+    flag: '<path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/>',
     q: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17v.5"/>'
   };
   const ic = (n, s = 20) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n] || ''}</svg>`;
@@ -4461,14 +4485,24 @@ footer.foot .wrap{position:relative}
   const RT = { ui: {}, tr: {} };   // runtime translations: ui[lang] = {key:str}; tr[lang|chunk] = {key:str}
   let sampler = null;
   try { if (window.claude && window.claude.use) window.claude.use('sample').then((s) => { sampler = s; }).catch(() => {}); } catch (e) { /* none */ }
+  /* Pre-translated dictionary (English -> language), built ahead of time and served as /tr/<lang>.json. */
+  let DICT = {}; let DICTLANG = 'en'; const dictTried = {};
+  function dictLoad() {
+    if (LANG === 'en' || DICTLANG === LANG || dictTried[LANG] || !/^https?:$/.test(location.protocol)) return;
+    const L0 = LANG; dictTried[L0] = 1;
+    fetch('/tr/' + L0 + '.json?v=' + encodeURIComponent(KB.version)).then((r) => (r.ok ? r.json() : null)).then((d) => {
+      if (d && typeof d === 'object' && LANG === L0) { DICT = d; DICTLANG = L0; if (Object.keys(d).length) safeRender(); }
+    }).catch(() => {});
+  }
+  const D = (en) => (DICTLANG === LANG && en ? DICT[en] : undefined);
   function T(key, vars) {
     const i = I18N.KEYS.indexOf(key);
-    let s = (I18N.STRINGS[LANG] || [])[i] || (RT.ui[LANG] || {})[key] || I18N.STRINGS.en[i] || key;
+    let s = (I18N.STRINGS[LANG] || [])[i] || (RT.ui[LANG] || {})[key] || D(I18N.STRINGS.en[i]) || I18N.STRINGS.en[i] || key;
     if (vars) Object.keys(vars).forEach((k) => { s = s.replace('{' + k + '}', vars[k]); });
     return s;
   }
-  const uiReady = (l) => l === 'en' || !!I18N.STRINGS[l] || !!RT.ui[l];
-  function trGet(chunk, key, en) { if (LANG === 'en') return en; const m = RT.tr[LANG + '|' + chunk]; return (m && m[key]) || en; }
+  const uiReady = (l) => l === 'en' || !!I18N.STRINGS[l] || !!RT.ui[l] || (DICTLANG === l && Object.keys(DICT).length > 300);
+  function trGet(chunk, key, en) { if (LANG === 'en') return en; const m = RT.tr[LANG + '|' + chunk]; return (m && m[key]) || D(en) || en; }
   const G = (iss, key, en) => trGet('g:' + iss.id + ':' + (/^[a-z]+_e_|^lq|^info|^st\d/.test(key) || /_u_/.test(key) ? 'b' : 'a'), key, en);
   function applyLangDom() {
     const m = LMETA[LANG]; const root = document.documentElement;
@@ -4515,6 +4549,13 @@ footer.foot .wrap{position:relative}
     if (LANG === 'en') return true;
     const lk = 'er_tr_' + LANG + '_' + KB.version + '_' + cacheKey;
     const cached = lsGet(lk); if (cached) { store(cached); return true; }
+    if (DICTLANG === LANG) {
+      const pre = {}; const rest = {};
+      Object.entries(map).forEach(([k, v]) => { if (DICT[v]) pre[k] = DICT[v]; else rest[k] = v; });
+      if (Object.keys(pre).length) store(pre);
+      if (!Object.keys(rest).length) return true;
+      if (Object.keys(pre).length) { const st = store; store = (o) => st(Object.assign({}, pre, o)); map = rest; }
+    } else if (!dictTried[LANG]) { dictLoad(); }
     if (pending[lk]) return pending[lk];
     if (chunkFail[lk] && Date.now() - chunkFail[lk] < 45000) return false;
     if (!sampler) {
@@ -4553,7 +4594,7 @@ ${JSON.stringify(map)}`;
   function X(en) {
     if (LANG === 'en' || !en) return en;
     if (XLANG !== LANG) { XLANG = LANG; XMAP = lsGet(XKEY()) || {}; }
-    const t = XMAP[en]; if (t) return t;
+    const t = XMAP[en] || D(en); if (t) return t;
     if (!xFail[LANG + '|' + en] && !xFly.has(LANG + '|' + en)) XQ.add(en);
     return en;
   }
@@ -4631,7 +4672,7 @@ ${JSON.stringify(map)}`;
     then();
   }
   function setLang(code) {
-    LANG = code; lsSet('er_lang', code); applyLangDom(); TRACK.ev('lang', { x: code });
+    LANG = code; lsSet('er_lang', code); applyLangDom(); TRACK.ev('lang', { x: code }); dictLoad();
     render();
   }
   function trNote() { return translated() ? `<p class="trnote">${ic('globe', 16)} ${esc(trFailed[LANG] && !Object.keys(pending).length ? T('enonly') : T('auto'))} <button class="btn text" data-act="toen">${esc(T('en'))}</button></p>` : ''; }
@@ -4672,7 +4713,7 @@ ${JSON.stringify(map)}`;
       <img class="flogo" src="${window.ER_BRAND.logoFull}" alt="Pehlo — Samajh. Tayyari. Apna Haq." width="210" height="96">
       <p><span class="tag draft">${esc(T('draft'))}</span></p>
       <p style="max-width:62em">${f('f_disc')} v${esc(KB.version)}.</p>
-      <div class="row"><button data-go="about">${f('f_about')}</button><button data-go="advocates">${f('f_adv')}</button><button data-go="myths">${f('f_myth')}</button><button data-go="help">${f('f_help')}</button>${S.issueId ? `<button data-act="clear">${f('f_clear')}</button>` : ''}${/^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname) ? `<a class="flink" href="/guide">${esc(X('All guides'))}</a><a class="flink" href="/privacy">${esc(X('Privacy'))}</a><a class="flink" href="/terms">${esc(X('Terms'))}</a>` : ''}</div>
+      <div class="row"><button data-go="about">${f('f_about')}</button><button data-go="advocates">${f('f_adv')}</button><button data-go="myths">${f('f_myth')}</button><button data-go="help">${f('f_help')}</button><button data-act="reportissue">${esc(X('Report a problem'))}</button>${S.issueId ? `<button data-act="clear">${f('f_clear')}</button>` : ''}${/^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname) ? `<a class="flink" href="/guide">${esc(X('All guides'))}</a><a class="flink" href="/privacy">${esc(X('Privacy'))}</a><a class="flink" href="/terms">${esc(X('Terms'))}</a>` : ''}</div>
       <p class="small muted" style="margin:8px 0 0">${esc(X('Law last checked {d} against official sources.').replace('{d}', new Date((KB.lawChecked || '2026-10-30') + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })))}</p>
       ${/^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname) && /^#?(home)?$/.test(location.hash) ? '<a class="adminlink" href="/admin" rel="nofollow">Admin</a>' : ''}
     </div></footer>`;
@@ -4803,7 +4844,7 @@ ${JSON.stringify(map)}`;
         <p class="muted small" style="margin:6px 0 0">${chaps.map((c) => esc(X(c))).join(' → ')}</p>
         <p class="small" style="margin:10px 0 0">${esc(X('Your first list appears after the quick round. You can go deeper after that, or stop.'))}</p>
       </div>
-      <p class="small muted" style="margin-top:14px"><span class="tag draft">${esc(X(KB.reviewed.label))}</span> ${esc(X(iss.juris))}</p>
+      <p class="small muted" style="margin-top:14px">${revTag(iss)} ${esc(X(iss.juris))}</p>
       ${srcBlock(iss)}
       <div class="row" style="margin-top:18px"><button class="btn go" data-act="begin" data-id="${iss.id}" ${topic ? `data-topic="${KB.directory.indexOf(topic)}"` : ''}>${esc(X('Open my file'))}</button><span class="small muted">${ic('lock', 14)} ${esc(X('Skip any question. Stop any time.'))}</span></div>
     </section></div>`);
@@ -4909,11 +4950,12 @@ ${JSON.stringify(map)}`;
       ${infos.map((x) => `<div class="banner info">${ic('info')}<div><p>${esc(G(iss, 'info' + iss.info.indexOf(x), x.text))}</p></div></div>`).join('')}
       ${standCard(iss, papers, have)}
       ${srcBlock(iss)}
+      <p class="noprint" style="margin:4px 0 0"><button class="btn text small" data-act="reportissue">${ic('flag', 16)} ${esc(X('Report a mistake in this guide'))}</button></p>
       <div class="fbk noprint" id="fbk">${UI.fb && UI.fb[iss.id] ? `<p class="small muted">${ic('check', 16)} ${esc(X('Thanks — that helps us improve this guide.'))}</p>` : `<span>${esc(X('Was this list useful?'))}</span><button class="btn line sm" data-act="fb" data-v="y">${esc(X('Yes'))}</button><button class="btn line sm" data-act="fb" data-v="n">${esc(X('Not really'))}</button>`}</div>
-      <div class="actbar noprint"><button class="btn go" data-act="print">${ic('file', 18)} ${esc(T('print'))}</button><button class="btn line" data-go="report">${esc(T('makepage'))}</button></div>
+      <div class="actbar noprint"><button class="btn go" data-act="print">${ic('file', 18)} ${esc(T('print'))}</button><button class="btn wa" data-act="wa" aria-label="${esc(X('Send on WhatsApp'))}">${ic('wa', 20)}<span>WhatsApp</span></button><button class="btn line" data-go="report">${esc(T('makepage'))}</button></div>
       ${deepLeft ? `<button class="deeper noprint" data-act="deep"><span><b>${esc(T('better'))}</b>${esc(T('more', { n: deepN }))}</span>${ic('chev', 24)}</button>` : ''}
       <div class="panel noprint">
-        <div class="row dupact"><button class="btn go big" data-act="print">${ic('file', 20)} ${esc(T('print'))}</button><button class="btn line" data-go="report">${esc(T('makepage'))}</button></div>
+        <div class="row dupact"><button class="btn go big" data-act="print">${ic('file', 20)} ${esc(T('print'))}</button><button class="btn wa" data-act="wa">${ic('wa', 20)} ${esc(X('Send on WhatsApp'))}</button><button class="btn line" data-go="report">${esc(T('makepage'))}</button></div>
         <p class="small muted" id="printhint" hidden style="margin:6px 0 0">Browser menu → Print, or Ctrl+P.</p>
         <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
         <label class="check"><input type="checkbox" data-act="savetoggle" ${saveOn ? 'checked' : ''}> ${esc(T('save'))}</label>
@@ -4960,6 +5002,11 @@ ${JSON.stringify(map)}`;
   }
 
 
+  function revTag(iss) {
+    const r = iss && iss.review;
+    if (!r) return `<span class="tag draft">${esc(X(KB.reviewed.label))}</span>`;
+    return `<span class="tag reviewed">${ic('check', 14)} ${esc(X('Reviewed by'))} ${esc(r.by)}${r.enrol ? ' · ' + esc(r.enrol) : ''} · ${esc(new Date(r.date + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }))}</span>`;
+  }
   function srcBlock(iss) {
     if (!iss || !iss.sources || !iss.sources.length) return '';
     const d = iss.checked ? new Date(iss.checked + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
@@ -5147,6 +5194,20 @@ ${JSON.stringify(map)}`;
       ${S.issueId || loadSaved() ? '<button class="btn line" data-act="clear" style="margin-top:16px">' + esc(X('Clear everything on this device')) + '</button>' : ''}
     </div>`);
   }
+  function showReport() {
+    const iss = issue() || BY_ID.general; if (!iss) return;
+    const ov = document.createElement('div'); ov.className = 'overlay'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-labelledby', 'reph');
+    const kinds = [['law', X('The law or a deadline looks wrong')], ['paper', X('A paper is missing or not needed')], ['confusing', X('Something is confusing')], ['translation', X('The translation is wrong')], ['other', X('Something else')]];
+    ov.innerHTML = `<div class="dialog"><h2 id="reph">${esc(X('Report a mistake'))}</h2><p class="small muted">${esc(X('This goes to the Pehlo team so we can fix the guide. Please don\'t write names, phone numbers or details of your case.'))}</p>
+      <form id="repform"><div class="opts" style="margin:10px 0">${kinds.map(([k, t], i) => `<label class="opt"><input type="radio" name="k" value="${k}" ${i ? '' : 'checked'}><span class="dot" aria-hidden="true"></span><span>${esc(t)}</span></label>`).join('')}</div>
+      <label class="f">${esc(X('What should we fix? (optional)'))}<textarea class="t" name="m" rows="3" maxlength="400"></textarea></label>
+      <div class="row" style="margin-top:12px"><button class="btn go" type="submit">${esc(X('Send'))}</button><button class="btn text" type="button" data-close="1">${esc(X('Cancel'))}</button></div></form></div>`;
+    document.body.appendChild(ov);
+    const close = () => ov.remove();
+    ov.addEventListener('click', (e) => { if (e.target === ov || e.target.dataset.close) close(); });
+    ov.querySelector('form').addEventListener('submit', (e) => { e.preventDefault(); const f = new FormData(e.target); TRACK.ev('report', { g: iss.id, x: String(f.get('k')), m: String(f.get('m') || '').slice(0, 400), v: KB.version }); TRACK.flush && TRACK.flush(); close(); toast(X('Thank you — sent to the Pehlo team.')); });
+    setTimeout(() => { const t = ov.querySelector('input'); if (t) t.focus(); }, 30);
+  }
   function showLang() {
     const ov = document.createElement('div'); ov.className = 'overlay'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-labelledby', 'langh');
     ov.innerHTML = `<div class="dialog wide"><h2 id="langh">${esc(T('lang'))}</h2><p class="small muted">${esc(T('auto'))}</p>
@@ -5247,6 +5308,16 @@ ${JSON.stringify(map)}`;
       case 'showlist': S.pendingUrgent = null; S.chapterFound = []; go('list'); break;
       case 'ackurgent': S.ackUrgent[S.pendingUrgent] = true; S.pendingUrgent = null; persist(); if (currentQ()) goQuiz(); else { finishStage(); go('list'); } break;
       case 'resumequiz': S.stage = 'quick'; S.skipped = Object.fromEntries(Object.entries(S.skipped).filter(([k]) => iss.questions.find((q) => q.id === k && q.deep))); goQuiz(); break;
+      case 'wa': {
+        const iss = issue(); const items = E.evidence(iss, S.answers); const g = (e) => G(iss, e.id + '.n', e.name);
+        const steps = items.filter((x) => x.action); const papers = items.filter((x) => !x.action);
+        const line = (e) => (S.status[e.id] === 'have' ? '✅ ' : '⬜ ') + g(e);
+        const txt = [`*${T('carry')}* — ${S.topic ? S.topic.title : G(iss, 's', iss.short)}`, steps.length ? '\n*' + T('dofirst') + '*\n' + steps.map(line).join('\n') : '', '\n*' + T('papers') + '*\n' + papers.map(line).join('\n'), '\n' + X('Made with Pehlo — free help to prepare for your advocate.') + ' ' + location.origin + '/'].filter(Boolean).join('\n');
+        TRACK.once('share', { g: iss.id });
+        window.open('https://wa.me/?text=' + encodeURIComponent(txt.slice(0, 3500)), '_blank', 'noopener');
+        break;
+      }
+      case 'reportissue': showReport(); break;
       case 'fb': UI.fb = UI.fb || {}; UI.fb[S.issueId] = t.dataset.v; TRACK.once('fb', { g: S.issueId, x: t.dataset.v }); { const f = document.getElementById('fbk'); if (f) f.innerHTML = `<p class="small muted">${ic('check', 16)} Thanks — that helps us improve this guide.</p>`; } break;
       case 'deep': TRACK.once('deep', { g: S.issueId }); S.stage = 'deep'; S.chapterFound = []; persist(); goQuiz(); break;
       case 'change': { const q = iss.questions.find((x) => x.id === t.dataset.q); if (!q) break; S.prefill[q.id] = S.answers[q.id]; delete S.answers[q.id]; delete S.skipped[q.id]; S.stage = q.deep ? 'deep' : 'quick'; S.history = S.history.filter((h) => h.id !== q.id); if (q.deep) S.deepDone = false; else S.quickDone = false; S.chapterFound = []; persist(); goQuiz(); break; }
@@ -5273,7 +5344,7 @@ ${JSON.stringify(map)}`;
   const TRACK = (() => {
     const on = /^https:$/.test(location.protocol) && !/claude\.ai|anthropic|claudeusercontent|localhost$/.test(location.hostname) && navigator.doNotTrack !== '1' && window.doNotTrack !== '1';
     const forced = /^http:$/.test(location.protocol) && /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && /pehlo_track=1/.test(document.cookie + location.search);
-    if (!on && !forced) return { ev() {}, once() {} };
+    if (!on && !forced) return { ev() {}, once() {}, flush() {} };
     let sid = ''; try { sid = sessionStorage.getItem('pa_s') || ''; if (!sid) { sid = Math.random().toString(36).slice(2, 12) + Date.now().toString(36).slice(-4); sessionStorage.setItem('pa_s', sid); } } catch (e) { sid = Math.random().toString(36).slice(2, 14); }
     const seen = new Set(); let q = []; let first = true; let timer = null;
     const ref = (() => { try { const r = document.referrer && new URL(document.referrer); return r && r.hostname !== location.hostname ? r.hostname : ''; } catch (e) { return ''; } })();
@@ -5299,7 +5370,7 @@ ${JSON.stringify(map)}`;
       if (/^tel:/.test(h)) ev('call', { x: h.replace(/\D/g, '') });
       else if (/^https?:/.test(h)) { try { const u = new URL(h); if (u.hostname !== location.hostname) ev('out', { x: u.hostname.replace(/^www\./, '') }); } catch (er) { /* ignore */ } }
     }, true);
-    return { ev, once };
+    return { ev, once, flush };
   })();
   let lastView = '';
   function trackRender() {
@@ -5328,7 +5399,7 @@ ${JSON.stringify(map)}`;
     searchT = setTimeout(() => { let n = 0; try { n = searchAll(v).length; } catch (e) { /* ignore */ } TRACK.ev('search', { n, x: v }); }, 1500);
   }
   try { const fi = document.createElement('link'); fi.rel = 'icon'; fi.href = window.ER_BRAND.icon; document.head.appendChild(fi); } catch (e) { /* none */ }
-  applyLangDom();
+  applyLangDom(); dictLoad();
   render();
 })();
 </script>

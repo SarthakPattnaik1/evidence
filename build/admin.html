@@ -166,6 +166,11 @@ select{border:1px solid var(--line);border-radius:8px;padding:5px 8px;background
     </div>
 
     <div class="sec card">
+      <div class="sechead"><h2>Mistakes reported by users</h2><p>From "Report a mistake in this guide" — fix these first</p></div>
+      <div class="scroll" style="max-height:380px"><table id="reps"></table></div>
+    </div>
+
+    <div class="sec card">
       <div class="sechead"><h2>Law freshness</h2><p>When each guide's law was last checked against official sources</p></div>
       <div class="scroll" style="max-height:380px"><table id="fresh"></table></div>
     </div>
@@ -378,6 +383,9 @@ select{border:1px solid var(--line);border-radius:8px;padding:5px 8px;background
       const what = o.n === 0 ? '<span class="tag crit">✕ No guide found</span>' : pk.length ? pk.map(([g, n]) => `→ ${esc(pickName(g))}${n > 1 ? ' ×' + n : ''}`).join('<br>') : '<span class="tag warn">! Left without choosing</span>';
       return `<tr><td>${esc(o.q)} <span class="small">${esc(o.l !== 'en' ? (LN[o.l] || o.l) : '')}</span></td><td class="n">${o.times || '—'}</td><td>${what}</td><td class="n small">${new Date(o.t).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</td></tr>`; }).join('')}</tbody>` : '<tbody><tr><td class="empty">No searches in this period.</td></tr></tbody>';
 
+    const KN = { law: 'Law or deadline looks wrong', paper: 'Paper missing / not needed', confusing: 'Confusing', translation: 'Translation wrong', other: 'Other' };
+    const rp = DATA.reports || [];
+    $('#reps').innerHTML = rp.length ? `<thead><tr><th>Guide</th><th>Problem</th><th>What they wrote</th><th>Lang</th><th class="n">When</th></tr></thead><tbody>${rp.map((x) => `<tr><td>${esc(gTitle(x.g))}</td><td><span class="tag ${x.k === 'law' ? 'crit' : 'warn'}">${esc(KN[x.k] || x.k)}</span></td><td>${esc(x.m || '—')}</td><td class="small">${esc(x.l)}</td><td class="n small">${new Date(x.t).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</td></tr>`).join('')}</tbody>` : '<tbody><tr><td class="empty"><span class="tag good">✓ No mistakes reported</span></td></tr></tbody>';
     const er = DATA.errors || [];
     $('#errs').innerHTML = er.length ? `<thead><tr><th>Error</th><th>Version</th><th class="n">When</th></tr></thead><tbody>${er.map((x) => `<tr><td class="mono">${esc(x.m)}</td><td class="small">${esc(x.v)}</td><td class="n small">${new Date(x.t).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</td></tr>`).join('')}</tbody>` : '<tbody><tr><td class="empty"><span class="tag good">✓ No errors</span> reported.</td></tr></tbody>';
 
@@ -388,13 +396,14 @@ select{border:1px solid var(--line);border-radius:8px;padding:5px 8px;background
     const now = Date.now();
     const rows = (META.guides || []).filter((g) => g.id !== 'general').map((g) => ({ ...g, age: g.checked ? Math.floor((now - new Date(g.checked + 'T00:00:00').getTime()) / 86400000) : null })).sort((a, b) => (b.age ?? 9999) - (a.age ?? 9999));
     const stale = rows.filter((r) => r.age == null || r.age > 90).length;
-    $('#fresh').innerHTML = `<thead><tr><th>Guide</th><th>Last checked</th><th class="n">Days ago</th><th class="n">Official sources</th><th>Status</th></tr></thead><tbody>${rows.map((r) => `<tr><td>${esc(r.title)}</td><td class="small">${esc(r.checked || '—')}</td><td class="n">${r.age ?? '—'}</td><td class="n">${r.sources}</td><td>${r.age == null || r.age > 180 ? '<span class="tag crit">✕ Re-check now</span>' : r.age > 90 ? '<span class="tag warn">! Due soon</span>' : '<span class="tag good">✓ Current</span>'}</td></tr>`).join('')}</tbody>`;
+    $('#fresh').innerHTML = `<thead><tr><th>Guide</th><th>Last checked</th><th class="n">Days ago</th><th class="n">Official sources</th><th>Advocate review</th><th>Status</th></tr></thead><tbody>${rows.map((r) => `<tr><td>${esc(r.title)}</td><td class="small">${esc(r.checked || '—')}</td><td class="n">${r.age ?? '—'}</td><td class="n">${r.sources}</td><td class="small">${r.review ? `<span class="tag good">✓ ${esc(r.review.by)}</span>` : '<span class="tag warn">! Not yet</span>'}</td><td>${r.age == null || r.age > 180 ? '<span class="tag crit">✕ Re-check now</span>' : r.age > 90 ? '<span class="tag warn">! Due soon</span>' : '<span class="tag good">✓ Current</span>'}</td></tr>`).join('')}</tbody>`;
     let tp = []; try { tp = (await (await fetch('/api/translate')).json()).providers || []; } catch (e) { /* none */ }
     const today = DATA && DATA.days ? DATA.days[DATA.days.length - 1] : null;
     $('#sys').innerHTML = `<table><tbody>
       <tr><td>Analytics storage</td><td>${DATA && DATA.store && !DATA.error ? `<span class="tag good">✓ ${esc(DATA.backend === 'supabase' ? 'Supabase' : 'Upstash Redis')}</span>` : DATA && DATA.error ? `<span class="tag warn">! ${esc(DATA.backend || '')} — ${DATA.error === 'schema' ? 'run schema.sql' : 'read error'}</span>` : '<span class="tag crit">✕ Not connected</span>'}</td></tr>
       <tr><td>Translation services</td><td>${tp.length ? tp.map((x) => `<span class="tag good">✓ ${esc(x)}</span>`).join(' ') : '<span class="tag warn">! None — guides show in English</span>'}</td></tr>
       <tr><td>Content version</td><td class="mono">${esc(META.version || '—')}</td></tr>
+      <tr><td>Advocate-reviewed guides</td><td>${(META.guides || []).filter((g) => g.review).length} of ${(META.guides || []).length}</td></tr>
       <tr><td>Guides</td><td>${(META.guides || []).length} · ${stale ? `<span class="tag warn">! ${stale} need a law re-check</span>` : '<span class="tag good">✓ All law checks under 90 days</span>'}</td></tr>
       <tr><td>Events counted in this period</td><td>${DATA && DATA.cur ? fmt(DATA.cur.ev || 0) : '—'}</td></tr>
     </tbody></table>
