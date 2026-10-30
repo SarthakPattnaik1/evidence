@@ -433,6 +433,29 @@ header.top{background:rgba(255,255,255,.86);border-bottom:1px solid rgba(15,30,6
 .s-risk .sic{background:var(--amber-l);color:#8a5a00} .s-risk b{color:#8a5a00}
 .s-next .sic{background:#E8ECF5;color:var(--ink)} .s-next b{color:var(--ink)}
 html[data-script] .srow b{text-transform:none;letter-spacing:0}
+
+/* v7: carry checklist */
+.carryhead{background:#0F1E3D;color:#fff;border-radius:18px;padding:20px 20px 18px;margin:8px 0 14px;box-shadow:var(--sh2)}
+.carryhead .typed{color:#E7D4A2;margin:0 0 4px;font-size:14px}
+.carryhead h1{color:#fff;font-size:clamp(26px,5vw,36px);line-height:1.15}
+.carryhead .fh{color:rgba(255,255,255,.82);margin:8px 0 0}
+.carryhead .fh b{color:#E7D4A2}
+.lh{font-size:19px;margin:20px 0 10px}
+.checks{display:flex;flex-direction:column;gap:10px}
+.crow{display:grid;grid-template-columns:40px 1fr;gap:12px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--sh1)}
+.crow.act{border-inline-start:4px solid var(--amber)}
+.crow.on{background:#F2FAF8;border-color:#BFE3DC}
+.crow.on h3{color:var(--go-d)}
+.cbox{width:36px;height:36px;border-radius:10px;border:2px solid #B7BECB;background:#fff;display:grid;place-items:center;cursor:pointer;padding:0;color:#fff}
+.crow.on .cbox{background:var(--go);border-color:var(--go)}
+.cbox:hover{border-color:var(--ink)}
+.cbody h3{font-size:17px;line-height:1.3;margin:4px 0 4px}
+.cbody .w{margin:0;color:var(--ink2);font-size:15px}
+.ctime{margin:8px 0 0;font-size:14px;font-weight:600;color:#8a5a00;display:flex;gap:6px;align-items:flex-start}
+.cbody details{margin-top:6px}
+.cbody details summary{font-size:14px;color:var(--go-d);cursor:pointer;font-weight:600}
+.cbody details p{font-size:14px;margin:6px 0 0;color:var(--ink2)}
+@media print{.crow{box-shadow:none;break-inside:avoid}.carryhead{background:#fff;color:#000;box-shadow:none;border:1px solid #000}.carryhead h1,.carryhead .fh,.carryhead .typed{color:#000}}
 </style>
 </head>
 <body>
@@ -3533,6 +3556,29 @@ html[data-script] .srow b{text-transform:none;letter-spacing:0}
   KEYS.push('stand', 'k_good', 'k_risk', 'k_next');
   Object.keys(EXTRA).forEach((l) => { if (S[l]) S[l].push(...EXTRA[l]); });
 
+  // v7 keys: the carry checklist
+  const EXTRA2 = {
+    en: ['Take these to your advocate', 'Tick each paper once you have it ready.', 'Do these first', 'Papers to carry', 'Print or save this list'],
+    hi: ['ये कागज़ वकील के पास ले जाएँ', 'जो कागज़ तैयार हो, उस पर निशान लगाएँ।', 'पहले ये करें', 'साथ ले जाने वाले कागज़', 'यह सूची प्रिंट या सेव करें'],
+    bn: ['এগুলো আইনজীবীর কাছে নিয়ে যান', 'যে কাগজ তৈরি, তাতে টিক দিন।', 'আগে এগুলো করুন', 'সঙ্গে নেওয়ার কাগজ', 'তালিকাটি প্রিন্ট বা সেভ করুন'],
+    te: ['ఇవి న్యాయవాది దగ్గరికి తీసుకెళ్లండి', 'సిద్ధంగా ఉన్న ప్రతి కాగితానికి టిక్ పెట్టండి.', 'ముందుగా ఇవి చేయండి', 'తీసుకెళ్లాల్సిన కాగితాలు', 'ఈ జాబితాను ప్రింట్ లేదా సేవ్ చేయండి'],
+    mr: ['हे कागद वकिलांकडे घेऊन जा', 'जो कागद तयार आहे त्यावर खूण करा.', 'आधी हे करा', 'सोबत न्यायचे कागद', 'ही यादी प्रिंट किंवा सेव्ह करा'],
+    ta: ['இவற்றை வழக்கறிஞரிடம் எடுத்துச் செல்லுங்கள்', 'தயாரான ஒவ்வொரு ஆவணத்தையும் டிக் செய்யுங்கள்.', 'முதலில் இவற்றைச் செய்யுங்கள்', 'எடுத்துச் செல்ல வேண்டிய ஆவணங்கள்', 'இந்தப் பட்டியலை அச்சிடுங்கள் அல்லது சேமியுங்கள்'],
+    ur: ['یہ کاغذات وکیل کے پاس لے جائیں', 'جو کاغذ تیار ہو اس پر نشان لگائیں۔', 'پہلے یہ کریں', 'ساتھ لے جانے والے کاغذات', 'یہ فہرست پرنٹ یا محفوظ کریں'],
+    gu: ['આ કાગળો વકીલ પાસે લઈ જાઓ', 'જે કાગળ તૈયાર હોય તેના પર ટિક કરો.', 'પહેલાં આ કરો', 'સાથે લઈ જવાના કાગળો', 'આ યાદી પ્રિન્ટ અથવા સેવ કરો'],
+    kn: ['ಇವನ್ನು ವಕೀಲರ ಬಳಿ ತೆಗೆದುಕೊಂಡು ಹೋಗಿ', 'ಸಿದ್ಧವಾದ ಪ್ರತಿ ಕಾಗದಕ್ಕೆ ಟಿಕ್ ಮಾಡಿ.', 'ಮೊದಲು ಇವನ್ನು ಮಾಡಿ', 'ತೆಗೆದುಕೊಂಡು ಹೋಗಬೇಕಾದ ಕಾಗದಗಳು', 'ಈ ಪಟ್ಟಿಯನ್ನು ಪ್ರಿಂಟ್ ಅಥವಾ ಸೇವ್ ಮಾಡಿ'],
+    or: ['ଏହି କାଗଜଗୁଡ଼ିକ ଓକିଲଙ୍କ ପାଖକୁ ନେଇଯାଆନ୍ତୁ', 'ଯେଉଁ କାଗଜ ପ୍ରସ୍ତୁତ, ସେଥିରେ ଟିକ୍ ଦିଅନ୍ତୁ।', 'ପ୍ରଥମେ ଏଗୁଡ଼ିକ କରନ୍ତୁ', 'ସାଙ୍ଗରେ ନେବାକୁ ଥିବା କାଗଜ', 'ଏହି ତାଲିକା ପ୍ରିଣ୍ଟ କିମ୍ବା ସେଭ୍ କରନ୍ତୁ'],
+    ml: ['ഇവ അഭിഭാഷകന്റെ അടുത്തേക്ക് കൊണ്ടുപോകുക', 'തയ്യാറായ ഓരോ രേഖയും ടിക്ക് ചെയ്യുക.', 'ആദ്യം ഇവ ചെയ്യുക', 'കൊണ്ടുപോകേണ്ട രേഖകൾ', 'ഈ പട്ടിക പ്രിന്റ് ചെയ്യുക അല്ലെങ്കിൽ സേവ് ചെയ്യുക'],
+    pa: ['ਇਹ ਕਾਗਜ਼ ਵਕੀਲ ਕੋਲ ਲੈ ਜਾਓ', 'ਜੋ ਕਾਗਜ਼ ਤਿਆਰ ਹੈ ਉਸ ’ਤੇ ਨਿਸ਼ਾਨ ਲਗਾਓ।', 'ਪਹਿਲਾਂ ਇਹ ਕਰੋ', 'ਨਾਲ ਲੈ ਜਾਣ ਵਾਲੇ ਕਾਗਜ਼', 'ਇਹ ਸੂਚੀ ਪ੍ਰਿੰਟ ਜਾਂ ਸੇਵ ਕਰੋ'],
+    as: ['এইবোৰ উকীলৰ ওচৰলৈ লৈ যাওক', 'যি কাগজ সাজু, তাত টিক দিয়ক।', 'প্ৰথমে এইবোৰ কৰক', 'লগত লৈ যাবলগীয়া কাগজ', 'এই তালিকা প্ৰিণ্ট বা ছেভ কৰক'],
+    mai: ['ई कागज वकील लग लऽ जाउ', 'जे कागज तैयार अछि, ओहिपर निशान लगाउ।', 'पहिने ई करू', 'संग लऽ जेबाक कागज', 'ई सूची प्रिंट वा सेव करू'],
+    ne: ['यी कागजात वकिलकहाँ लैजानुहोस्', 'तयार भएका कागजमा चिनो लगाउनुहोस्।', 'पहिले यी गर्नुहोस्', 'साथमा लैजाने कागजात', 'यो सूची प्रिन्ट वा सेभ गर्नुहोस्'],
+    kok: ['हीं कागदां वकिलाकडेन व्हरात', 'तयार आशिल्ल्या कागदाचेर खूण करात.', 'पयलीं हें करात', 'वांगडा व्हरपाचीं कागदां', 'ही वळेरी प्रिंट वा सेव करात'],
+    doi: ['एह् कागज वकील कोल लेई जाओ', 'जेह्ड़ा कागज त्यार ऐ, उस पर निशान लाओ।', 'पैह्लें एह् करो', 'कन्नै लेई जाने आह्ले कागज', 'एह् लिस्ट प्रिंट जां सेव करो']
+  };
+  KEYS.push('carry', 'tickhave', 'dofirst', 'papers', 'print');
+  Object.keys(EXTRA2).forEach((l) => { if (S[l]) S[l].push(...EXTRA2[l]); });
+
   root.ER_I18N = { KEYS, LANGS, STRINGS: S };
 })(globalThis);
 </script>
@@ -3777,11 +3823,13 @@ ${JSON.stringify(map)}`;
       ${opt.tray ? trayHTML() : ''}
       ${opt.noFooter ? '' : footer()}`;
   }
+  const FOOT = {"f_disc": "EvidenceReady helps you prepare for a meeting with an advocate. It is not legal advice, does not replace an advocate, and cannot tell you whether a court will accept any document.", "f_about": "How this works & privacy", "f_adv": "For advocates", "f_myth": "Myth or fact", "f_help": "Legal aid & urgent help", "f_clear": "Clear my answers"};
   function footer() {
+    const f = (k) => esc(H(k, FOOT[k]));
     return `<footer class="foot"><div class="wrap">
       <p><span class="tag draft">${esc(T('draft'))}</span></p>
-      <p style="max-width:62em">EvidenceReady helps you prepare for a meeting with an advocate. It is not legal advice, does not replace an advocate, and cannot tell you whether a court will accept any document. Content v${esc(KB.version)}.</p>
-      <div class="row"><button data-go="about">How this works &amp; privacy</button><button data-go="advocates">For advocates</button><button data-go="myths">Myth or fact</button><button data-go="help">Legal aid &amp; urgent help</button>${S.issueId ? '<button data-act="clear">Clear my answers</button>' : ''}</div>
+      <p style="max-width:62em">${f('f_disc')} v${esc(KB.version)}.</p>
+      <div class="row"><button data-go="about">${f('f_about')}</button><button data-go="advocates">${f('f_adv')}</button><button data-go="myths">${f('f_myth')}</button><button data-go="help">${f('f_help')}</button>${S.issueId ? `<button data-act="clear">${f('f_clear')}</button>` : ''}</div>
     </div></footer>`;
   }
 
@@ -3815,7 +3863,14 @@ ${JSON.stringify(map)}`;
     return deep.map((i) => `<button class="prob" data-play="${i.id}"><b>${esc(C(cid, i.id + '.s', i.short))}</b><span>${esc(C(cid, i.id + '.t', i.title))}</span>${ic('chev', 22)}</button>`).join('')
       + gen.map((d) => `<button class="prob" data-play="general" data-topic="${d.idx}"><b>${esc(C(cid, 'd' + d.idx, d.title))}</b><span>${esc(T('basic'))}</span>${ic('chev', 22)}</button>`).join('');
   }
+  const H = (k, en) => trGet('home', k, en);
+  function ensureHome() {
+    if (LANG === 'en' || RT.tr[LANG + '|home']) return Promise.resolve(true);
+    const map = {}; KB.categories.forEach((c) => { map['b_' + c.id] = c.blurb; }); SUGGEST.forEach((x, i) => { map['s' + i] = x; }); Object.assign(map, FOOT);
+    return translateMap(map, 'home2', (o) => { RT.tr[LANG + '|home'] = o; });
+  }
   function viewHome() {
+    if (translated() && sampler && !RT.tr[LANG + '|home']) setTimeout(() => ensureHome().then((ok) => { if (ok && /^#?(home)?$/.test(location.hash.replace('#', '')) ) render(); }), 0);
     const saved = !S.issueId && loadSaved();
     return shell(`<section class="band"><div class="wrap">
         <div class="langbar" role="group" aria-label="Language">${TOP_LANGS.map((c) => `<button class="lchip" lang="${c}" data-lang="${c}" aria-pressed="${LANG === c}">${esc(LMETA[c].native)}</button>`).join('')}<button class="lchip more" data-act="lang">${ic('globe', 16)} ${I18N.LANGS.length}</button></div>
@@ -3826,13 +3881,13 @@ ${JSON.stringify(map)}`;
           ${ic('search', 22)}<input id="matter" type="search" autocomplete="off" placeholder="${esc(T('search'))}">
         </div>
         <div id="results" class="results" aria-live="polite"></div>
-        ${LANG === 'en' ? `<div class="suggest" id="suggest">${SUGGEST.map((x) => `<button class="slipchip" data-ex="${esc(x)}">${esc(x)}</button>`).join('')}</div>` : '<div id="suggest"></div>'}
+        <div class="suggest" id="suggest">${SUGGEST.map((x, i) => `<button class="slipchip" data-ex="${esc(x)}">${esc(H('s' + i, x))}</button>`).join('')}</div>
       </div></section>
       <div class="wrap home">
       ${saved && saved.issueId ? `<div class="banner info" style="margin-top:18px">${ic('folder')}<div><h3>${esc(T('listh'))}</h3><p>${esc((BY_ID[saved.issueId] || {}).short || '')}. <button class="btn text" data-act="resume">${esc(T('seelist'))}</button> <button class="btn text" data-act="forget">${esc(T('delall'))}</button></p></div></div>` : ''}
       <section aria-labelledby="areah">
         <h2 id="areah">${esc(T('area'))}</h2>
-        <div class="tiles">${KB.categories.map((c) => `<button class="tile" data-go="cat-${c.id}"><span class="tic">${ic(c.icon, 26)}</span><b>${esc(catTitle(c))}</b>${LANG === 'en' ? `<span>${esc(c.blurb)}</span>` : ''}</button>`).join('')}
+        <div class="tiles">${KB.categories.map((c) => `<button class="tile" data-go="cat-${c.id}"><span class="tic">${ic(c.icon, 26)}</span><b>${esc(catTitle(c))}</b><span>${esc(H('b_' + c.id, c.blurb))}</span></button>`).join('')}
           <button class="tile" data-play="general"><span class="tic">${ic('q', 26)}</span><b>${esc(T('notsure'))}</b><span>${esc(T('notsure_s'))}</span></button></div>
       </section>
       <section class="minirow">
@@ -3929,7 +3984,7 @@ ${JSON.stringify(map)}`;
       </form>
       <details class="why"><summary>${esc(T('why'))}</summary><p>${esc(G(iss, q.id + '.w', q.why))}</p></details>
       <p style="margin-top:14px"><button class="btn text" data-act="skip">${esc(T('skip'))}</button></p>
-    </div>`, { tray: true, inJourney: true });
+    </div>`, { inJourney: true });
   }
   function urgentBanner(u, iss) {
     iss = iss || issue();
@@ -3947,11 +4002,10 @@ ${JSON.stringify(map)}`;
     persist();
     const newNow = E.urgent(iss, S.answers).find((u) => u.level === 'now' && !beforeUrg.has(u.id) && !S.ackUrgent[u.id]);
     if (newNow) { S.pendingUrgent = newNow.id; go('urgent'); return; }
-    S._fly = added.map((e) => G(iss, e.id + '.n', e.name));
     nextAfter(q);
   }
   function nextAfter() {
-    if (!currentQ()) { S._fly = null; finishStage(); go('list'); return; }
+    if (!currentQ()) { finishStage(); go('list'); return; }
     render();
   }
   function finishStage() { if (S.stage === 'quick') S.quickDone = true; else S.deepDone = true; persist(); }
@@ -3964,51 +4018,65 @@ ${JSON.stringify(map)}`;
       <div class="banner now" role="alert">${ic('alert', 24)}<div><h1 style="font-size:clamp(24px,4vw,32px);margin:0 0 6px">${esc(u.title)}</h1><p>${esc(u.text)}</p></div></div>
       <div class="grid" style="margin:16px 0">${help.map(helpCard).join('')}</div>
       <p class="muted">Your answers are kept on this page. Come back and finish when you can.</p>
-      <div class="row"><button class="btn go" data-act="ackurgent">Continue preparing</button><button class="btn line" data-act="showlist">Open my file now</button></div>
+      <div class="row"><button class="btn go" data-act="ackurgent">Continue</button></div>
     </div>`, { inJourney: true });
   }
   function helpCard(h) {
     return `<div class="helpcard"><span class="helpnum">${esc(h.label)}</span><div><h3>${esc(h.name)}</h3><p class="small muted" style="margin:2px 0 0">${esc(h.detail)}</p>${h.href ? `<a class="small" href="${esc(h.href)}" target="_blank" rel="noopener">${esc(h.href.replace('https://', ''))}</a>` : ''}</div></div>`;
   }
 
-  /* ============ YOUR LIST ============ */
+  /* ============ THE LIST: papers to carry ============ */
   const STATUSES = () => [['have', T('s_have')], ['find', T('s_find')], ['others', T('s_others')], ['na', T('s_na')]];
   const ACTION_ST = () => [['have', T('s_done')], ['find', T('s_notdone')], ['na', T('s_na')]];
   function viewList() {
     const iss = issue();
     const items = E.evidence(iss, S.answers);
     const must = new Set((S.adv && S.adv.issueId === iss.id && S.adv.must) || []);
-    items.sort((a, b) => (must.has(b.id) - must.has(a.id)) || ((!!b.time) - (!!a.time)));
-    const st = (e) => S.status[e.id] || '';
-    const have = items.filter((e) => st(e) === 'have').length;
+    const order = (a, b) => (must.has(b.id) - must.has(a.id)) || ((!!b.time) - (!!a.time));
+    const papers = items.filter((e) => !e.action).sort(order);
+    const steps = items.filter((e) => e.action).sort(order);
+    const have = papers.filter((e) => S.status[e.id] === 'have').length;
     const urg = E.urgent(iss, S.answers); const infos = E.info(iss, S.answers);
     const quickLeft = E.nextQuestion(iss, S.answers, 'quick', S.skipped);
+    if (quickLeft) return viewQuiz();
     const deepLeft = E.nextQuestion(iss, S.answers, 'deep', S.skipped);
     const deepN = E.stageQuestions(iss, S.answers, 'deep').filter((q) => S.answers[q.id] == null && !S.skipped[q.id]).length;
     return shell(`<div class="wrap narrow" style="padding-top:14px;padding-bottom:30px">
-      <button class="btn text" data-go="home">${ic('back', 20)} ${esc(T('home'))}</button>
+      <button class="btn text noprint" data-go="home">${ic('back', 20)} ${esc(T('home'))}</button>
       ${S.adv && S.adv.issueId === iss.id ? advBanner(S.adv) : ''}
-      <div class="filehead"><span class="tape" aria-hidden="true"></span><p class="typed">${esc(S.topic ? S.topic.title : G(iss, 's', iss.short))}</p><h1>${esc(T('listh'))}</h1>
-        <p class="fh">${esc(T('have', { a: have, b: items.length }))} ${esc(T('tapmark'))}</p>
-        <div class="stack" aria-hidden="true">${items.map((e) => `<i class="${st(e)}"></i>`).join('')}</div>
-      </div>
+      <div class="carryhead"><p class="typed">${esc(S.topic ? S.topic.title : G(iss, 's', iss.short))}</p><h1>${esc(T('carry'))}</h1>
+        <p class="fh">${esc(T('tickhave'))} <b>${have}/${papers.length}</b></p></div>
       ${trNote()}
-      ${standCard(iss, items, have)}
-      <p class="muted">${esc(T('worry'))}</p>
       ${urg.map((u) => urgentBanner(u, iss)).join('')}
-      ${infos.map((x, i) => `<div class="banner info">${ic('info')}<div><p>${esc(G(iss, 'info' + iss.info.indexOf(x), x.text))}</p></div></div>`).join('')}
-      ${quickLeft ? `<div class="banner soon">${ic('info')}<div><p><button class="btn text" data-act="resumequiz">${esc(T('more', { n: '' }).trim())}</button></p></div></div>` : ''}
-      ${!quickLeft && deepLeft ? `<button class="deeper" data-act="deep"><span><b>${esc(T('better'))}</b>${esc(T('more', { n: deepN }))}</span>${ic('chev', 24)}</button>` : ''}
-      <div id="evlist">${items.map((e) => evCard(e, must.has(e.id), iss)).join('')}</div>
-      <div class="panel">
-        <h2>${esc(T('ready'))}</h2>
-        <div class="row"><button class="btn go big" data-go="report">${ic('file', 20)} ${esc(T('makepage'))}</button><button class="btn line" data-go="timeline">${ic('cal', 20)} ${esc(T('dates'))}</button></div>
+      ${steps.length ? `<h2 class="lh">${esc(T('dofirst'))}</h2><div class="checks">${steps.map((e) => checkRow(e, iss, must.has(e.id))).join('')}</div>` : ''}
+      <h2 class="lh">${esc(T('papers'))} <span class="muted small">(${papers.length})</span></h2>
+      <div class="checks" id="evlist">${papers.map((e) => checkRow(e, iss, must.has(e.id))).join('')}</div>
+      <p class="muted small" style="margin-top:10px">${esc(T('worry'))}</p>
+      ${infos.map((x) => `<div class="banner info">${ic('info')}<div><p>${esc(G(iss, 'info' + iss.info.indexOf(x), x.text))}</p></div></div>`).join('')}
+      ${standCard(iss, papers, have)}
+      ${deepLeft ? `<button class="deeper noprint" data-act="deep"><span><b>${esc(T('better'))}</b>${esc(T('more', { n: deepN }))}</span>${ic('chev', 24)}</button>` : ''}
+      <div class="panel noprint">
+        <div class="row"><button class="btn go big" data-act="print">${ic('file', 20)} ${esc(T('print'))}</button><button class="btn line" data-go="report">${esc(T('makepage'))}</button></div>
+        <p class="small muted" id="printhint" hidden style="margin:6px 0 0">Browser menu → Print, or Ctrl+P.</p>
         <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
         <label class="check"><input type="checkbox" data-act="savetoggle" ${saveOn ? 'checked' : ''}> ${esc(T('save'))}</label>
         <div class="row" style="margin-top:6px"><button class="btn text" data-go="answers">${esc(T('change'))}</button><button class="btn text" data-act="clear">${esc(T('delall'))}</button></div>
       </div>
     </div>`, { inJourney: true });
   }
+  function checkRow(e, iss, flagged) {
+    const on = S.status[e.id] === 'have'; const g = (k, en) => G(iss, e.id + k, en);
+    const more = [e.where && g('.wh', e.where), e.preserve && g('.p', e.preserve), e.limit && g('.l', e.limit)].filter(Boolean);
+    return `<div class="crow ${on ? 'on' : ''} ${e.action ? 'act' : ''}" id="ev-${e.id}">
+      <button class="cbox" data-status="have" data-ev="${e.id}" role="checkbox" aria-checked="${on}" aria-label="${esc(g('.n', e.name))}">${on ? ic('check', 18) : ''}</button>
+      <div class="cbody"><h3>${flagged ? '★ ' : ''}${esc(g('.n', e.name))}</h3>
+        <p class="w">${esc(g('.y', e.why))}</p>
+        ${e.time ? `<p class="ctime">${ic('alert', 15)} ${esc(g('.tm', e.time))}</p>` : ''}
+        ${more.length ? `<details class="noprint"><summary>${esc(T('where'))}</summary>${more.map((m) => `<p>${esc(m)}</p>`).join('')}</details>` : ''}
+      </div></div>`;
+  }
+  function evCard(e, flagged, iss) { return checkRow(e, iss || issue(), flagged); }
+
   function standCard(iss, items, have) {
     const st = E.stand(iss, S.answers);
     const rows = { good: [], risk: [], next: [] };
@@ -4019,60 +4087,6 @@ ${JSON.stringify(map)}`;
     const sec = (k, icon) => rows[k].length ? `<div class="srow s-${k}"><span class="sic">${ic(icon, 18)}</span><div><b>${esc(T('k_' + k))}</b><ul>${rows[k].map((t) => `<li>${esc(t)}</li>`).join('')}</ul></div></div>` : '';
     return `<section class="standcard" aria-labelledby="standh"><h2 id="standh">${esc(T('stand'))}</h2>${sec('good', 'check')}${sec('risk', 'alert')}${sec('next', 'chev')}</section>`;
   }
-  function evCard(e, flagged, iss) {
-    iss = iss || issue();
-    const st = S.status[e.id]; const opts = e.action ? ACTION_ST() : STATUSES(); const recs = S.records[e.id] || [];
-    const justStamped = S._stamp === e.id;
-    const g = (k, en) => G(iss, e.id + k, en);
-    return `<article class="ev ${flagged ? 'flag' : ''} ${st ? 'st-' + st : ''}" id="ev-${e.id}">
-      ${st === 'have' ? `<span class="instamp ${justStamped ? 'pop' : ''}">${esc(T('gotit'))}</span>` : ''}
-      <h3>${esc(g('.n', e.name))}</h3>
-      <div class="tags">${flagged ? '<span class="tag adv">★</span>' : ''}${e.time ? `<span class="tag time">${esc(T('urgent'))}</span>` : ''}</div>
-      <p class="w">${esc(g('.y', e.why))}</p>
-      <details><summary>${esc(T('where'))}</summary><dl>
-        ${e.where ? `<dd>${esc(g('.wh', e.where))}</dd>` : ''}
-        ${e.preserve ? `<dd>${esc(g('.p', e.preserve))}</dd>` : ''}
-        ${e.time ? `<dd><b>${esc(g('.tm', e.time))}</b></dd>` : ''}
-        ${e.limit ? `<dd>${esc(g('.l', e.limit))}</dd>` : ''}
-      </dl></details>
-      <div class="sts" role="group" aria-label="${esc(g('.n', e.name))}">${opts.map(([k, l]) => `<button class="sbtn" data-status="${k}" data-ev="${e.id}" aria-pressed="${st === k}">${esc(l)}</button>`).join('')}</div>
-      ${st === 'have' && !e.action ? `<div class="records">
-        ${recs.map((r, i) => `<div class="rec"><span>${esc(r.label)}${r.date ? ', ' + esc(r.date) : ''}${r.pages ? ', ' + esc(r.pages) + ' p.' : ''}</span><button class="btn text" data-delrec="${e.id}:${i}" aria-label="Remove">✕</button></div>`).join('')}
-        <form class="recform" data-addrec="${e.id}">
-          <label class="f full">✎<input class="t" name="label" required maxlength="120" placeholder="e.g. SBI bank statement, May 2026"></label>
-          <label class="f">📅<input class="t" name="date" maxlength="40" placeholder="12 Jan 2026"></label>
-          <label class="f">#<input class="t" name="pages" inputmode="numeric" maxlength="4" placeholder="3"></label>
-          <button class="btn line" type="submit">+</button>
-        </form></div>` : ''}
-    </article>`;
-  }
-
-  function viewAnswers() {
-    const iss = issue(); const qs = iss.questions.filter((q) => S.answers[q.id] != null || S.skipped[q.id]);
-    return shell(`<div class="wrap narrow" style="padding:20px 0 40px"><button class="btn text" data-go="list">${ic('back', 18)} Your file</button>
-      <h1 style="font-size:clamp(28px,5vw,42px);margin:8px 0 10px">Your answers</h1>
-      <p class="muted">Change any answer. Questions that depend on it will be asked again. Documents you named are kept.</p>
-      <div class="grid">${qs.map((q) => `<div class="helpcard" style="justify-content:space-between;align-items:center"><div><p class="small muted" style="margin:0">${esc(q.text)}</p><p style="margin:2px 0 0;font-weight:700">${S.skipped[q.id] ? '<span class="muted">Skipped</span>' : esc(answerText(q, S.answers[q.id]))}</p></div><button class="btn line" data-act="change" data-q="${q.id}">Change</button></div>`).join('') || '<p class="muted">No answers yet.</p>'}</div>
-    </div>`, { inJourney: true });
-  }
-
-  function viewTimeline() {
-    const items = [...S.chrono].sort((a, b) => (a.date || '9999').localeCompare(b.date || '9999'));
-    return shell(`<div class="wrap narrow" style="padding:20px 0 40px"><button class="btn text" data-go="list">${ic('back', 18)} Your file</button>
-      <h1 style="font-size:clamp(28px,5vw,42px);margin:8px 0 10px">Your timeline</h1>
-      <p class="muted">List the main events in your own words. Approximate dates are fine — mark them.</p>
-      ${items.length ? `<ol class="tl">${items.map((t) => `<li><div class="d">${t.date ? esc(fmtDate(t.date)) + (t.approx ? ' (approx.)' : '') : 'Date unknown'}</div><div>${esc(t.text)}</div><button class="btn text small" data-delchrono="${t.id}">Remove</button></li>`).join('')}</ol>` : '<p class="panel muted">No events yet. Add the first one below.</p>'}
-      <form class="panel" id="chronoform">
-        <h2>Add an event</h2>
-        <div class="grid" style="grid-template-columns:1fr 1fr;align-items:end"><label class="f">Date<input class="t" type="date" name="date" max="${today()}"></label><label class="check"><input type="checkbox" name="approx"> Approximate</label></div>
-        <label class="f" style="margin-top:10px">What happened?<textarea class="t" name="text" rows="2" maxlength="300" required placeholder="e.g. Paid ₹40,000 deposit by UPI"></textarea></label>
-        <p class="small muted">Stick to what happened. Leave out private details you don't need.</p>
-        <button class="btn go" type="submit">Add to timeline</button>
-      </form>
-      <div class="row" style="margin-top:18px"><button class="btn go" data-go="report">${ic('file', 18)} Make my lawyer page</button></div>
-    </div>`, { inJourney: true });
-  }
-
   /* ============ REPORT ============ */
   const INSTRUCTION = 'Arrange the documents in the order shown in this preparation report. Keep related pages together, preserve original records, and make clear, complete copies. Where appropriate, add dates and page numbers so your advocate can review the materials and determine how they should be presented as annexures or exhibits in court. The final order, numbering, certification, format, admissibility and filing requirements must be confirmed by your advocate and the relevant court.';
   function reportData() {
@@ -4080,7 +4094,7 @@ ${JSON.stringify(map)}`;
     const shown = iss.questions.filter((q) => S.answers[q.id] != null && !(S.excludeSensitive && q.sensitive));
     const unresolved = iss.questions.filter((q) => E.applicable(q, S.answers) && (S.skipped[q.id] || (S.answers[q.id] && [].concat(S.answers[q.id]).includes('unsure'))));
     const by = (k) => items.filter((e) => (S.status[e.id] || '') === k);
-    const annex = []; items.forEach((e) => (S.status[e.id] === 'have' ? (S.records[e.id] || []) : []).forEach((r) => annex.push({ ...r, ev: e })));
+    const annex = []; items.forEach((e) => { if (S.status[e.id] !== 'have' || e.action) return; const rs = S.records[e.id] || []; (rs.length ? rs : [{ label: e.name }]).forEach((r) => annex.push({ ...r, ev: e })); });
     return { iss, shown, unresolved, have: by('have').filter((e) => !e.action), others: by('others'), missing: items.filter((e) => ['find', 'unsure', ''].includes(S.status[e.id] || '') && !e.action),
       todo: items.filter((e) => e.action && !['have', 'na'].includes(S.status[e.id])), annex, urgent: E.urgent(iss, S.answers).filter((u) => u.level !== 'info'), lqs: E.lawyerQs(iss, S.answers),
       chrono: [...S.chrono].sort((a, b) => (a.date || '9999').localeCompare(b.date || '9999')) };
@@ -4261,7 +4275,6 @@ ${JSON.stringify(map)}`;
       const qq = issue().questions.find((x) => x.id === form.dataset.q);
       form.addEventListener('change', (e) => { if (e.target.name === 'a') { form.classList.add('picked'); setTimeout(() => answer(qq, e.target.value), 220); } });
       form.addEventListener('submit', (e) => e.preventDefault());
-      if (S._fly) { const f = S._fly; S._fly = null; requestAnimationFrame(() => flyToTray(f)); }
     }
     const cf = document.getElementById('chronoform');
     if (cf) cf.addEventListener('submit', (e) => { e.preventDefault(); const f = new FormData(cf); S.chrono.push({ id: Date.now().toString(36), date: f.get('date') || '', approx: !!f.get('approx'), text: String(f.get('text')).trim() }); persist(); render(); announce('Event added'); });
@@ -4305,7 +4318,7 @@ ${JSON.stringify(map)}`;
     if (t.dataset.ex) { const m = document.getElementById('matter'); m.value = t.dataset.ex; renderResults(m.value); m.focus(); return; }
     if (t.dataset.copy) { try { await navigator.clipboard.writeText(t.dataset.copy); toast('Copied'); } catch (err) { toast('Copy blocked — select and copy manually'); } return; }
     if (t.dataset.mf) { UI.mf.ans = t.dataset.mf === 'fact'; const m = KB.myths[UI.mf.order[UI.mf.i]]; if (UI.mf.ans === m.fact) UI.mf.score++; render(); document.querySelector('.mfresult')?.focus?.(); return; }
-    if (t.dataset.status) { const id = t.dataset.ev; const nv = S.status[id] === t.dataset.status ? undefined : t.dataset.status; if (nv) S.status[id] = nv; else delete S.status[id]; if (nv === 'have') S._stamp = id; persist(); rerenderList('ev-' + id, nv === 'have' ? 'input[name=label]' : '[aria-pressed=true]'); return; }
+    if (t.dataset.status) { const id = t.dataset.ev; const nv = S.status[id] === t.dataset.status ? undefined : t.dataset.status; if (nv) S.status[id] = nv; else delete S.status[id]; if (nv === 'have') S._stamp = id; persist(); rerenderList('ev-' + id, '.cbox'); return; }
     if (t.dataset.delrec) { const [id, i] = t.dataset.delrec.split(':'); S.records[id].splice(Number(i), 1); persist(); rerenderList('ev-' + id, 'input[name=label]'); return; }
     if (t.dataset.delchrono) { S.chrono = S.chrono.filter((c) => c.id !== t.dataset.delchrono); persist(); render(); return; }
     const iss = issue();

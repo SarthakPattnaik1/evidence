@@ -26,8 +26,9 @@ const url = 'file://' + require('path').resolve(__dirname, '../build/index.html'
     await p.click('[data-act=ackurgent]'); await p.waitForTimeout(250);
     for (let i = 0; i < 10 && await p.locator('#qform').count(); i++) { await p.keyboard.press('1'); await p.waitForTimeout(550); }
     if (!(await p.locator('#evlist').count())) errs.push(n + ' did not land on list');
-    await p.click('#ev-cb_e_cheque [data-status=have]'); await p.waitForTimeout(150);
-    await p.fill('#ev-cb_e_cheque input[name=label]', 'Cheque no. 004512, HDFC'); await p.click('#ev-cb_e_cheque button[type=submit]'); await p.waitForTimeout(150);
+    await p.click('#ev-cb_e_cheque .cbox'); await p.waitForTimeout(150);
+    if (await p.getAttribute('#ev-cb_e_cheque .cbox', 'aria-checked') !== 'true') errs.push(n + ' tick did not stick');
+    if (await p.locator('.tray').count()) errs.push(n + ' tray should be gone');
     await shot(p, n + '-list', true);
     await p.goto(url + '#report'); await p.waitForTimeout(200);
     if (!(await p.textContent('#report')).includes('A-1')) errs.push(n + ' no annex');
@@ -40,7 +41,10 @@ const url = 'file://' + require('path').resolve(__dirname, '../build/index.html'
     await lp.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: css }));
     await lp.addInitScript(() => { window.claude = { use: async () => ({ json: async (prompt) => { const m = JSON.parse(prompt.slice(prompt.indexOf('\n\n{') + 2)); const o = {}; for (const k in m) o[k] = '᱕ ' + m[k]; return o; } }) }; });
     await lp.goto(url); await lp.waitForTimeout(300);
-    await lp.click('.lchip[data-lang=hi]'); await lp.waitForTimeout(200);
+    const shape = () => lp.evaluate(() => [...document.querySelectorAll('.tile')].map((t) => t.children.length).join(',') + '|' + document.querySelectorAll('.slipchip').length);
+    const enShape = await shape();
+    await lp.click('.lchip[data-lang=hi]'); await lp.waitForTimeout(600);
+    if (await shape() !== enShape) errs.push('hi: home layout differs from English');
     if (!/[ऀ-ॿ]/.test(await lp.textContent('.band h1'))) errs.push('hi: heading not Hindi');
     await shot(lp, 'm-home-hi', true);
     await lp.click('.tile >> nth=0'); await lp.waitForTimeout(600);
@@ -69,12 +73,11 @@ const url = 'file://' + require('path').resolve(__dirname, '../build/index.html'
     for (let i = 0; i < 25; i++) {
       if (await p.locator('[data-act=ackurgent]').count()) { await p.click('[data-act=ackurgent]'); await p.waitForTimeout(100); continue; }
       if (!(await p.locator('#qform').count())) break;
-      if (await p.locator('.trayin').count() === 0) errs.push(id + ' no tray');
       await p.click('.opt >> nth=0'); await p.waitForTimeout(330);
     }
     if (await p.locator('[data-act=deep]').count()) { await p.click('[data-act=deep]'); await p.waitForTimeout(120);
       for (let i = 0; i < 25 && await p.locator('#qform').count(); i++) { if (await p.locator('[data-act=ackurgent]').count()) { await p.click('[data-act=ackurgent]'); await p.waitForTimeout(100); continue; } await p.click('.opt >> nth=-1'); await p.waitForTimeout(330); } }
-    const n = await p.locator('.ev').count(); const ow = await p.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+    const n = await p.locator('.crow').count(); const ow = await p.evaluate(() => document.documentElement.scrollWidth - innerWidth);
     if (n < 3 || ow > 1) errs.push(`${id}: ev=${n} overflow=${ow}`);
     await p.evaluate(() => { location.hash = 'home'; });
   }
