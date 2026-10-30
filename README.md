@@ -1,121 +1,147 @@
-# Saboot (formerly EvidenceReady)
+# Saboot
 
-**Going to a lawyer? Know what to bring.**
+**Walk into your lawyer’s office ready.**
 
-A free, open-source preparation tool for people in India facing a legal problem. Users pick what happened, answer short game-like chapters of questions, and build a case file: the records to collect, where to find them lawfully, the dates that matter, and questions for their advocate. It ends with a printable lawyer preparation pack and a provisional annexure index built only from documents the user has actually named.
+Saboot (सबूत, “proof”) is a free tool for people in India facing a legal problem. You say what happened — by tapping, typing or speaking, in English or any of the 22 scheduled Indian languages — answer a few simple questions, and get a personal list of the papers to carry to your advocate: what each one proves, where to get it lawfully, how to keep it safe, and the deadlines that matter.
 
-> **Status: draft content.** None of the legal content has yet been reviewed by a practising advocate. Do not present it to the public as verified legal guidance.
+Made by [Sarthak Pattnaik](https://www.linkedin.com/in/sarthakad) and [Subhankar Das](https://www.linkedin.com/in/subhankar-das-311030b1/).
 
-## What's in it
+Live: https://evidence-orpin.vercel.app
 
-- **66 guided problems** with branching questions, chosen from what most often reaches Indian courts and Lok Adalats (cheque bounce, matrimonial, motor accident, traffic challans, bank recovery, electricity), the National Consumer Helpline (e-commerce, durables, banking, telecom, travel), the RBI Ombudsman (loans and credit cards lead) and NCRB cyber-crime data (fraud is 72.6% of cyber cases; "digital arrest" scams hit a record in 2024).
-- **Where you stand**: after the quick questions, each guide shows what helps you, what to watch out for, and the usual next step.
-- **23 languages**: English plus all 22 scheduled languages; 16 with a hand-written interface, the rest and all guide text machine-translated live and labelled.
-  - Money & banking: cheque bounce (both sides), loan/EMI recovery and SARFAESI, credit cards, CIBIL errors, UPI/online fraud, frozen accounts, failed payments
-  - Family: divorce, maintenance, domestic violence, child custody, dowry/498A (both sides), inheritance and partition
-  - Shopping & services: refunds, defective products, insurance claims, builder delays
-  - NRI: property abroad, sale & repatriation, power of attorney from abroad, NRI marriage disputes (both sides), running a case from abroad, NRI bank/tax issues
-  - Business & company: unpaid invoices (MSME council, commercial suit, insolvency), shareholder/director disputes, partnership/LLP, commercial contracts, brand copying and trade secrets
-  - Home & land, police & notices, work, accidents, online harassment, money lent
-- **General preparation route** for other problems (clearly labelled)
-- **Legal questions hub** — 52 answer-first explainers with "what can change the answer" and the governing law
-- **Myth or fact** — 22-card rights quiz
-- **Advocate links** — advocates can send clients a guide with flagged records and a note (no client data in the link)
-- **Urgent routing** — help-first screens for danger, fresh fraud, cheque deadlines, custody/arrest
-- **Privacy** — no login, no uploads, no server; answers stay in the browser tab unless the user opts in to local saving
+> **Status: draft content.** No guide has yet been reviewed by a practising advocate. Each guide says so until a review is recorded in `src/reviews.js`. Saboot is a preparation tool — it is not legal advice, does not recommend advocates, and takes no fees.
+
+---
+
+## What it does
+
+- **85 legal situations** across 11 areas — money & banking (12), family (11), police & notices (11), home & land (9), work (8), young people & students (7), shopping & services (7), online & other (7), NRI (6), business (5), accidents (3) — plus a general route for anything else.
+  Chosen from real demand: LawRato question volumes (property, divorce, criminal, family, service matters lead), Tele-Law case categories (government entitlements are the largest), National Consumer Helpline sectors, RBI Ombudsman and NCRP cyber-crime data.
+- **Short branching questions → a printable list of papers**, with “where you stand” notes (what helps, what to watch, the usual next step), urgent warnings, and questions to ask the advocate.
+- **Voice input in all 23 languages.** Tap the mic and describe the problem in your own words.
+- **Search that understands how people actually write**: English, Hinglish (“kabza”, “udhaar wapas nahi”), and native scripts (“मेरा फोन चोरी हो गया”, “ମୋ ଜମି ଦଖଲ”).
+- **23 languages**: English plus all 22 scheduled languages.
+- **Help first**: 112, 1930 and 15100 are one tap away; sensitive guides (domestic violence, sexual assault, caste atrocity, missing person, trafficking) have a quick-exit button.
+- **Legal questions hub** (52 plain-language answers), **Myth or fact** quiz (22 cards), WhatsApp share, “report a mistake”, and an advocate link that sends a client a guide without any client data.
+- **Every guide shows its official sources** and the date its law was last checked.
+
+### Guides added in October 2026 (from search testing)
+
+Neighbour disputes · housing society / RWA · land records and mutation (khata, 7/12, jamabandi, patta) · will, gift deed and release deed · adoption and guardianship · government job and pension · injury at work · assault, threats and extortion · defamation · lost or stolen phone and documents · missing person · sexual assault and POCSO · caste abuse (SC/ST Atrocities Act) · bonded labour, trafficking and child labour · vehicle RC transfer · dog bite · name and document correction · government benefits and RTI · income tax and GST notices · land acquisition.
+
+## Privacy
+
+- No login, no uploads, no tracking cookies. **Answers to the questions are never sent to the server** — they stay in the browser tab unless the user chooses to save them on the device.
+- **Voice and non-English searches** are the one exception: the recording or the typed search text is sent through `/api/voice` to Google Gemini only to turn it into text and a short English meaning. It is not stored and not linked to anyone. In English, the browser’s own speech recognition is used where available. This is stated on `/privacy` and in the app.
+- Analytics are anonymous and aggregate (see *Admin* below). Do Not Track is honoured.
 
 ## Project layout
 
 ```
 src/
-  kb.js          help directory, categories, original 9 guides, general route, directory
-  j-money.js     cheque bounce, loan recovery, credit card, credit report
+  kb.js          help directory, categories, first guides, general route, engine helpers
+  j-money.js     cheque bounce, loan recovery, credit cards, credit report
   j-family.js    domestic violence, custody, dowry/498A, inheritance
-  j-consumer.js  defective product, insurance claim, builder delay
+  j-consumer.js  defective products, insurance, builder delay
+  j-other.js     eviction, encroachment, termination, POSH, FIR, arrest, legal notice, road accident, online harassment
   j-nri.js       NRI guides
   j-business.js  business and company guides
-  j-more.js      high-search gaps: scams, loan apps, e-commerce, travel, telecom, bank service, challans, electricity,
-                 court marriage, senior citizens, death claims, property purchase, PF/gratuity, medical, education
-  j-genz.js      young people & students: leaked/deepfake photos, hacked accounts, gaming/betting, internships &
-                 creator pay, ragging, live-in, trans & queer rights, police stops, gig workers
-  stand.js       "Where you stand" situation checks for existing guides
-  i18n.js        23 languages: UI strings and language metadata
-  j-other.js     eviction, encroachment, termination, POSH, FIR, arrest, legal notice, road accident, online harassment
+  j-more.js      scams, loan apps, e-commerce, travel, telecom, bank service, challans, electricity, court marriage,
+                 senior citizens, death claims, property purchase, PF/gratuity, medical, education
+  j-genz.js      young people: leaked/deepfake photos, hacked accounts, betting, internships, ragging, live-in,
+                 trans & queer rights, police stops, gig workers
+  j-gaps.js      the 20 guides found missing by search testing, plus search words for existing guides
+  stand.js       “where you stand” checks
+  law-2026.js    2025–26 law changes and official sources per guide (CHECKED date)
+  reviews.js     advocate reviews (empty until a guide is reviewed)
   qa.js          legal questions and myth/fact cards
-  engine.js      deterministic interview engine (pure functions)
-  app.js         UI
-  style.css      "case file" visual system
+  i18n.js        23 languages: interface strings and language metadata
+  engine.js      interview engine and search (stemming, Hindi/Hinglish dictionary, rare-word weighting)
+  app.js         UI, voice input
+  style.css      visual system
+  brand.js       logo and hero illustration (inlined)
   shell.html     page template
-build.py         inlines everything into build/index.html (single self-contained file)
-test/test.js     knowledge-base invariants + random-walk branch tests
-test/e2e.js      Playwright walk-through of every guide (mobile + desktop)
+  static/        icons, logo, share image, admin page
+  tr/            pre-translated app text per language
+api/
+  translate.js   guide translation (Bhashini → Gemini → Anthropic), allow-listed to the app’s own text
+  voice.js       voice transcription and non-English search meaning (Gemini); nothing stored
+  e.js           anonymous analytics events
+  admin.js       admin login and stats
+  health.js      setup check
+  _lib.js        storage (Supabase or Upstash) and helpers
+supabase/schema.sql   tables and functions for analytics and the translation cache
+tools/site.py         static pages: /guide/<id>, /privacy, /terms, 404, sitemap, manifest, service worker
+build.py              inlines everything into build/index.html and runs tools/site.py
 ```
 
 ## Build and test
 
 ```bash
-python3 build.py            # writes build/index.html
-node test/test.js           # content and engine checks
-node test/e2e.js            # needs Playwright + Chromium
+python3 build.py                 # writes build/ (index.html + 89 static pages)
+node test/test.js                # ~110,000 content and engine checks (random walks through every guide)
+node test/search.js              # 537 real-world searches must find the right guide (fails below 97% top-3)
+
+# browser tests (Playwright + Chromium); start the local server first:
+FAKE_TRANSLATE=50 node test/devserver.js &
+node test/e2e.js                 # walks all 86 journeys on mobile
+node test/voice.js               # fake microphone: Hindi voice, typed Hindi/Odia, 320px, permission denied
+node test/nav.js
+node test/analytics.js
 ```
 
-Open `build/index.html` in a browser — it runs fully offline.
+`test/devserver.js` serves `build/`, runs `api/*.js`, fakes Upstash (or a local Postgres for Supabase with `STORE=supabase`) and, with `FAKE_TRANSLATE`, fakes Gemini for translation and voice.
+
+### Search coverage
+
+`test/search/` holds four query sets in English and Hinglish: the tuning set, a hold-out set, and two sets written blind after tuning. Current result: right guide in the top 3 for 100%, first for 96%. On wording never seen before, expect roughly 86–90% — add misses from `/admin` (“Searched for → no guide found”) to the guides’ `synonyms` and to `test/search/`.
+
+## Deploy (Vercel)
+
+Connected to this repo; every push to `main` deploys. `vercel.json` sets security headers, allows the microphone for the site itself, and keeps `sw.js` uncached.
+
+Environment variables (Vercel → Project → Settings → Environment Variables), then redeploy:
+
+| Purpose | Variables | Notes |
+|---|---|---|
+| Translation + voice | `GEMINI_API_KEY` | Free at aistudio.google.com. Used by `/api/translate` and `/api/voice`. Optional `GEMINI_MODEL`, `GEMINI_VOICE_MODEL`. |
+| Translation (Govt of India, free) | `BHASHINI_USER_ID`, `BHASHINI_API_KEY` | Tried first for translation. bhashini.gov.in |
+| Analytics storage | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` **or** `KV_REST_API_URL`, `KV_REST_API_TOKEN` | For Supabase, run `supabase/schema.sql` once in the SQL Editor. |
+| Admin | `ADMIN_PASSWORD` (required), `ADMIN_USER` (default `admin`), `ADMIN_SECRET` | |
+
+Checks after deploying:
+- `/api/health` — everything should be `true`.
+- `/api/translate?check=hi` — tests translation end to end.
+- `/api/voice` — returns `{"ok":true}` when voice is available.
+
+**Quota:** each voice search and each non-English typed search is one Gemini call. On the free tier, heavy use can hit the daily limit; the app then asks people to type. Add billing or Bhashini ASR if usage grows.
+
+## Pre-translated text
+
+The GitHub Action **Pre-translate app text** translates all ~5,000 app strings into the 22 languages and commits them to `src/tr/<lang>.json`, so languages load instantly and keep working when the free quota runs out.
+
+1. GitHub → Settings → Secrets and variables → Actions → add `GEMINI_API_KEY`.
+2. Actions → *Pre-translate app text* → Run workflow. It saves after every batch and re-runs daily until done.
+
+The app uses the pre-translated file first, then the shared cache, then live translation for anything new (including newly added guides).
+
+## Admin analytics (`/admin`)
+
+Password-protected dashboard (small “Admin” link at the bottom right of the home page). Shows visitors and visits, the journey from opening a guide to printing a list, where people stop, languages, translation failures, microphone use, helpline taps, urgent warnings shown, searches with no match, traffic sources, devices, reported mistakes, law freshness per guide, advocate review status and browser errors.
+
+No answers, names or dates are ever collected. No cookies on the public site, no IPs stored; unique visitors use a hash with a daily-rotating salt. Search text is scrubbed of numbers, emails and links, and only the latest 1,000 are kept.
 
 ## Content rules
 
 - Conditions reference stable question/option IDs, never display text.
-- Every evidence item states the fact it helps show, why, where to find it lawfully, how to preserve it, limits and time-sensitivity.
-- No case-strength scores, no win predictions. Missing records never block a user from seeing an advocate.
-- Before publishing a guide: review by a qualified advocate, recorded with name, date and version.
-
-## Licence
-
-Not yet chosen. Suggested: MIT/Apache-2.0 for code, CC BY-SA 4.0 for legal content.
-
-## Translation on the live site (free)
-
-17 languages ship with built-in interface text. Guide content in all 22 non-English languages is translated on demand by `api/translate.js`, which uses free providers. Add one or both in Vercel → Project → Settings → Environment Variables, then redeploy:
-
-| Provider | Cost | Variables | Where to get them |
-|---|---|---|---|
-| Bhashini (Govt of India, IndicTrans2) — tried first | Free | `BHASHINI_USER_ID`, `BHASHINI_API_KEY` | Register at bhashini.gov.in → profile → generate API key |
-| Google Gemini free tier (Flash) — fallback | Free, rate-limited | `GEMINI_API_KEY` (optional `GEMINI_MODEL`) | aistudio.google.com → Get API key |
-| Anthropic — optional | Paid | `ANTHROPIC_API_KEY` | console.anthropic.com |
-
-`GET /api/translate` shows which providers are active. Only text that exists in the app's own source is translated (checked against `api/_corpus.js`), so nobody can spend your quota on other text. Placeholders like `{n}` are protected. Translations are cached on the server instance and in each visitor's browser.
-
-With no keys set, the app uses Chrome's on-device translator where available, and otherwise shows guide content in English with a clear note.
-
-## Law updates
-
-`src/law-2026.js` holds the latest law changes and the official sources for every guide, with a "law checked" date shown in the app and on each `/guide/<id>` page. Update `CHECKED` there whenever you re-verify.
-
-## Static pages
-
-`build.py` also writes `/guide/<id>` pages (indexable by search engines), `/guide`, `/privacy`, `/terms`, `sitemap.xml`, `robots.txt`, a web app manifest and a network-first service worker.
-
-## Admin analytics (`/admin`)
-
-A private dashboard at `/admin` behind a password. It shows visitors, visits, the journey from opening a guide to printing a list, per-guide list rate and "where people stop" by question, languages, translation failures, helpline taps, urgent warnings shown, searches (no match / left without choosing / what they picked), traffic sources, states, devices, outbound official links, law freshness per guide, and browser errors.
-
-Set up once in Vercel — use **either** Supabase or Upstash for storage:
-1. **Supabase**: Vercel → Storage → Supabase (or add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` yourself), then in Supabase → SQL Editor run `supabase/schema.sql` once. **Or Upstash**: Vercel → Storage → Upstash for Redis (adds `KV_REST_API_URL`, `KV_REST_API_TOKEN`).
-2. **Settings → Environment Variables**: `ADMIN_PASSWORD` (long and unique), optionally `ADMIN_USER` (default `admin`) and `ADMIN_SECRET` (any long random string; signs the login session).
-3. Redeploy, then open `/api/health` to confirm everything shows `true`, and `/admin` to sign in.
-
-Privacy by design: answers, notes, names and dates are never sent. No cookies on the public site, no IP stored; unique visitors use a hash with a daily-rotating salt. Search text is scrubbed of numbers, emails and links and only the latest 1,000 are kept. Do Not Track is honoured. Daily counters expire after 400 days.
-
-Local test: `node test/devserver.js` (fake Redis, password `test-pass-123`), then `node test/analytics.js`.
-
-## Pre-translated text (recommended)
-
-Runtime translation depends on Gemini's free quota. To make every language load instantly and work even when the quota runs out, the GitHub Action **Pre-translate app text** translates all ~5,000 app strings into all 22 languages and commits them to `src/tr/<lang>.json` (served as `/tr/<lang>.json`).
-
-1. GitHub → repo → Settings → Secrets and variables → Actions → New repository secret: `GEMINI_API_KEY`.
-2. Actions → *Pre-translate app text* → Run workflow. It saves progress after every batch and runs again daily until all languages are done (the free quota is per day).
-
-The app uses the pre-translated file first, then the shared Supabase cache, then live Gemini for anything new.
+- Every paper states the fact it helps show, why it matters, where to get it lawfully, and how to keep it safe.
+- No case-strength scores, no win predictions. Missing papers never stop someone from seeing an advocate.
+- Every guide lists official sources; re-verify and update `CHECKED` in `src/law-2026.js`.
+- No advocate is recommended or advertised (Bar Council of India Rule 36). Makers are credited only as makers.
 
 ## Advocate reviews
 
-When an advocate reviews a guide, add them to `src/reviews.js` (name, enrolment number, date). The guide then shows "Reviewed by …" instead of "Draft", on the app and on its `/guide/<id>` page, and `/admin` tracks how many guides are reviewed.
+When an advocate reviews a guide, add them to `src/reviews.js` (name, enrolment number, date). The guide then shows “Reviewed by …” instead of “Draft” in the app and on its `/guide/<id>` page, and `/admin` tracks progress. Suggested first: UPI fraud, cheque bounce, divorce, maintenance, domestic violence, FIR, property, salary, sexual assault, caste atrocity, missing person.
+
+## Licence
+
+Not yet chosen. Suggested: MIT or Apache-2.0 for code, CC BY-SA 4.0 for legal content.
