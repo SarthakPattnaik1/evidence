@@ -984,3 +984,24 @@ body.consenting{overflow:hidden}
 .carryhead .fh b{color:#6B4700}
 .dialog .btn.wa,.btn.wa{background:#0E7A3D;color:#fff;border-color:#0E7A3D}
 .dialog .btn.wa:hover,.btn.wa:hover{background:#0B6633}
+/* v32 time limit card */
+.lim{margin:14px 0 18px;padding:16px 16px 12px;border-radius:18px;background:#fff;border:1px solid var(--line);box-shadow:var(--sh1);border-left:6px solid var(--go)}
+.lim.soon{border-left-color:var(--amber)}.lim.edge,.lim.past{border-left-color:var(--tape)}.lim.unknown{border-left-color:#8A97A8}
+.lim .limtop{display:flex;gap:10px;align-items:flex-start}.lim .limtop svg{flex:none;margin-top:3px;color:var(--go)}
+.lim.soon .limtop svg{color:#9A6410}.lim.edge .limtop svg,.lim.past .limtop svg{color:var(--tape)}
+.lim .kick{margin:0;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lim h2{font-size:21px;margin:2px 0 0;line-height:1.2}
+.lim .lline{margin:8px 0 6px;font-weight:600}
+.lim .lrule{margin:10px 0 4px;color:var(--ink2);font-size:15px}
+.lim .ltips{margin:8px 0;padding-left:20px;font-size:15px}.lim .ltips li{margin:5px 0}
+.lim .lgood{display:flex;gap:6px;align-items:flex-start;background:var(--go-l);color:var(--go-d);border-radius:10px;padding:8px 10px;margin:8px 0;font-size:15px}.lim .lgood svg{flex:none;margin-top:3px}
+.ltl{margin:12px 0 2px}.ltl .track{position:relative;height:12px;border-radius:99px;background:linear-gradient(90deg,#E4F0E8 0 60%,#FBF0D9 60% 85%,#F7E4DE 85% 100%);overflow:visible}
+.ltl .lband{display:block;position:absolute;top:0;height:12px;border-radius:99px;background:repeating-linear-gradient(135deg,rgba(19,41,74,.75) 0 4px,rgba(19,41,74,.45) 4px 8px);max-width:100%}
+.ltl .now{display:block;position:absolute;top:-6px;width:4px;height:24px;margin-left:-2px;border-radius:2px;background:var(--ink);box-shadow:0 0 0 2px #fff}
+.ltl .end{display:block;position:absolute;right:0;top:-6px;width:3px;height:24px;background:var(--tape);border-radius:2px}
+.ltl .lbls{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-top:6px}
+.ltl .here{margin:2px 0 0;font-size:13px;color:var(--ink2)}
+.lim .lexact{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:10px 0 4px;font-size:15px}
+.lim .lexact input{margin-left:6px;padding:6px 8px;border:1px solid var(--line);border-radius:10px;font:inherit;background:#fff}
+.lim details{margin-top:6px}.lim details summary{cursor:pointer;font-size:14px;font-weight:600;color:var(--go-d)}
+@media print{.lim{box-shadow:none;break-inside:avoid}}

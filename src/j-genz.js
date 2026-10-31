@@ -123,7 +123,8 @@
       { id: 'ic_type', text: 'What is it about?', why: 'Interns, freelancers and new hires have different routes.', options: o([['intern', 'Internship stipend or certificate'], ['freelance', 'Freelance / client work'], ['creator', 'Brand deal / creator payment'], ['offer', 'Job offer revoked or joining delayed'], ['fee', 'I paid a fee for an internship or job']]) },
       { id: 'ic_written', text: 'What do you have in writing?', why: 'Written terms are the key proof.', options: o([['letter', 'Offer letter / contract'], ['emails', 'Emails or DMs agreeing the work and pay'], ['nothing', 'Almost nothing']]) },
       { id: 'ic_done', text: 'Did you complete the work or period?', when: NOT(W('ic_type', 'offer', 'fee')), why: 'Completed work is harder to deny.', options: o([['all', 'Yes, fully'], ['part', 'Partly'], ['no', 'No']]) },
-      { id: 'ic_amount', text: 'How much is owed?', why: 'Helps choose between a notice, consumer forum or suit.', options: o([['u50k', 'Under ₹50,000'], ['50to5', '₹50,000–₹5 lakh'], ['over5', 'Over ₹5 lakh']]) }
+      { id: 'ic_amount', text: 'How much is owed?', why: 'Helps choose between a notice, consumer forum or suit.', options: o([['u50k', 'Under ₹50,000'], ['50to5', '₹50,000–₹5 lakh'], ['over5', 'Over ₹5 lakh']]) },
+      { id: 'ic_when', text: 'When was the payment due?', when: W('ic_type', 'intern', 'freelance', 'creator'), why: 'A case to recover unpaid work must usually be filed within 3 years. We use this to show how much time you have.', options: o([['m6', 'In the last 6 months'], ['y1', '6 months to 1 year ago'], ['y2', '1 to 2 years ago'], ['y3', '2 to 3 years ago'], ['older', 'More than 3 years ago']]) }
     ],
     evidence: [
       { id: 'ic_e_terms', name: 'Offer letter, contract, or the emails/DMs where pay was agreed', fact: 'What was promised', why: 'The core of your claim.', where: 'Email, LinkedIn, Instagram DMs.', preserve: 'Screenshot with dates and usernames; export the chat.' },

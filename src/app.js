@@ -12,6 +12,7 @@
   /* ---------- icons ---------- */
   const P = {
     bell: '<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15Z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
+    hourglass: '<path d="M6 3h12M6 21h12M7 3c0 5 10 5 10 9s-10 4-10 9M17 3c0 5-10 5-10 9"/>',
     speaker: '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/>',
     pin: '<path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.3"/>',
     scale: '<path d="M12 4v16M7 20h10M5 7h14"/><path d="m5 7-2.5 6a3 3 0 0 0 5 0Zm14 0-2.5 6a3 3 0 0 0 5 0Z"/>',
@@ -63,7 +64,7 @@
 
   /* ---------- state ---------- */
   const blank = () => ({ issueId: null, topic: null, answers: {}, skipped: {}, stage: 'quick', history: [], quickDone: false, deepDone: false,
-    status: {}, records: {}, chrono: [], ackUrgent: {}, adv: null, excludeSensitive: true, notes: '', prefill: {}, chapterFound: [], breaks: 0 });
+    status: {}, records: {}, chrono: [], ackUrgent: {}, adv: null, excludeSensitive: true, notes: '', prefill: {}, chapterFound: [], breaks: 0, limDate: {} });
   let S = blank();
   const UI = { club: 'money', qcat: 'all', qsearch: '', mf: { i: 0, score: 0, ans: null, order: null } };
   let saveOn = false;
@@ -618,7 +619,7 @@ ${JSON.stringify(map)}`;
     const pr = E.progress(iss, S.answers, S.stage, S.skipped);
     const pct = Math.round((pr.done / Math.max(pr.total, 1)) * 100);
     const cur = S.answers[q.id] != null ? [].concat(S.answers[q.id])[0] : [].concat((S.prefill || {})[q.id] || [])[0];
-    const urg = E.urgent(iss, S.answers).filter((u) => u.level !== 'info');
+    const repl = LIM ? LIM.replaced(iss.id, S.answers) : []; const urg = E.urgent(iss, S.answers).filter((u) => u.level !== 'info' && !repl.includes(u.id));
     const first = S.stage === 'quick' && pr.done === 0;
     return shell(`<div class="wrap narrow qwrap">
       <div class="qtop"><button class="btn text" data-act="${S.history.length ? 'qback' : 'quit'}">${ic('back', 20)} ${esc(T('back'))}</button><span class="ptitle">${esc(S.topic ? S.topic.title : G(iss, 's', iss.short))}</span></div>
@@ -687,7 +688,7 @@ ${JSON.stringify(map)}`;
     const papers = items.filter((e) => !e.action).sort(order);
     const steps = items.filter((e) => e.action).sort(order);
     const have = papers.filter((e) => S.status[e.id] === 'have').length;
-    const urg = E.urgent(iss, S.answers); const infos = E.info(iss, S.answers);
+    const repl = LIM ? LIM.replaced(iss.id, S.answers) : []; const urg = E.urgent(iss, S.answers).filter((u) => !repl.includes(u.id)); const infos = E.info(iss, S.answers);
     const quickLeft = E.nextQuestion(iss, S.answers, 'quick', S.skipped);
     if (quickLeft) return viewQuiz();
     const deepLeft = E.nextQuestion(iss, S.answers, 'deep', S.skipped);
@@ -700,6 +701,7 @@ ${JSON.stringify(map)}`;
         <p class="fh">${esc(T('tickhave'))} <b>${have}/${papers.length}</b></p></div>
       ${trNote()}
       ${urg.map((u) => urgentBanner(u, iss)).join('')}
+      ${timeCard(iss)}
       ${steps.length ? `<h2 class="lh">${esc(T('dofirst'))}</h2><div class="checks">${steps.map((e) => checkRow(e, iss, must.has(e.id))).join('')}</div>` : ''}
       <h2 class="lh">${esc(T('papers'))} <span class="muted small">(${papers.length})</span></h2>
       <div class="checks" id="evlist">${papers.map((e) => checkRow(e, iss, must.has(e.id))).join('')}</div>
@@ -806,6 +808,7 @@ ${JSON.stringify(map)}`;
       ${S.notes ? `<p><b>In my own words:</b> ${esc(S.notes)}</p>` : ''}
       <h2>B. Chronology</h2>
       ${d.chrono.length ? `<table><thead><tr><th style="width:30%">Date</th><th>Event</th></tr></thead><tbody>${d.chrono.map((t) => `<tr><td>${t.date ? esc(fmtDate(t.date)) + (t.approx ? ' (approx.)' : '') : 'Unknown'}</td><td>${esc(t.text)}</td></tr>`).join('')}</tbody></table>` : '<p class="muted">No timeline entries yet.</p>'}
+      ${limReportHTML(iss)}
       <h2>C. Records I have</h2>${li(d.have, (e) => `<b>${esc(e.name)}</b>${(S.records[e.id] || []).length ? ': ' + S.records[e.id].map((r) => esc(r.label)).join('; ') : ' <span class="muted">(not named yet)</span>'}`)}
       <h2>D. Records still to find or check</h2>${li(d.missing, (e) => `${esc(e.name)} <span class="muted">(${esc(e.where || '')})</span>${e.time ? ' <b>Time-sensitive.</b>' : ''}`)}
       ${d.todo.length ? `<p><b>Steps not yet done:</b></p>${li(d.todo, (e) => esc(e.name))}` : ''}
@@ -983,6 +986,60 @@ ${JSON.stringify(map)}`;
 
   /* ============ NEXT STEPS: where to go, free lawyer, reminders, read aloud, follow-up ============ */
   // Where to go with the papers — official offices only, never an advocate (Bar Council rules).
+  /* ---------- time limit card (src/limits.js; law/limitation-act-1963.txt) ---------- */
+  const LIM = window.ER_LIM;
+  function spanText(m) { const [n, u] = LIM.span(m); return X('{n} ' + u).replace('{n}', String(n).replace('.5', '½')); }
+  function rangeText(a, b) {
+    if (b - a < 1 || spanText(a) === spanText(b)) return spanText(b);
+    if (a < 0.5) return X('up to {b}').replace('{b}', spanText(b));
+    const [na, ua] = LIM.span(a), [nb, ub] = LIM.span(b); const h = (n) => String(n).replace('.5', '½');
+    if (/^year/.test(ua) && /^year/.test(ub)) return X('{a} to {b} years').replace('{a}', h(na)).replace('{b}', h(nb));
+    if (/^month/.test(ua) && /^month/.test(ub)) return X('{a} to {b} months').replace('{a}', h(na)).replace('{b}', h(nb));
+    return X('{a} to {b}').replace('{a}', spanText(a)).replace('{b}', spanText(b));
+  }
+  const limFmt = (d) => d.toLocaleDateString(LBCP[LANG] || 'en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+  function limData(iss) { return LIM ? LIM.card(iss.id, S.answers, (S.limDate || {})[iss.id]) : null; }
+  function timeCard(iss) {
+    const c = limData(iss); if (!c) return '';
+    const r = c.rule; const per = spanText(c.months);
+    const HEAD = { ok: 'You have time', soon: 'Time is getting short', edge: 'You may be very close to the time limit', past: 'This may be past the usual time limit', unknown: 'Find the exact date' };
+    let line = ''; let head = HEAD[c.status];
+    if (c.restarted && (c.status === 'past' || c.status === 'edge')) { head = 'The time may have started again'; }
+    if (c.exact) {
+      line = c.status === 'past' ? X('The time ended around {d}.').replace('{d}', limFmt(c.exact.end))
+        : X('The time ends around {d} — {n} days from today.').replace('{d}', limFmt(c.exact.end)).replace('{n}', c.exact.leftDays);
+    } else if (c.status === 'ok') line = X('About {r} left.').replace('{r}', rangeText(c.left[0], c.left[1]));
+    else if (c.status === 'soon') line = X('About {r} left. See an advocate in the next few weeks.').replace('{r}', rangeText(c.left[0], c.left[1]));
+    else if (c.status === 'edge') line = X('You may have up to {r} left — or none. Find the exact date today.').replace('{r}', spanText(c.left[1]));
+    else if (c.status === 'past' && c.restarted) line = X('More than {p} have passed — but their payment or admission may have started the time again.').replace('{p}', per);
+    else if (c.status === 'past') line = X('Do not give up yet. Ask an advocate about these:');
+    else line = c.note ? X(c.note) : X('Look for anything that shows the date: a bank record, a message, a receipt.');
+    if (c.exact && c.status !== 'past' && c.status !== 'ok') line += ' ' + X('See an advocate well before then.');
+    const rule = X('The law gives {p} from {s} to file {w}.').replace('{p}', per).replace('{s}', X(r.start)).replace('{w}', X(r.what));
+    // timeline: band = elapsed range as a share of the period
+    const P = c.months, pc = (m) => Math.max(0, Math.min(100, (m / P) * 100));
+    const band = c.elapsed ? (c.exact ? `<i class="now" style="left:${pc(c.elapsed[0])}%"></i>` : (() => { const l = Math.min(pc(c.elapsed[0]), 96); return `<i class="lband" style="left:${l}%;width:${Math.max(4, pc(c.elapsed[1]) - l)}%"></i>`; })()) : '';
+    const bar = c.status === 'unknown' ? '' : `<div class="ltl" aria-hidden="true"><div class="track">${band}<b class="end"></b></div><div class="lbls"><span>${esc(X(r.startShort))}</span><span>${esc(X('{p} limit').replace('{p}', per))}</span></div><p class="here">${esc(c.exact ? X('Today') : c.status === 'past' ? X('You are past the end of this line') : X('You are somewhere in the shaded part'))}</p></div>`;
+    const tips = (c.status === 'past' || c.status === 'edge' || c.restarted) ? c.tips.filter((t) => !(c.restarted && /Section 1[89]/.test(t.s))) : c.tips.filter((t) => !t.s);
+    const max = (() => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); })();
+    const law = c.arts.map((a) => `<p class="small"><b>${esc(c.law)}, Schedule, Article ${a.n}</b><br><span lang="en">“${esc(a.d)}” — ${esc(a.p)} ${esc(X('Starts:'))} “${esc(a.s)}”</span></p>`).join('');
+    return `<section class="lim ${c.status}" aria-labelledby="limh">
+      <div class="limtop">${ic('hourglass', 22)}<div><p class="kick">${esc(X('Time limit'))}</p><h2 id="limh">${esc(X(head))}</h2></div></div>
+      <p class="lline">${esc(line)}</p>
+      ${bar}
+      <p class="lrule">${esc(rule)}</p>
+      ${c.restarted ? `<p class="lgood">${ic('check', 16)} ${esc(X(r.restart.t))}</p>` : ''}
+      ${tips.length ? `<ul class="ltips">${tips.map((t) => `<li>${esc(X(t.t))}${t.s ? ` <span class="muted">(${esc(t.s)})</span>` : ''}</li>`).join('')}</ul>` : ''}
+      <div class="lexact noprint"><label>${esc(X(c.exact ? 'Exact date' : 'Know the exact date?'))} <input type="date" id="limdate" max="${max}" value="${esc((S.limDate || {})[iss.id] || '')}" aria-describedby="limh"></label>
+        ${c.status !== 'past' ? `<button class="btn text sm" data-act="limremind">${ic('bell', 16)} ${esc(X('Remind me'))}</button>` : ''}</div>
+      <details class="noprint"><summary>${esc(X('The law behind this'))}</summary>${law}<p class="small muted">${esc(X('Courts count the exact days, and some cases allow more time. Where the law can be read two ways, we show the earlier date so you do not wait too long. Your advocate will confirm.'))}</p></details>
+    </section>`;
+  }
+  function limReportHTML(iss) {
+    const c = limData(iss); if (!c) return '';
+    const q = iss.questions.find((x) => x.id === c.rule.q);
+    return `<h2>Time limit (guide only)</h2><p>${esc(c.law)}, Schedule, Article ${c.arts.map((a) => a.n).join(' / ')}: ${esc(spanText(c.months))} from ${esc(c.rule.start)}. Client's answer: <b>${esc(q ? answerText(q, S.answers[q.id]) : '')}</b>${c.exact ? `; exact date given: <b>${esc(limFmt(c.exact.start))}</b> (period ends around ${esc(limFmt(c.exact.end))})` : ''}.${c.restarted ? ' Client reports a part-payment or acknowledgement (ss. 18–19 may apply).' : ''} Please verify.</p>`;
+  }
   function whereBox(iss) {
     const w = iss.where || []; if (!w.length) return '';
     const row = (x) => `<li>${x.u ? `<a href="${esc(x.u)}" target="_blank" rel="noopener">${esc(X(x.t))}</a>` : esc(X(x.t))}</li>`;
@@ -1029,11 +1086,11 @@ ${JSON.stringify(map)}`;
 
   const LBCP = { en: 'en-IN', hi: 'hi-IN', bn: 'bn-IN', te: 'te-IN', mr: 'mr-IN', ta: 'ta-IN', ur: 'ur-IN', gu: 'gu-IN', kn: 'kn-IN', or: 'or-IN', ml: 'ml-IN', pa: 'pa-IN', as: 'as-IN', ne: 'ne-NP', mai: 'hi-IN', doi: 'hi-IN', kok: 'mr-IN', sa: 'hi-IN', brx: 'hi-IN', ks: 'ur-IN', sd: 'ur-IN', sat: 'hi-IN', mni: 'bn-IN' };
   // Deadline reminder: add to the phone's calendar (.ics) or send to their own WhatsApp.
-  function showRemind(u, iss) {
+  function showRemind(u, iss, pre) {
     const title = G(iss, u.id + '.t', u.title), text = G(iss, u.id + '.x', u.text);
     const pad = (n) => String(n).padStart(2, '0');
     const at = (days) => { const d = new Date(); d.setDate(d.getDate() + days); d.setHours(10, 0, 0, 0); return d; };
-    let when = at(1);
+    let when = pre instanceof Date && !isNaN(pre) ? new Date(pre.getFullYear(), pre.getMonth(), pre.getDate(), 10, 0, 0) : at(1);
     const ov = document.createElement('div'); ov.className = 'overlay'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-labelledby', 'remh');
     const today = new Date(); const min = today.getFullYear() + '-' + pad(today.getMonth() + 1) + '-' + pad(today.getDate());
     const fmt = (d) => d.toLocaleDateString(LBCP[LANG] || 'en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
@@ -1229,6 +1286,7 @@ ${JSON.stringify(map)}`;
   function afterRender(view) {
     const m = document.getElementById('matter'); if (m) m.addEventListener('input', () => { renderResults(m.value); trackSearch(m.value); });
     const qs = document.getElementById('qsearch'); if (qs) qs.addEventListener('input', () => { UI.qsearch = qs.value; const pos = qs.selectionStart; render(); const n = document.getElementById('qsearch'); n.focus(); n.setSelectionRange(pos, pos); });
+    const ld = document.getElementById('limdate'); if (ld) ld.addEventListener('change', () => { const iss = issue(); S.limDate = S.limDate || {}; if (ld.value) S.limDate[iss.id] = ld.value; else delete S.limDate[iss.id]; persist(); const y = scrollY; render(); scrollTo(0, y); const n = document.getElementById('limh'); if (n) announce(n.textContent); });
     const form = document.getElementById('qform');
     if (form) {
       const qq = issue().questions.find((x) => x.id === form.dataset.q);
@@ -1317,6 +1375,8 @@ ${JSON.stringify(map)}`;
       case 'exit': S = blank(); saveOn = false; clearSaved(); app.innerHTML = ''; history.replaceState(null, '', '#home'); render(); break;
       case 'excl': S.excludeSensitive = t.checked; persist(); render(); break;
       case 'mic': TRACK.once('voice', { l: LANG }); VOICE.toggle(); break;
+      case 'limremind': { const iss = issue(); const c = limData(iss); if (!c) break; let pre = null; if (c.exact) { pre = new Date(c.exact.end.getTime()); pre.setDate(pre.getDate() - 30); if (pre <= new Date()) pre = null; }
+        showRemind({ id: 'lim', title: X('See an advocate about the time limit'), text: c.exact ? X('The time ends around {d}.').replace('{d}', limFmt(c.exact.end)) : X('Find the exact date and take your list to an advocate.') }, iss, pre); break; }
       case 'remind': { const iss = issue(); const u = iss && (iss.urgent || []).find((x) => x.id === t.dataset.u); if (u) showRemind(u, iss); break; }
       case 'aidcheck': showAid(); break;
       case 'readaloud': READ.toggle(t); break;

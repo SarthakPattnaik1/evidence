@@ -368,7 +368,7 @@
     questions: [
       { id: 'df_side', text: 'Which side are you on?', why: 'Accusing and defending are very different.', options: o([['victim', 'Someone defamed me'], ['accused', 'I received a notice or case for defamation']]) },
       { id: 'df_where', text: 'Where was it said or published?', why: 'Online posts can be removed quickly; evidence differs.', type: 'multi', options: o([['social', 'Social media or WhatsApp'], ['news', 'News or website'], ['review', 'Review site'], ['spoken', 'Spoken to others'], ['letter', 'Letter, notice or complaint to an office']]) },
-      { id: 'df_when', text: 'When was it first published?', why: 'Civil cases should usually be filed within a year.', options: o([['recent', 'Within the last 3 months'], ['year', '3 to 12 months ago'], ['old', 'More than a year ago']]) },
+      { id: 'df_when', text: 'When was it first published?', why: 'A civil case for compensation must usually be filed within one year. We use this to show how much time you have.', options: o([['recent', 'Within the last 3 months'], ['m9', '3 to 9 months ago'], ['year', '9 to 12 months ago'], ['old', 'More than a year ago']]) },
       { id: 'df_harm', text: 'What harm has it caused?', deep: true, when: W('df_side', 'victim'), why: 'Damages depend on harm.', type: 'multi', options: o([['job', 'Job or business loss'], ['family', 'Family or marriage trouble'], ['social', 'Social humiliation'], ['none', 'Not sure yet']]) }
     ],
     evidence: [
