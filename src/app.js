@@ -426,6 +426,7 @@ ${JSON.stringify(map)}`;
   const API_OK = () => /^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname);
   const VOICE = (() => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SRLANG = { en: 'en-IN', hi: 'hi-IN', bn: 'bn-IN', te: 'te-IN', mr: 'mr-IN', ta: 'ta-IN', ur: 'ur-IN', gu: 'gu-IN', kn: 'kn-IN', or: 'or-IN', ml: 'ml-IN', pa: 'pa-IN', as: 'as-IN', ne: 'ne-NP', mai: 'hi-IN', doi: 'hi-IN', kok: 'mr-IN', sa: 'hi-IN', brx: 'hi-IN', ks: 'ur-IN', sd: 'ur-IN' };
     const canRecord = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder && (window.AudioContext || window.webkitAudioContext));
     let st = null; let mode = ''; let lastHint = ''; // st: { kind, rec, stream, chunks, timer }
     const box = () => document.querySelector('.searchbox'); const btn = () => document.querySelector('[data-act=mic]');
@@ -451,7 +452,7 @@ ${JSON.stringify(map)}`;
       if (silent && s.stream) s.stream.getTracks().forEach((t) => t.stop());
     }
     function withBrowser() {
-      const rec = new SR(); rec.lang = 'en-IN'; rec.interimResults = true; rec.maxAlternatives = 1; rec.continuous = false;
+      const rec = new SR(); rec.lang = (SRLANG[LANG] || 'en-IN'); rec.interimResults = true; rec.maxAlternatives = 1; rec.continuous = false;
       let finalText = ''; st = { kind: 'sr', rec, timer: setTimeout(() => { try { rec.stop(); } catch (e) {} }, 15000) };
       rec.onresult = (e) => { let t = ''; for (const r of e.results) t += r[0].transcript; const m = document.getElementById('matter'); if (m) m.value = t; if (e.results[e.results.length - 1].isFinal) finalText = t; };
       rec.onerror = (e) => {
@@ -460,7 +461,7 @@ ${JSON.stringify(map)}`;
         st = null; setUI(''); if (canRecord && API_OK()) withServer(); else fail(X('Voice is not available in this browser. Please type instead.'));
       };
       rec.onend = () => { if (st && st.kind === 'sr') { clearTimeout(st.timer); st = null; } const m = document.getElementById('matter'); finish((finalText || (m && m.value) || '').trim(), ''); };
-      rec.start(); setUI('listen'); hint(X('Listening… tap the square to stop.'));
+      rec.start(); setUI('listen'); hint(X('Listening… speak, then tap the square.'));
     }
     async function withServer() {
       let stream;
@@ -501,12 +502,13 @@ ${JSON.stringify(map)}`;
       return btoa(bin);
     }
     return {
-      can: () => API_OK() && ((LANG === 'en' && !!SR) || canRecord),
+      can: () => API_OK() && (canRecord || !!SR),
       toggle() {
         if (st) { if (st.kind === 'sr') { try { st.rec.stop(); } catch (e) {} } else stop(false); return; }
         hint('');
-        if (LANG === 'en' && SR) { try { return withBrowser(); } catch (e) { /* fall through */ } }
+        // The server recognises whichever Indian language is actually spoken, so use it whenever it is reachable.
         if (canRecord && API_OK()) return withServer();
+        if (SR) { try { return withBrowser(); } catch (e) { /* fall through */ } }
         fail(X('Voice is not available in this browser. Please type instead.'));
       },
       cancel: () => stop(true),

@@ -68,7 +68,7 @@ module.exports = async (req, res) => {
       const text = clean(b.text, MAX_TEXT); if (!text) return send(res, 400, { error: 'empty' });
       const key = lang + '|' + text.toLowerCase();
       if (cache.has(key)) return send(res, 200, { en: cache.get(key) });
-      const out = await gemini([{ text: 'A person in India typed this into a legal-help search box (language: ' + name + ', may be mixed or romanised). '
+      const out = await gemini([{ text: 'A person in India typed this into a legal-help search box. The app is set to ' + name + ', but the text may be in any Indian language or script, mixed or romanised. '
         + 'Give a short, plain English phrase (max 12 words) that says what legal problem they describe. Keep names of apps, banks, laws and places. '
         + 'Do not add advice. Reply only as JSON: {"en": "..."}\n\nTEXT: ' + JSON.stringify(text) }]);
       const en = clean(out.en, 160);
@@ -80,11 +80,13 @@ module.exports = async (req, res) => {
       if (!audio || audio.length > MAX_AUDIO || !/^[A-Za-z0-9+/=]+$/.test(audio.slice(0, 2000))) return send(res, 400, { error: 'bad audio' });
       const out = await gemini([
         { inlineData: { mimeType: 'audio/wav', data: audio } },
-        { text: 'This is a person in India describing a legal problem by voice, most likely in ' + name + ' (they may mix in English or Hindi). '
-          + 'Transcribe exactly what they said, in the script normally used for that language. Then give a short, plain English phrase (max 12 words) for what legal problem they describe. '
-          + 'If there is no clear speech, return empty strings. Do not add advice. Reply only as JSON: {"text": "...", "en": "..."}' }
+        { text: 'This is a person in India describing a legal problem by voice. The app is set to ' + name + ', but they may speak ANY Indian language '
+          + '(Hindi, Bengali, Odia, Tamil, Telugu, Marathi, Gujarati, Kannada, Malayalam, Punjabi, Assamese, Urdu, Maithili, Santali, Nepali, Konkani, Manipuri, Bodo, Dogri, Kashmiri, Sindhi, Sanskrit or English), often mixed with English words. '
+          + 'First identify the language actually spoken. Transcribe exactly what they said, in the script normally used for that language (for example Odia in Odia script, Tamil in Tamil script). '
+          + 'Then give a short, plain English phrase (max 12 words) for what legal problem they describe. If there is no clear speech, return empty strings. Do not add advice. '
+          + 'Reply only as JSON: {"lang": "<ISO 639 code of the spoken language>", "text": "...", "en": "..."}' }
       ]);
-      return send(res, 200, { text: clean(out.text, 300), en: clean(out.en, 160) });
+      return send(res, 200, { text: clean(out.text, 300), en: clean(out.en, 160), spoken: clean(out.lang, 8) });
     }
     return send(res, 400, { error: 'mode' });
   } catch (e) {

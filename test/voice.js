@@ -18,6 +18,13 @@ const URL = process.env.URL || 'http://localhost:8790/';
   if (!/कुत्ते/.test(v1)) fails.push('transcript not put in search box: ' + v1);
   if (!t1.length || !/dog|animal|कुत्त/i.test(t1.join(' '))) fails.push('voice search did not find dog-bite guide: ' + t1.join(' | '));
   await p.screenshot({ path: '/tmp/voice-hi.png' });
+  // 1b. English UI, speaking another language: must go to the server (which detects the language), not the browser's English recogniser
+  await p.evaluate(() => localStorage.setItem('er_lang', '"en"')); await p.reload(); await p.waitForTimeout(700);
+  let hit = 0; const onReq = (r) => { if (r.url().includes('/api/voice') && r.method() === 'POST') hit++; }; p.on('request', onReq);
+  await p.click('[data-act=mic]'); await p.waitForTimeout(1200); await p.click('[data-act=mic]'); await p.waitForTimeout(2500); p.off('request', onReq);
+  if (!hit) fails.push('English UI did not send speech to the server');
+  if (!/कुत्ते/.test(await p.inputValue('#matter'))) fails.push('English UI: non-English speech not transcribed');
+  await p.evaluate(() => localStorage.setItem('er_lang', '"hi"')); await p.reload(); await p.waitForTimeout(700);
   // 2. typed Hindi (Devanagari) search
   await p.fill('#matter', ''); await p.type('#matter', 'मेरा फोन चोरी हो गया', { delay: 10 }); await p.waitForTimeout(1500);
   const t2 = await titles(); if (!/phone|फ़ोन|फोन/i.test(t2.join(' '))) fails.push('typed Hindi did not find phone guide: ' + t2.join(' | '));
@@ -35,7 +42,7 @@ const URL = process.env.URL || 'http://localhost:8790/';
   await q.evaluate(() => { navigator.mediaDevices.getUserMedia = () => Promise.reject(Object.assign(new Error('denied'), { name: 'NotAllowedError' })); });
   await q.click('[data-act=mic]'); await q.waitForTimeout(500);
   const h = await q.textContent('#voicehint'); if (!/permission|Microphone|माइक/i.test(h || '')) fails.push('no permission message: ' + h);
-  console.log(errs.length || fails.length ? 'VOICE FAIL\n' + errs.concat(fails).join('\n') : 'VOICE OK (Hindi voice, typed Hindi, typed Odia, 320px, permission denied)');
+  console.log(errs.length || fails.length ? 'VOICE FAIL\n' + errs.concat(fails).join('\n') : 'VOICE OK (Hindi voice, English UI + other language, typed Hindi, typed Odia, 320px, permission denied)');
   console.log('typed Hindi →', t2.join(' | '), '\ntyped Odia →', t3.join(' | '));
   await b.close(); process.exit(errs.length || fails.length ? 1 : 0);
 })();
