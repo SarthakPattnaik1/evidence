@@ -5,8 +5,8 @@
   const KB = root.ER_KB; const I = KB.issues;
   const S = (t, u) => ({ t, u });
   const SRC = {
-    bns: S('Bharatiya Nyaya Sanhita, 2023 (India Code)', 'https://www.indiacode.nic.in'),
-    bnss: S('Bharatiya Nagarik Suraksha Sanhita, 2023 (India Code)', 'https://www.indiacode.nic.in'),
+    bns: root.ER_CITE.ACT.bns,
+    bnss: root.ER_CITE.ACT.bnss,
     nalsa: S('NALSA — free legal aid', 'https://nalsa.gov.in'),
     rti: S('RTI Online (Government of India)', 'https://rtionline.gov.in'),
     cpgrams: S('CPGRAMS — public grievance portal', 'https://pgportal.gov.in'),
@@ -15,7 +15,7 @@
     vahan: S('Parivahan — vehicle services (Vahan)', 'https://vahan.parivahan.gov.in'),
     itportal: S('Income Tax e-filing portal', 'https://www.incometax.gov.in'),
     gst: S('GST portal', 'https://www.gst.gov.in'),
-    landAcq: S('Right to Fair Compensation in Land Acquisition Act, 2013 (India Code)', 'https://www.indiacode.nic.in'),
+    landAcq: root.ER_CITE.ACT.landAcq,
     dilrmp: S('Department of Land Resources — land records (DILRMP)', 'https://dolr.gov.in'),
     egazette: S('e-Gazette of India (name change notifications)', 'https://egazette.gov.in'),
     crs: S('Civil Registration System — births and deaths', 'https://crsorgi.gov.in'),
@@ -23,21 +23,21 @@
     passport: S('Passport Seva', 'https://www.passportindia.gov.in'),
     cat: S('Central Administrative Tribunal', 'https://cgat.gov.in'),
     pension: S('CPENGRAMS — pensioners grievance portal', 'https://pgportal.gov.in/pension'),
-    coss: S('Code on Social Security, 2020 (Ministry of Labour)', 'https://labour.gov.in'),
+    coss: S('Ministry of Labour and Employment (official site) — Code on Social Security, 2020', 'https://labour.gov.in'),
     esic: S('ESIC', 'https://www.esic.gov.in'),
-    scst: S('SC/ST (Prevention of Atrocities) Act, 1989 (India Code)', 'https://www.indiacode.nic.in'),
+    scst: root.ER_CITE.ACT.scst,
     ncsc: S('National Commission for Scheduled Castes', 'https://ncsc.nic.in'),
     bonded: S('Ministry of Labour — bonded and child labour', 'https://labour.gov.in'),
     pencil: S('PENCIL — child labour complaint portal', 'https://pencil.gov.in'),
     trackchild: S('Khoya-Paya / TrackChild (missing children)', 'https://trackthemissingchild.gov.in'),
-    abc: S('Animal Birth Control Rules, 2023 (Animal Welfare Board of India)', 'https://awbi.gov.in'),
-    succession: S('Indian Succession Act, 1925 and Registration Act, 1908 (India Code)', 'https://www.indiacode.nic.in'),
-    senior: S('Maintenance and Welfare of Parents and Senior Citizens Act, 2007', 'https://www.indiacode.nic.in'),
+    abc: S('Animal Welfare Board of India (official site) — Animal Birth Control Rules, 2023', 'https://awbi.gov.in'),
+    succession: root.ER_CITE.ACT.succession,
+    senior: root.ER_CITE.ACT.senior,
     udid: S('UDID — disability certificate portal', 'https://www.swavlambancard.gov.in'),
-    itRules: S('IT (Intermediary Guidelines) Rules — MeitY', 'https://www.meity.gov.in'),
-    pocso: S('POCSO Act, 2012 (India Code)', 'https://www.indiacode.nic.in'),
+    itRules: S('IT (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021, as amended in 2026', ''),
+    pocso: root.ER_CITE.ACT.pocso,
     onestop: S('One Stop Centres for women (Ministry of WCD)', 'https://wcd.gov.in'),
-    rpwd: S('Rights of Persons with Disabilities Act, 2016', 'https://depwd.gov.in')
+    rpwd: S('Department of Empowerment of Persons with Disabilities (official site)', 'https://depwd.gov.in')
   };
   Object.assign(KB.help, {
     ceir: { label: 'CEIR', name: 'Sanchar Saathi — block a lost or stolen phone', detail: 'Blocks the phone on every network using its IMEI, and helps trace it. Needs a police report number.', href: 'https://www.sancharsaathi.gov.in' },
@@ -88,7 +88,7 @@
       { text: 'Can I recover repair costs from my neighbour?', when: W('nb_what', 'leak', 'build') },
       { text: 'Can I get an urgent stay on the construction?', when: W('nb_what', 'build') }
     ],
-    sources: [SRC.bnss, S('Noise Pollution (Regulation and Control) Rules, 2000 — CPCB', 'https://cpcb.nic.in'), SRC.nalsa]
+    sources: [SRC.bnss, S('Central Pollution Control Board (official site) — noise rules', 'https://cpcb.nic.in'), SRC.nalsa]
   });
 
   /* ================= 2. Housing society / RWA ================= */
@@ -241,7 +241,7 @@
       { text: 'Which law and route applies to us, and how long will it take?' },
       { text: 'How do we regularise a child who was given to us informally?', when: W('ad_what', 'given') }
     ],
-    sources: [SRC.cara, S('Juvenile Justice (Care and Protection of Children) Act, 2015 (India Code)', 'https://www.indiacode.nic.in'), SRC.nalsa]
+    sources: [SRC.cara, root.ER_CITE.ACT.jj, SRC.nalsa]
   });
 
   /* ================= 6. Government job / service matters ================= */
@@ -619,7 +619,7 @@
     ],
     lawyerQs: [{ text: 'How do I protect myself from liability for the period after the sale?' }, { text: 'Is this a police case, a consumer complaint, or both?', when: W('vt_problem', 'fraud') }],
     also: ['accidents'],
-    sources: [SRC.vahan, S('Motor Vehicles Act, 1988 (India Code)', 'https://www.indiacode.nic.in'), SRC.nalsa]
+    sources: [SRC.vahan, root.ER_CITE.ACT.mv, SRC.nalsa]
   });
 
   /* ================= 16. Dog bite / animal attack ================= */
@@ -755,7 +755,7 @@
     ],
     lawyerQs: [{ text: 'Is the notice within time and under the correct section?' }, { text: 'Should I pay, reply, or appeal?', when: W('tx_type', 'demand') }],
     also: ['business'],
-    sources: [SRC.itportal, SRC.gst, S('Income-tax Act, 2025 (in force 1 Apr 2026)', 'https://incometaxindia.gov.in')]
+    sources: [SRC.itportal, SRC.gst, S('Income-tax Act, 2025 (in force from 1 Apr 2026)', '')]
   });
 
   /* ================= 20. Land acquisition ================= */

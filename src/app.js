@@ -769,7 +769,8 @@ ${JSON.stringify(map)}`;
   function srcBlock(iss) {
     if (!iss || !iss.sources || !iss.sources.length) return '';
     const d = iss.checked ? new Date(iss.checked + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
-    return `<details class="srcs"><summary>${ic('file', 14)} ${esc(X('Law checked {d} · {n} official sources').replace('{d}', d).replace('{n}', iss.sources.length))}</summary><ul>${iss.sources.map((x) => `<li><a href="${esc(x.u)}" target="_blank" rel="noopener">${esc(x.t)}</a></li>`).join('')}</ul><p class="small muted">${esc(X('Law changes. Confirm the current position with an advocate before you act.'))}</p></details>`;
+    const li = (x) => x.u ? `<li><a href="${esc(x.u)}" target="_blank" rel="noopener">${esc(x.t)}</a> <span class="muted">· ${esc(window.ER_CITE.host(x.u))}</span></li>` : `<li>${esc(x.t)}</li>`;
+    return `<details class="srcs"><summary>${ic('file', 14)} ${esc(X('Sources ({n})').replace('{n}', iss.sources.length))}</summary><ul>${iss.sources.map(li).join('')}</ul><p class="small muted">${esc(X('Law changes. Confirm the current position with an advocate before you act.'))}</p></details>`;
   }
   function standCard(iss, items, have) {
     const st = E.stand(iss, S.answers);
@@ -853,7 +854,7 @@ ${JSON.stringify(map)}`;
       <div id="qalist">${(() => {
         const qa = (q) => `<details class="qa" id="qa-${q.id}" ${q.id === openId ? 'open' : ''}><summary>${esc(X(q.q))}</summary><div class="body">
         <p>${esc(X(q.a))}</p><p class="small" style="margin:0"><b>${esc(X('What can change the answer'))}</b></p><ul>${q.depends.map((x) => `<li>${esc(X(x))}</li>`).join('')}</ul>
-        <p class="law">Law: ${esc(q.law)}. ${esc(KB.reviewed.label)}.</p>
+        <p class="law">Law: ${window.ER_CITE.linkify(q.law)}. ${esc(KB.reviewed.label)}.</p>
         ${q.journey && BY_ID[q.journey] ? `<button class="btn line" data-play="${q.journey}">${esc(X('Prepare for a lawyer:'))} ${esc(BY_ID[q.journey].short)}</button>` : ''}
       </div></details>`;
         if (!list.length) return '<p class="panel muted">' + esc(X('No match. Try other words, or ')) + '<button class="btn text" data-go="start-general">use general preparation</button>.</p>';
@@ -1004,7 +1005,7 @@ ${JSON.stringify(map)}`;
       TRACK.ev('aid', { x: k });
       return `<div class="dialog wide aid"><h2 id="aidh">${esc(X(R[0]))}</h2><p>${esc(X(R[1]))}</p>
         <div class="aidacts">${k !== 'no' ? `<a class="btn go big" href="tel:15100">${ic('phone', 18)} ${esc(X('Call 15100 — free legal aid'))}</a>` : ''}<a class="btn line" href="tel:14454">${ic('phone', 18)} ${esc(X('Tele-Law 14454 — free advice'))}</a></div>
-        <p class="small">${esc(X('Or visit the District Legal Services Authority at your district court. Take an ID and this list.'))} <a href="https://nalsa.gov.in/services/legal-aid/eligibility" target="_blank" rel="noopener">${esc(X('Who is eligible (NALSA)'))}</a></p>
+        <p class="small">${esc(X('Or visit the District Legal Services Authority at your district court. Take an ID and this list.'))} <a href="https://nalsa.gov.in/legal-aid/" target="_blank" rel="noopener">${esc(X('Who is eligible (NALSA)'))}</a></p>
         <div class="row" style="justify-content:flex-end"><button class="btn line" data-close>${esc(X('Close'))}</button></div></div>`;
     };
     const step1 = `<div class="dialog wide aid"><h2 id="aidh">${esc(X('Do I get a free lawyer?'))}</h2><p class="small muted">${esc(X('Tick anything that is true for you (or the person you are helping).'))}</p>

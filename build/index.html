@@ -1761,6 +1761,79 @@ body.consenting{overflow:hidden}
   root.ER_H = { W, ALL, ANY, NOT, ANS, o, NS, PN, LAWFUL };
 })(globalThis);
 </script>
+<script>/* Saboot citations: one place for every Act and judgment the app names.
+   Each link was opened and its page title matched to the citation on 31 Oct 2026 (from Mumbai, and by page title):
+   judgments and Acts on Indian Kanoon (free full text, stable addresses); rules and circulars on the official site.
+   India Code moved from indiacode.nic.in to indiacode.gov.in in 2026 and its old deep links no longer open,
+   so nothing links there. Where an exact page could not be confirmed, the citation is shown WITHOUT a link:
+   a wrong link costs more trust than no link. test/sources.js enforces this. */
+(function (root) {
+  const IK = (n) => 'https://indiankanoon.org/doc/' + n + '/';
+  const ACT = {
+    lim: { t: 'Limitation Act, 1963', u: IK(1317393) },
+    ni: { t: 'Negotiable Instruments Act, 1881', u: IK(1132672) },
+    cpa: { t: 'Consumer Protection Act, 2019', u: IK(48103131) },
+    rera: { t: 'Real Estate (Regulation and Development) Act, 2016', u: IK(65068227) },
+    senior: { t: 'Maintenance and Welfare of Parents and Senior Citizens Act, 2007', u: IK(118724005) },
+    sma: { t: 'Special Marriage Act, 1954', u: IK(4234) },
+    dv: { t: 'Protection of Women from Domestic Violence Act, 2005', u: IK(542601) },
+    bnss: { t: 'Bharatiya Nagarik Suraksha Sanhita, 2023', u: IK(91117739) },
+    hma: { t: 'Hindu Marriage Act, 1955', u: IK(590166) },
+    hsa: { t: 'Hindu Succession Act, 1956', u: IK(685111) },
+    gwa: { t: 'Guardians and Wards Act, 1890', u: IK(1874830) },
+    hmga: { t: 'Hindu Minority and Guardianship Act, 1956', u: IK(76168618) },
+    contract: { t: 'Indian Contract Act, 1872', u: IK(171398) },
+    sra: { t: 'Specific Relief Act, 1963', u: IK(1671917) },
+    tm: { t: 'Trade Marks Act, 1999', u: IK(1017213) },
+    copyright: { t: 'Copyright Act, 1957', u: IK(1136195) },
+    tpa: { t: 'Transfer of Property Act, 1882', u: IK(515323) },
+    posh: { t: 'Sexual Harassment of Women at Workplace (Prevention, Prohibition and Redressal) Act, 2013', u: IK(35616442) },
+    msmed: { t: 'Micro, Small and Medium Enterprises Development Act, 2006', u: IK(352833) },
+    // exact page not yet confirmed — shown as text only
+    bns: { t: 'Bharatiya Nyaya Sanhita, 2023', u: '' },
+    partnership: { t: 'Indian Partnership Act, 1932 and Limited Liability Partnership Act, 2008', u: '' },
+    companies: { t: 'Companies Act, 2013', u: '' },
+    ibc: { t: 'Insolvency and Bankruptcy Code, 2016', u: '' },
+    jj: { t: 'Juvenile Justice (Care and Protection of Children) Act, 2015', u: '' },
+    succession: { t: 'Indian Succession Act, 1925 and Registration Act, 1908', u: '' },
+    commercial: { t: 'Commercial Courts Act, 2015', u: '' },
+    mv: { t: 'Motor Vehicles Act, 1988', u: '' },
+    landAcq: { t: 'Right to Fair Compensation and Transparency in Land Acquisition, Rehabilitation and Resettlement Act, 2013', u: '' },
+    scst: { t: 'Scheduled Castes and Scheduled Tribes (Prevention of Atrocities) Act, 1989', u: '' },
+    pocso: { t: 'Protection of Children from Sexual Offences Act, 2012', u: '' }
+  };
+  // name as it appears in the text → full citation and link
+  const CASE = {
+    'Amardeep Singh v. Harveen Kaur': { t: 'Amardeep Singh v. Harveen Kaur, Supreme Court, 12 Sep 2017 — (2017) 8 SCC 746', u: IK(79830357) },
+    'Rajnesh v. Neha': { t: 'Rajnesh v. Neha, Supreme Court, 4 Nov 2020 — (2021) 2 SCC 324', u: IK(117541087) },
+    'Vineeta Sharma v. Rakesh Sharma': { t: 'Vineeta Sharma v. Rakesh Sharma, Supreme Court, 11 Aug 2020 — (2020) 9 SCC 1', u: IK(67965481) },
+    'Shakti Yezdani v. Jayanand Salgaonkar': { t: 'Shakti Yezdani v. Jayanand Jayant Salgaonkar, Supreme Court, 14 Dec 2023', u: IK(166607072) },
+    'Pratibha Rani v. Suraj Kumar': { t: 'Pratibha Rani v. Suraj Kumar, Supreme Court, 12 Mar 1985 — (1985) 2 SCC 370', u: IK(1684706) },
+    'Imperia Structures v. Anil Patni': { t: 'Imperia Structures Ltd. v. Anil Patni, Supreme Court, 2 Nov 2020 — (2020) 10 SCC 783', u: IK(122264633) },
+    'Jitendra Singh v. State of MP': { t: 'Jitendra Singh v. State of Madhya Pradesh, Supreme Court, 6 Sep 2021 — 2021 SCC OnLine SC 802', u: IK(104309066) },
+    'Lalita Kumari v. Govt of UP': { t: 'Lalita Kumari v. Govt. of U.P., Supreme Court (Constitution Bench), 12 Nov 2013 — (2014) 2 SCC 1', u: IK(10239019) },
+    'Arnesh Kumar v. State of Bihar': { t: 'Arnesh Kumar v. State of Bihar, Supreme Court, 2 Jul 2014 — (2014) 8 SCC 273', u: IK(2982624) },
+    'Y. Narasimha Rao v. Y. Venkata Lakshmi': { t: 'Y. Narasimha Rao v. Y. Venkata Lakshmi, Supreme Court, 9 Jul 1991 — (1991) 3 SCC 451', u: IK(989920) },
+    'Patil Automation v. Rakheja Engineers': { t: 'Patil Automation Pvt. Ltd. v. Rakheja Engineers Pvt. Ltd., Supreme Court, 17 Aug 2022 — (2022) 10 SCC 1', u: IK(164693074) },
+    'Vodafone Idea v. Ajay Kumar Agarwal': { t: 'Vodafone Idea Cellular Ltd. v. Ajay Kumar Agarwal, Supreme Court, 16 Feb 2022 — (2022) 6 SCC 496 (Indian Kanoon lists it with the connected appeal M. Lakshman Bhakta v. Vodafone Idea)', u: IK(149138346) },
+    'Sanjabij Tari v. Kishore S. Borcar': { t: 'Sanjabij Tari v. Kishore S. Borcar, Supreme Court, 25 Sep 2025 — 2025 INSC 1158', u: IK(198100584) },
+    'ICICI Lombard v. Ayiti Navaneetha': { t: 'ICICI Lombard General Insurance Co. Ltd. v. Ayiti Navaneetha, Supreme Court interim order, 4 Nov 2025', u: IK(199850448) },
+    'Bachpan Bachao Andolan v. Union of India': { t: 'Bachpan Bachao Andolan v. Union of India, W.P.(C) 75 of 2012, Supreme Court orders of 17 Jan 2013 and 10 May 2013', u: '' }
+  };
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return ''; } };
+  // Turn a plain "Law:" line into HTML with every known case linked to its judgment.
+  function linkify(text) {
+    let out = esc(text);
+    for (const [name, c] of Object.entries(CASE)) {
+      const re = new RegExp(esc(name).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+      out = out.replace(re, c.u ? `<a href="${c.u}" target="_blank" rel="noopener" title="${esc(c.t)}">${esc(name)}</a>` : esc(name));
+    }
+    return out;
+  }
+  root.ER_CITE = { ACT, CASE, IK, linkify, host };
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
 <script>/* Money & banking journeys (draft, not advocate-reviewed). */
 (function (root) {
   const { W, ALL, ANY, NOT, ANS, o, NS, PN, LAWFUL } = root.ER_H;
@@ -2613,7 +2686,7 @@ body.consenting{overflow:hidden}
     id: 'road-accident', cat: 'accidents', title: 'Road accident — injury, death or vehicle damage claim', short: 'Road accident claim',
     synonyms: ['accident', 'road accident', 'hit and run', 'motor accident claim', 'mact', 'accident compensation', 'accident death compensation', 'injured in accident', 'vehicle hit me', 'third party claim'],
     intro: 'Accident claims are decided on the police record, the medical record and the proof of income. We\'ll collect all three.',
-    juris: 'Compensation claims go to the Motor Accident Claims Tribunal (MACT). The 6-month filing limit in Section 166(3) of the Motor Vehicles Act has been stayed by the Supreme Court (November 2025) while its validity is decided — still file as early as possible.',
+    juris: 'Compensation claims go to the Motor Accident Claims Tribunal (MACT). Section 166(3) of the Motor Vehicles Act says a claim must be filed within 6 months of the accident. Its validity is being challenged in the Supreme Court: by interim order of 4 Nov 2025 (ICICI Lombard v. Ayiti Navaneetha), tribunals must not dismiss claims as time-barred under it while the case is pending, and by order of 16 Dec 2025 they may hear late claims but not finalise the judgment until the Supreme Court decides. So file within 6 months if you can; if that time has passed, still file.',
     tips: ['You can file the claim where the accident happened, where you live or work, or where the other side lives.', 'Hit-and-run victims can claim fixed compensation from a government fund (₹2 lakh for death, ₹50,000 for grievous injury).', 'Police must send an accident report to the tribunal, but your own documents still matter.'],
     questions: [
       { id: 'ra_harm', text: 'What happened?', chapter: 'The accident', why: 'Death, injury and vehicle damage claims are calculated differently.',
@@ -3976,8 +4049,8 @@ body.consenting{overflow:hidden}
   const KB = root.ER_KB; const I = KB.issues;
   const S = (t, u) => ({ t, u });
   const SRC = {
-    bns: S('Bharatiya Nyaya Sanhita, 2023 (India Code)', 'https://www.indiacode.nic.in'),
-    bnss: S('Bharatiya Nagarik Suraksha Sanhita, 2023 (India Code)', 'https://www.indiacode.nic.in'),
+    bns: root.ER_CITE.ACT.bns,
+    bnss: root.ER_CITE.ACT.bnss,
     nalsa: S('NALSA — free legal aid', 'https://nalsa.gov.in'),
     rti: S('RTI Online (Government of India)', 'https://rtionline.gov.in'),
     cpgrams: S('CPGRAMS — public grievance portal', 'https://pgportal.gov.in'),
@@ -3986,7 +4059,7 @@ body.consenting{overflow:hidden}
     vahan: S('Parivahan — vehicle services (Vahan)', 'https://vahan.parivahan.gov.in'),
     itportal: S('Income Tax e-filing portal', 'https://www.incometax.gov.in'),
     gst: S('GST portal', 'https://www.gst.gov.in'),
-    landAcq: S('Right to Fair Compensation in Land Acquisition Act, 2013 (India Code)', 'https://www.indiacode.nic.in'),
+    landAcq: root.ER_CITE.ACT.landAcq,
     dilrmp: S('Department of Land Resources — land records (DILRMP)', 'https://dolr.gov.in'),
     egazette: S('e-Gazette of India (name change notifications)', 'https://egazette.gov.in'),
     crs: S('Civil Registration System — births and deaths', 'https://crsorgi.gov.in'),
@@ -3994,21 +4067,21 @@ body.consenting{overflow:hidden}
     passport: S('Passport Seva', 'https://www.passportindia.gov.in'),
     cat: S('Central Administrative Tribunal', 'https://cgat.gov.in'),
     pension: S('CPENGRAMS — pensioners grievance portal', 'https://pgportal.gov.in/pension'),
-    coss: S('Code on Social Security, 2020 (Ministry of Labour)', 'https://labour.gov.in'),
+    coss: S('Ministry of Labour and Employment (official site) — Code on Social Security, 2020', 'https://labour.gov.in'),
     esic: S('ESIC', 'https://www.esic.gov.in'),
-    scst: S('SC/ST (Prevention of Atrocities) Act, 1989 (India Code)', 'https://www.indiacode.nic.in'),
+    scst: root.ER_CITE.ACT.scst,
     ncsc: S('National Commission for Scheduled Castes', 'https://ncsc.nic.in'),
     bonded: S('Ministry of Labour — bonded and child labour', 'https://labour.gov.in'),
     pencil: S('PENCIL — child labour complaint portal', 'https://pencil.gov.in'),
     trackchild: S('Khoya-Paya / TrackChild (missing children)', 'https://trackthemissingchild.gov.in'),
-    abc: S('Animal Birth Control Rules, 2023 (Animal Welfare Board of India)', 'https://awbi.gov.in'),
-    succession: S('Indian Succession Act, 1925 and Registration Act, 1908 (India Code)', 'https://www.indiacode.nic.in'),
-    senior: S('Maintenance and Welfare of Parents and Senior Citizens Act, 2007', 'https://www.indiacode.nic.in'),
+    abc: S('Animal Welfare Board of India (official site) — Animal Birth Control Rules, 2023', 'https://awbi.gov.in'),
+    succession: root.ER_CITE.ACT.succession,
+    senior: root.ER_CITE.ACT.senior,
     udid: S('UDID — disability certificate portal', 'https://www.swavlambancard.gov.in'),
-    itRules: S('IT (Intermediary Guidelines) Rules — MeitY', 'https://www.meity.gov.in'),
-    pocso: S('POCSO Act, 2012 (India Code)', 'https://www.indiacode.nic.in'),
+    itRules: S('IT (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021, as amended in 2026', ''),
+    pocso: root.ER_CITE.ACT.pocso,
     onestop: S('One Stop Centres for women (Ministry of WCD)', 'https://wcd.gov.in'),
-    rpwd: S('Rights of Persons with Disabilities Act, 2016', 'https://depwd.gov.in')
+    rpwd: S('Department of Empowerment of Persons with Disabilities (official site)', 'https://depwd.gov.in')
   };
   Object.assign(KB.help, {
     ceir: { label: 'CEIR', name: 'Sanchar Saathi — block a lost or stolen phone', detail: 'Blocks the phone on every network using its IMEI, and helps trace it. Needs a police report number.', href: 'https://www.sancharsaathi.gov.in' },
@@ -4059,7 +4132,7 @@ body.consenting{overflow:hidden}
       { text: 'Can I recover repair costs from my neighbour?', when: W('nb_what', 'leak', 'build') },
       { text: 'Can I get an urgent stay on the construction?', when: W('nb_what', 'build') }
     ],
-    sources: [SRC.bnss, S('Noise Pollution (Regulation and Control) Rules, 2000 — CPCB', 'https://cpcb.nic.in'), SRC.nalsa]
+    sources: [SRC.bnss, S('Central Pollution Control Board (official site) — noise rules', 'https://cpcb.nic.in'), SRC.nalsa]
   });
 
   /* ================= 2. Housing society / RWA ================= */
@@ -4212,7 +4285,7 @@ body.consenting{overflow:hidden}
       { text: 'Which law and route applies to us, and how long will it take?' },
       { text: 'How do we regularise a child who was given to us informally?', when: W('ad_what', 'given') }
     ],
-    sources: [SRC.cara, S('Juvenile Justice (Care and Protection of Children) Act, 2015 (India Code)', 'https://www.indiacode.nic.in'), SRC.nalsa]
+    sources: [SRC.cara, root.ER_CITE.ACT.jj, SRC.nalsa]
   });
 
   /* ================= 6. Government job / service matters ================= */
@@ -4590,7 +4663,7 @@ body.consenting{overflow:hidden}
     ],
     lawyerQs: [{ text: 'How do I protect myself from liability for the period after the sale?' }, { text: 'Is this a police case, a consumer complaint, or both?', when: W('vt_problem', 'fraud') }],
     also: ['accidents'],
-    sources: [SRC.vahan, S('Motor Vehicles Act, 1988 (India Code)', 'https://www.indiacode.nic.in'), SRC.nalsa]
+    sources: [SRC.vahan, root.ER_CITE.ACT.mv, SRC.nalsa]
   });
 
   /* ================= 16. Dog bite / animal attack ================= */
@@ -4726,7 +4799,7 @@ body.consenting{overflow:hidden}
     ],
     lawyerQs: [{ text: 'Is the notice within time and under the correct section?' }, { text: 'Should I pay, reply, or appeal?', when: W('tx_type', 'demand') }],
     also: ['business'],
-    sources: [SRC.itportal, SRC.gst, S('Income-tax Act, 2025 (in force 1 Apr 2026)', 'https://incometaxindia.gov.in')]
+    sources: [SRC.itportal, SRC.gst, S('Income-tax Act, 2025 (in force from 1 Apr 2026)', '')]
   });
 
   /* ================= 20. Land acquisition ================= */
@@ -5098,72 +5171,92 @@ body.consenting{overflow:hidden}
   KB.lawChecked = CHECKED;
 
   /* ---- Official / primary sources, by guide ---- */
+  const C = root.ER_CITE, A = C.ACT, K = C.CASE;
   const SRC = {
-    rbiFraud: { t: 'RBI: Amendment Directions on limiting customer liability in digital transactions (24 Jun 2026, effective 1 Jan 2027)', u: 'https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx' },
-    rbiDL: { t: 'RBI (Digital Lending) Directions, 2025', u: 'https://www.rbi.org.in/scripts/NotificationUser.aspx?Id=12848' },
-    rbiIOS: { t: 'RBI Integrated Ombudsman Scheme — complaint portal', u: 'https://cms.rbi.org.in' },
-    sachet: { t: 'RBI Sachet portal', u: 'https://sachet.rbi.org.in' },
+    // rules, circulars and portals: official pages, each opened and checked on 31 Oct 2026
+    rbiFraud: { t: 'RBI press release, 24 Jun 2026: Amendment Directions on limiting customer liability in digital transactions (effective 1 Jan 2027)', u: 'https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx?prid=63011' },
+    rbiDL: { t: 'RBI (Digital Lending) Directions, 2025 — 8 May 2025', u: 'https://www.rbi.org.in/scripts/NotificationUser.aspx?Id=12848' },
+    rbiIOS: { t: 'RBI complaint portal (Integrated Ombudsman Scheme)', u: 'https://cms.rbi.org.in' },
+    sachet: { t: 'RBI Sachet portal — check if a lender or scheme is registered', u: 'https://sachet.rbi.org.in' },
     cyber: { t: 'National Cyber Crime Reporting Portal (MHA)', u: 'https://cybercrime.gov.in' },
-    ni138: { t: 'Negotiable Instruments Act, 1881 (India Code)', u: 'https://www.indiacode.nic.in' },
-    sanjabij: { t: 'Supreme Court: Sanjabij Tari v. Kishore S. Borcar, 2025 INSC 1158 (25 Sep 2025)', u: 'https://www.sci.gov.in' },
-    mvStay: { t: 'Supreme Court interim order staying s.166(3) MV Act (ICICI Lombard v. Ayiti Navaneetha, 7 Nov 2025)', u: 'https://www.sci.gov.in' },
-    janVishwas: { t: 'Jan Vishwas (Amendment of Provisions) Act, 2026 — Gazette, Act 8 of 2026', u: 'https://egazette.gov.in' },
-    cmvr2026: { t: 'Ministry of Road Transport and Highways — Motor Vehicles Act and rules', u: 'https://morth.nic.in' },
+    ni138: A.ni,
+    sanjabij: K['Sanjabij Tari v. Kishore S. Borcar'],
+    mvStay: K['ICICI Lombard v. Ayiti Navaneetha'],
+    mv: A.mv,
+    janVishwas: { t: 'Jan Vishwas (Amendment of Provisions) Act, 2026 — Motor Vehicles Act changes in force from 15 Aug 2026', u: '' },
     echallan: { t: 'eChallan portal (Parivahan)', u: 'https://echallan.parivahan.gov.in' },
-    cpa: { t: 'Consumer Protection Act, 2019 and Jurisdiction Rules, 2021', u: 'https://consumeraffairs.gov.in' },
-    ejag: { t: 'e-Jagriti consumer complaint filing', u: 'https://e-jagriti.gov.in' },
-    ecom: { t: 'Consumer Protection (E-Commerce) (Amendment) Rules, 2026 (G.S.R. 789(E), effective 1 Jan 2027)', u: 'https://consumeraffairs.gov.in/public/upload/admin/cmsfiles/whatsnews/E_Commerce_Amendment_Rules_2026_2026-09-11_18-12-39.pdf' },
-    nch: { t: 'National Consumer Helpline', u: 'https://consumerhelpline.gov.in' },
-    dgca: { t: 'DGCA Civil Aviation Requirement on refund of airline tickets', u: 'https://www.dgca.gov.in' },
-    irdai: { t: 'IRDAI Master Circular on Health Insurance Business (29 May 2024)', u: 'https://irdai.gov.in' },
-    bima: { t: 'Bima Bharosa (IRDAI grievance portal)', u: 'https://bimabharosa.irdai.gov.in' },
-    itRules: { t: 'IT (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021, as amended — 2026 amendment in force 20 Feb 2026 (2-hour removal of intimate images)', u: 'https://www.meity.gov.in' },
-    gaming: { t: 'Promotion and Regulation of Online Gaming Act, 2025 (MeitY)', u: 'https://www.meity.gov.in' },
-    dpdp: { t: 'DPDP Rules, 2025 (PIB, 17 Nov 2025)', u: 'https://static.pib.gov.in/WriteReadData/specificdocs/documents/2025/nov/doc20251117695301.pdf' },
-    trans: { t: 'Transgender Persons (Protection of Rights) Amendment Act, 2026 (in force 25 May 2026)', u: 'https://egazette.gov.in' },
+    cpa: A.cpa,
+    ejag: { t: 'e-Jagriti — file a consumer complaint online', u: 'https://e-jagriti.gov.in' },
+    ecom: { t: 'Consumer Protection (E-Commerce) (Amendment) Rules, 2026 — G.S.R. 789(E), 9 Sep 2026, effective 1 Jan 2027 (official PDF)', u: 'https://consumeraffairs.gov.in/public/upload/admin/cmsfiles/whatsnews/E_Commerce_Amendment_Rules_2026_2026-09-11_18-12-39.pdf' },
+    nch: { t: 'National Consumer Helpline (1915)', u: 'https://consumerhelpline.gov.in' },
+    dgca: { t: 'DGCA — civil aviation regulator (passenger rules)', u: 'https://www.dgca.gov.in' },
+    airsewa: { t: 'AirSewa — complaint against an airline', u: 'https://airsewa.gov.in' },
+    irdai: { t: 'IRDAI — insurance regulator', u: 'https://irdai.gov.in' },
+    bima: { t: 'Bima Bharosa — IRDAI complaint portal', u: 'https://bimabharosa.irdai.gov.in' },
+    itRules: { t: 'IT (Intermediary Guidelines and Digital Media Ethics Code) Amendment Rules, 2026 — G.S.R. 120(E), in force 20 Feb 2026 (intimate-image complaints: action within 2 hours)', u: '' },
+    gaming: { t: 'Promotion and Regulation of Online Gaming Act, 2025', u: '' },
+    dpdp: { t: 'Digital Personal Data Protection Rules, 2025 — PIB document, 17 Nov 2025', u: 'https://static.pib.gov.in/WriteReadData/specificdocs/documents/2025/nov/doc20251117695301.pdf' },
+    trans: { t: 'Transgender Persons (Protection of Rights) Amendment Act, 2026 (No. 3 of 2026, in force 25 May 2026)', u: '' },
     transPortal: { t: 'National Portal for Transgender Persons', u: 'https://transgender.dosje.gov.in' },
-    ugcRag: { t: 'UGC anti-ragging regulations and helpline', u: 'https://www.antiragging.in' },
-    ugcFee: { t: 'UGC fee refund policy and non-retention of certificates', u: 'https://www.ugc.gov.in' },
-    coss: { t: 'Code on Social Security, 2020 (in force 21 Nov 2025)', u: 'https://labour.gov.in' },
+    ugcRag: { t: 'Anti-ragging helpline and complaint portal (UGC)', u: 'https://www.antiragging.in' },
+    ugcFee: { t: 'UGC — University Grants Commission', u: 'https://www.ugc.gov.in' },
+    coss: { t: 'Ministry of Labour and Employment (official site) — Code on Social Security, 2020 in force from 21 Nov 2025', u: 'https://labour.gov.in' },
     epfo: { t: 'EPFO grievance portal', u: 'https://epfigms.gov.in' },
     eshram: { t: 'e-Shram portal', u: 'https://eshram.gov.in' },
-    rbiDeceased: { t: 'RBI rules on settling claims of deceased bank customers', u: 'https://www.rbi.org.in' },
-    rera: { t: 'Real Estate (Regulation and Development) Act, 2016', u: 'https://www.indiacode.nic.in' },
-    elec: { t: 'Electricity (Rights of Consumers) Rules, 2020 (amended 2024)', u: 'https://powermin.gov.in' },
-    senior: { t: 'Maintenance and Welfare of Parents and Senior Citizens Act, 2007', u: 'https://www.indiacode.nic.in' },
-    sma: { t: 'Special Marriage Act, 1954', u: 'https://www.indiacode.nic.in' },
-    dv: { t: 'Protection of Women from Domestic Violence Act, 2005', u: 'https://www.indiacode.nic.in' },
-    bnss: { t: 'Bharatiya Nagarik Suraksha Sanhita, 2023', u: 'https://www.indiacode.nic.in' },
-    bns: { t: 'Bharatiya Nyaya Sanhita, 2023', u: 'https://www.indiacode.nic.in' },
-    nalsa: { t: 'NALSA — free legal aid', u: 'https://nalsa.gov.in' },
-    labourCodes: { t: 'Labour Codes (in force from 21 Nov 2025) — Ministry of Labour', u: 'https://labour.gov.in' },
-    posh: { t: 'Sexual Harassment of Women at Workplace Act, 2013 and SHe-Box', u: 'https://shebox.wcd.gov.in' },
-    msme: { t: 'MSMED Act, 2006 and MSME ODR portal', u: 'https://msme.gov.in' },
-    ibc: { t: 'Insolvency and Bankruptcy Code, 2016', u: 'https://ibbi.gov.in' },
-    companies: { t: 'Companies Act, 2013 (MCA)', u: 'https://www.mca.gov.in' },
-    fema: { t: 'FEMA and RBI rules on NRI property and repatriation', u: 'https://www.rbi.org.in' },
-    itAct2025: { t: 'Income-tax Act, 2025 (in force 1 Apr 2026)', u: 'https://incometaxindia.gov.in' },
+    rbiDeceased: { t: 'RBI complaint portal — for delays in settling a deceased customer\'s account', u: 'https://cms.rbi.org.in' },
+    rera: A.rera,
+    elec: { t: 'Ministry of Power (official site) — consumer rules on connections and bills', u: 'https://powermin.gov.in' },
+    senior: A.senior,
+    sma: A.sma,
+    dv: A.dv,
+    bnss: A.bnss,
+    bns: A.bns,
+    nalsa: { t: 'NALSA — free legal aid and who is eligible', u: 'https://nalsa.gov.in/legal-aid/' },
+    labourCodes: { t: 'Ministry of Labour and Employment (official site) — Labour Codes in force from 21 Nov 2025', u: 'https://labour.gov.in' },
+    samadhan: { t: 'Samadhan — labour dispute portal', u: 'https://samadhan.labour.gov.in' },
+    posh: A.posh,
+    shebox: { t: 'SHe-Box — online complaint of sexual harassment at work', u: 'https://shebox.wcd.gov.in' },
+    msme: A.msmed,
+    msmeOdr: { t: 'MSME Samadhaan — delayed payment complaints', u: 'https://samadhaan.msme.gov.in' },
+    ibc: A.ibc,
+    companies: A.companies,
+    partnership: A.partnership,
+    contract: A.contract,
+    sra: A.sra,
+    lim: A.lim,
+    tpa: A.tpa,
+    tm: A.tm,
+    copyright: A.copyright,
+    ipindia: { t: 'IP India — trade mark search and filing', u: 'https://ipindia.gov.in' },
+    commercial: A.commercial,
+    fema: { t: 'Reserve Bank of India — FEMA rules for NRIs', u: 'https://www.rbi.org.in' },
+    itAct2025: { t: 'Income Tax e-filing portal (official) — the Income-tax Act, 2025 applies from 1 Apr 2026', u: 'https://www.incometax.gov.in' },
     madad: { t: 'MADAD consular grievance portal (MEA)', u: 'https://madad.gov.in' },
-    hindu: { t: 'Hindu Marriage Act, 1955 and Hindu Succession Act, 1956', u: 'https://www.indiacode.nic.in' },
+    hma: A.hma,
+    hsa: A.hsa,
+    gwa: A.gwa,
+    hmga: A.hmga,
+    succession: A.succession,
     ucc: { t: 'Uttarakhand Uniform Civil Code — registration portal', u: 'https://ucc.uk.gov.in' },
-    trai: { t: 'TRAI consumer complaint framework; Vodafone Idea v. Ajay Kumar Agarwal (SC, 2022)', u: 'https://www.trai.gov.in' },
-    imc: { t: 'Indian Medical Council (Professional Conduct) Regulations, 2002 — records within 72 hours', u: 'https://www.nmc.org.in' }
+    trai: { t: 'TRAI — telecom regulator', u: 'https://www.trai.gov.in' },
+    vodafone: K['Vodafone Idea v. Ajay Kumar Agarwal'],
+    nmc: { t: 'National Medical Commission', u: 'https://www.nmc.org.in' }
   };
   const MAP = {
     'upi-cyber-fraud': ['rbiFraud', 'cyber', 'rbiIOS'], 'bank-account-frozen': ['rbiIOS', 'bnss'], 'failed-payment-debited': ['rbiIOS'],
-    'cheque-bounce': ['ni138', 'sanjabij'], 'money-lent-not-returned': ['ni138', 'sanjabij'], 'loan-recovery': ['rbiIOS', 'rbiDL'], 'credit-card-dispute': ['rbiFraud', 'rbiIOS'], 'credit-report-error': ['rbiIOS'],
+    'cheque-bounce': ['ni138', 'sanjabij', 'lim'], 'money-lent-not-returned': ['lim', 'contract', 'ni138'], 'loan-recovery': ['rbiIOS', 'rbiDL'], 'credit-card-dispute': ['rbiFraud', 'rbiIOS'], 'credit-report-error': ['rbiIOS'],
     'digital-arrest-scam': ['cyber', 'rbiFraud'], 'job-investment-scam': ['cyber', 'sachet', 'rbiFraud'], 'loan-app-harassment': ['rbiDL', 'sachet', 'cyber'], 'bank-service': ['rbiIOS', 'irdai'],
-    'refund-refused': ['cpa', 'nch', 'ejag'], 'defective-product': ['cpa', 'nch', 'ejag'], 'ecommerce-order': ['ecom', 'nch', 'ejag'], 'travel-refund': ['dgca', 'nch'], 'telecom-internet': ['trai', 'cpa'],
-    'insurance-claim': ['irdai', 'bima'], 'builder-delay': ['rera', 'cpa'], 'road-accident': ['mvStay', 'janVishwas'], 'traffic-challan': ['cmvr2026', 'janVishwas', 'echallan'],
-    'medical-negligence': ['imc', 'cpa'], 'electricity-bill': ['elec'], 'education-dispute': ['ugcFee'], 'ragging': ['ugcRag'],
-    'divorce-separation': ['hindu', 'sma', 'bnss'], 'maintenance': ['bnss', 'dv'], 'domestic-violence': ['dv'], 'child-custody': ['hindu'], 'dowry-cruelty': ['bns', 'dv'], 'inheritance-partition': ['hindu'],
-    'court-marriage': ['sma', 'ucc'], 'parents-maintenance': ['senior', 'bnss'], 'death-claims': ['rbiDeceased', 'epfo'], 'live-in': ['dv', 'bnss', 'ucc'], 'gender-identity': ['trans', 'transPortal'],
-    'rental-security-deposit': ['cpa'], 'eviction-tenancy': ['bnss'], 'land-encroachment': ['bnss'], 'property-purchase': ['rera', 'itAct2025'],
-    'unpaid-salary': ['labourCodes'], 'wrongful-termination': ['labourCodes'], 'workplace-harassment': ['posh'], 'pf-gratuity': ['coss', 'epfo'], 'gig-worker': ['coss', 'eshram'], 'internship-creator-pay': ['labourCodes'],
-    'police-complaint': ['bnss'], 'accused-arrest': ['bnss', 'nalsa'], 'police-stop': ['bnss', 'nalsa'], 'legal-notice-received': ['nalsa'],
+    'refund-refused': ['cpa', 'nch', 'ejag'], 'defective-product': ['cpa', 'nch', 'ejag'], 'ecommerce-order': ['ecom', 'cpa', 'nch'], 'travel-refund': ['airsewa', 'nch', 'cpa'], 'telecom-internet': ['vodafone', 'trai', 'cpa'],
+    'insurance-claim': ['bima', 'irdai', 'cpa'], 'builder-delay': ['rera', 'cpa'], 'road-accident': ['mvStay', 'mv'], 'traffic-challan': ['echallan', 'janVishwas', 'mv'],
+    'medical-negligence': ['cpa', 'nmc'], 'electricity-bill': ['elec'], 'education-dispute': ['ugcFee', 'cpa'], 'ragging': ['ugcRag'],
+    'divorce-separation': ['hma', 'sma', 'bnss'], 'maintenance': ['bnss', 'dv'], 'domestic-violence': ['dv'], 'child-custody': ['gwa', 'hmga'], 'dowry-cruelty': ['bns', 'dv'], 'inheritance-partition': ['hsa', 'succession'],
+    'court-marriage': ['sma', 'ucc'], 'parents-maintenance': ['senior', 'bnss'], 'death-claims': ['rbiDeceased', 'epfo', 'hsa'], 'live-in': ['dv', 'bnss', 'ucc'], 'gender-identity': ['trans', 'transPortal'],
+    'rental-security-deposit': ['contract', 'lim'], 'eviction-tenancy': ['tpa', 'sra'], 'land-encroachment': ['sra', 'lim', 'bnss'], 'property-purchase': ['rera', 'tpa', 'itAct2025'],
+    'unpaid-salary': ['labourCodes', 'samadhan'], 'wrongful-termination': ['labourCodes', 'samadhan'], 'workplace-harassment': ['posh', 'shebox'], 'pf-gratuity': ['coss', 'epfo'], 'gig-worker': ['coss', 'eshram'], 'internship-creator-pay': ['contract', 'lim'],
+    'police-complaint': ['bnss'], 'accused-arrest': ['bnss', 'nalsa'], 'police-stop': ['bnss', 'nalsa'], 'legal-notice-received': ['nalsa', 'lim'],
     'online-harassment': ['itRules', 'cyber'], 'intimate-images': ['itRules', 'cyber'], 'account-hacked': ['itRules', 'cyber'], 'gaming-betting': ['gaming', 'cyber'],
-    'nri-property': ['fema', 'madad'], 'nri-sale-repatriation': ['fema', 'itAct2025'], 'nri-poa': ['madad'], 'nri-marriage': ['madad', 'hindu'], 'nri-case-abroad': ['madad', 'bnss'], 'nri-bank-tax': ['fema', 'itAct2025'],
-    'business-unpaid': ['msme', 'ibc'], 'shareholder-dispute': ['companies'], 'partnership-dispute': ['companies'], 'contract-breach': ['ibc'], 'ip-brand': ['companies'], general: ['nalsa']
+    'nri-property': ['sra', 'lim', 'madad'], 'nri-sale-repatriation': ['fema', 'itAct2025'], 'nri-poa': ['madad'], 'nri-marriage': ['madad', 'hma'], 'nri-case-abroad': ['madad', 'bnss'], 'nri-bank-tax': ['fema', 'itAct2025'],
+    'business-unpaid': ['msme', 'msmeOdr', 'lim'], 'shareholder-dispute': ['companies'], 'partnership-dispute': ['partnership', 'contract'], 'contract-breach': ['contract', 'sra', 'commercial'], 'ip-brand': ['tm', 'copyright', 'ipindia'], general: ['nalsa']
   };
   I.forEach((i) => { i.checked = CHECKED; i.sources = MAP[i.id] ? MAP[i.id].map((k) => SRC[k]).filter(Boolean) : (i.sources && i.sources.length ? i.sources : [SRC.nalsa]); });
 
@@ -6465,7 +6558,8 @@ ${JSON.stringify(map)}`;
   function srcBlock(iss) {
     if (!iss || !iss.sources || !iss.sources.length) return '';
     const d = iss.checked ? new Date(iss.checked + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
-    return `<details class="srcs"><summary>${ic('file', 14)} ${esc(X('Law checked {d} · {n} official sources').replace('{d}', d).replace('{n}', iss.sources.length))}</summary><ul>${iss.sources.map((x) => `<li><a href="${esc(x.u)}" target="_blank" rel="noopener">${esc(x.t)}</a></li>`).join('')}</ul><p class="small muted">${esc(X('Law changes. Confirm the current position with an advocate before you act.'))}</p></details>`;
+    const li = (x) => x.u ? `<li><a href="${esc(x.u)}" target="_blank" rel="noopener">${esc(x.t)}</a> <span class="muted">· ${esc(window.ER_CITE.host(x.u))}</span></li>` : `<li>${esc(x.t)}</li>`;
+    return `<details class="srcs"><summary>${ic('file', 14)} ${esc(X('Sources ({n})').replace('{n}', iss.sources.length))}</summary><ul>${iss.sources.map(li).join('')}</ul><p class="small muted">${esc(X('Law changes. Confirm the current position with an advocate before you act.'))}</p></details>`;
   }
   function standCard(iss, items, have) {
     const st = E.stand(iss, S.answers);
@@ -6549,7 +6643,7 @@ ${JSON.stringify(map)}`;
       <div id="qalist">${(() => {
         const qa = (q) => `<details class="qa" id="qa-${q.id}" ${q.id === openId ? 'open' : ''}><summary>${esc(X(q.q))}</summary><div class="body">
         <p>${esc(X(q.a))}</p><p class="small" style="margin:0"><b>${esc(X('What can change the answer'))}</b></p><ul>${q.depends.map((x) => `<li>${esc(X(x))}</li>`).join('')}</ul>
-        <p class="law">Law: ${esc(q.law)}. ${esc(KB.reviewed.label)}.</p>
+        <p class="law">Law: ${window.ER_CITE.linkify(q.law)}. ${esc(KB.reviewed.label)}.</p>
         ${q.journey && BY_ID[q.journey] ? `<button class="btn line" data-play="${q.journey}">${esc(X('Prepare for a lawyer:'))} ${esc(BY_ID[q.journey].short)}</button>` : ''}
       </div></details>`;
         if (!list.length) return '<p class="panel muted">' + esc(X('No match. Try other words, or ')) + '<button class="btn text" data-go="start-general">use general preparation</button>.</p>';
@@ -6700,7 +6794,7 @@ ${JSON.stringify(map)}`;
       TRACK.ev('aid', { x: k });
       return `<div class="dialog wide aid"><h2 id="aidh">${esc(X(R[0]))}</h2><p>${esc(X(R[1]))}</p>
         <div class="aidacts">${k !== 'no' ? `<a class="btn go big" href="tel:15100">${ic('phone', 18)} ${esc(X('Call 15100 — free legal aid'))}</a>` : ''}<a class="btn line" href="tel:14454">${ic('phone', 18)} ${esc(X('Tele-Law 14454 — free advice'))}</a></div>
-        <p class="small">${esc(X('Or visit the District Legal Services Authority at your district court. Take an ID and this list.'))} <a href="https://nalsa.gov.in/services/legal-aid/eligibility" target="_blank" rel="noopener">${esc(X('Who is eligible (NALSA)'))}</a></p>
+        <p class="small">${esc(X('Or visit the District Legal Services Authority at your district court. Take an ID and this list.'))} <a href="https://nalsa.gov.in/legal-aid/" target="_blank" rel="noopener">${esc(X('Who is eligible (NALSA)'))}</a></p>
         <div class="row" style="justify-content:flex-end"><button class="btn line" data-close>${esc(X('Close'))}</button></div></div>`;
     };
     const step1 = `<div class="dialog wide aid"><h2 id="aidh">${esc(X('Do I get a free lawyer?'))}</h2><p class="small muted">${esc(X('Tick anything that is true for you (or the person you are helping).'))}</p>

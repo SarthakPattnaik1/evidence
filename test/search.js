@@ -1,7 +1,7 @@
 /* Search coverage: real-world queries (English, Hinglish) must find the right guide. Run: node test/search.js */
 const fs = require('fs'); const path = require('path');
 global.window = global;
-['kb', 'j-money', 'j-family', 'j-consumer', 'j-other', 'j-nri', 'j-business', 'j-more', 'j-genz', 'j-gaps', 'stand', 'law-2026', 'reviews', 'qa', 'engine'].forEach((f) => require('../src/' + f + '.js'));
+['kb', 'cites', 'j-money', 'j-family', 'j-consumer', 'j-other', 'j-nri', 'j-business', 'j-more', 'j-genz', 'j-gaps', 'stand', 'law-2026', 'reviews', 'qa', 'engine'].forEach((f) => require('../src/' + f + '.js'));
 const K = global.ER_KB, E = global.ER_ENGINE;
 const items = [];
 K.issues.filter((i) => !i.general).forEach((i) => items.push({ text: i.title + ' ' + i.short, syn: i.synonyms, ref: { bonus: 1, id: i.id } }));

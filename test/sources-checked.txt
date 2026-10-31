@@ -1,0 +1,99 @@
+# Links opened and matched to their label on 31 Oct 2026. Format: URL [note]
+# "blocked": refused automated checks from cloud servers in India and the US; confirm on a phone.
+https://aftdelhi.nic.in blocked
+https://airsewa.gov.in
+https://awbi.gov.in
+https://bimabharosa.irdai.gov.in
+https://cara.wcd.gov.in
+https://cgat.gov.in
+https://cms.rbi.org.in
+https://consumeraffairs.gov.in/public/upload/admin/cmsfiles/whatsnews/E_Commerce_Amendment_Rules_2026_2026-09-11_18-12-39.pdf
+https://consumerhelpline.gov.in
+https://cpcb.nic.in
+https://crsorgi.gov.in
+https://cybercrime.gov.in
+https://depwd.gov.in
+https://dolr.gov.in
+https://e-jagriti.gov.in
+https://echallan.parivahan.gov.in
+https://egazette.gov.in blocked
+https://epfigms.gov.in
+https://eshram.gov.in
+https://incometaxindia.gov.in blocked
+https://indiankanoon.org/doc/1017213/
+https://indiankanoon.org/doc/10239019/
+https://indiankanoon.org/doc/104309066/
+https://indiankanoon.org/doc/1132672/
+https://indiankanoon.org/doc/1136195/
+https://indiankanoon.org/doc/117541087/
+https://indiankanoon.org/doc/118724005/
+https://indiankanoon.org/doc/122264633/
+https://indiankanoon.org/doc/1317393/
+https://indiankanoon.org/doc/149138346/
+https://indiankanoon.org/doc/164693074/
+https://indiankanoon.org/doc/166607072/
+https://indiankanoon.org/doc/1671917/
+https://indiankanoon.org/doc/1684706/
+https://indiankanoon.org/doc/171398/
+https://indiankanoon.org/doc/1874830/
+https://indiankanoon.org/doc/198100584/
+https://indiankanoon.org/doc/199850448/
+https://indiankanoon.org/doc/2982624/
+https://indiankanoon.org/doc/352833/
+https://indiankanoon.org/doc/35616442/
+https://indiankanoon.org/doc/4234/
+https://indiankanoon.org/doc/48103131/
+https://indiankanoon.org/doc/515323/
+https://indiankanoon.org/doc/542601/
+https://indiankanoon.org/doc/590166/
+https://indiankanoon.org/doc/65068227/
+https://indiankanoon.org/doc/67965481/
+https://indiankanoon.org/doc/685111/
+https://indiankanoon.org/doc/76168618/
+https://indiankanoon.org/doc/79830357/
+https://indiankanoon.org/doc/91117739/
+https://indiankanoon.org/doc/989920/
+https://ipindia.gov.in
+https://irdai.gov.in
+https://labour.gov.in
+https://madad.gov.in blocked
+https://mohua.gov.in
+https://nalsa.gov.in
+https://nalsa.gov.in/legal-aid/
+https://ncsc.nic.in
+https://ncw.nic.in blocked
+https://nhai.gov.in
+https://pencil.gov.in
+https://pgportal.gov.in
+https://pgportal.gov.in/pension
+https://powermin.gov.in
+https://rtionline.gov.in
+https://sachet.rbi.org.in
+https://samadhaan.msme.gov.in
+https://samadhan.labour.gov.in
+https://sancharsaathi.gov.in
+https://services.ecourts.gov.in
+https://shebox.wcd.gov.in
+https://stopncii.org
+https://trackthemissingchild.gov.in blocked
+https://transgender.dosje.gov.in blocked
+https://ucc.uk.gov.in
+https://uidai.gov.in
+https://vahan.parivahan.gov.in blocked
+https://wcd.gov.in blocked
+https://www.antiragging.in
+https://www.cioins.co.in
+https://www.cooperation.gov.in blocked
+https://www.esic.gov.in
+https://www.gst.gov.in
+https://www.incometax.gov.in
+https://www.mca.gov.in blocked
+https://www.nmc.org.in
+https://www.passportindia.gov.in
+https://www.rbi.org.in
+https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx?prid=63011
+https://www.rbi.org.in/scripts/NotificationUser.aspx?Id=12848
+https://www.sancharsaathi.gov.in
+https://www.swavlambancard.gov.in
+https://www.trai.gov.in
+https://www.ugc.gov.in

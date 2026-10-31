@@ -79,15 +79,15 @@ def run():
     for i in data['issues']:
         if i['id'] == 'general':
             continue
-        srcs = ''.join(f'<li><a href="{e(s["u"])}" rel="noopener">{e(s["t"])}</a></li>' for s in (i.get('sources') or []))
+        srcs = ''.join((f'<li><a href="{e(s["u"])}" rel="noopener">{e(s["t"])}</a></li>' if s.get('u') else f'<li>{e(s["t"])}</li>') for s in (i.get('sources') or []))
         ev = ''.join(f'<li><b>{e(x["name"])}</b><br><span class="muted">{e(x["why"])}</span></li>' for x in i['evidence'][:14])
         qs = ''.join(f'<li>{e(q)}</li>' for q in i['questions'])
         body = f"""<p class="muted">{e(cats.get(i['cat'], ''))}</p><h1>{e(i['title'])}</h1><p>{e(i['intro'])}</p>
 <a class="cta" href="/#start-{e(i['id'])}">Answer a few questions and get your list →</a>
-<h2>What the law says</h2><div class="box"><p>{e(i['juris'])}</p><p class="muted"><span class="tag">Law checked {e(i.get('checked',''))}</span> {('Reviewed by ' + e(i['review']['by']) + (' (' + e(i['review'].get('enrol','')) + ')' if i['review'].get('enrol') else '') + ' on ' + e(i['review']['date'])) if i.get('review') else 'Draft — not yet reviewed by a named advocate.'}</p></div>
+<h2>What the law says</h2><div class="box"><p>{e(i['juris'])}</p><p class="muted">{('Reviewed by ' + e(i['review']['by']) + (' (' + e(i['review'].get('enrol','')) + ')' if i['review'].get('enrol') else '') + ' on ' + e(i['review']['date'])) if i.get('review') else 'Draft — not yet reviewed by a named advocate.'}</p></div>
 <h2>Papers that usually help</h2><ul>{ev}</ul>
 <h2>Questions Saboot will ask you</h2><ul>{qs}</ul>
-<h2>Official sources</h2><ul>{srcs}</ul>
+<h2>Sources</h2><ul>{srcs}</ul>
 <a class="cta" href="/#start-{e(i['id'])}">Start — it's free, no sign-up</a>
 <p class="muted">Also searched as: {e(', '.join(i.get('synonyms', [])[:12]))}</p>"""
         desc = (i['short'] + ' — ' + i['intro'])[:155]
@@ -120,7 +120,7 @@ def run():
         ('what', 'What Saboot is', '<p>Saboot is a free tool that asks simple questions and gives you a list of papers and facts to take to an advocate, in your language.</p>'),
         ('barcouncil', 'Disclaimer (Bar Council of India rules)', '<p>The Bar Council of India does not allow advocates to advertise or solicit work. Saboot is made by advocates. By using Saboot you confirm that you are visiting it on your own wish to get general information, and that there has been no advertisement, solicitation, invitation or inducement of any kind from Saboot, its makers or any advocate. Nothing on Saboot is an offer of legal services. Saboot shows this disclaimer, with “I agree” and “I disagree”, before it can be used.</p>'),
         ('advice', 'Not legal advice', '<p>Saboot gives general information. It does not give legal advice, does not tell you what a court will decide, and does not say whether a document will be accepted. Using Saboot does not create an advocate–client relationship.</p>'),
-        ('accuracy', 'Accuracy and updates', '<p>Each guide is prepared from official sources and shows the date its law was last checked. Guides marked <b>Draft</b> have not yet been reviewed by an advocate. Laws, deadlines and fees can change, so confirm with an advocate before you act.</p>'),
+        ('accuracy', 'Accuracy and updates', '<p>Each guide lists its sources: the Act, rule or judgment it relies on, linked to the full text where we could confirm the exact page. Guides marked <b>Draft</b> have not yet been reviewed by an advocate. Laws, deadlines and fees can change, so confirm with an advocate before you act.</p>'),
         ('use', 'Using Saboot fairly', '<ul><li>Use Saboot only for lawful purposes.</li><li>Do not try to obtain other people’s records without lawful permission.</li><li>Do not misuse the service or try to disrupt it.</li></ul>'),
         ('advocates', 'Advocates', '<p>Saboot does not recommend, rank or advertise any advocate. Choose any advocate you trust. Free legal aid is available from your Legal Services Authority — call 15100.</p>'),
         ('links', 'Links to other websites', '<p>Guides link to official websites (for example cybercrime.gov.in or e-Jagriti). We are not responsible for their content or availability.</p>'),
