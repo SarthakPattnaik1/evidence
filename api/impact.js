@@ -6,7 +6,7 @@
 // This deliberately undercounts (a family on one Wi-Fi counts once), so totals can be stated as "at least".
 const { hasStore, store, dayKey, send, crypto } = require('./_lib.js');
 const START = '2026-10-31';
-const LABEL = { 'v:visit': 'people who used Saboot', 'v:agree': 'agreed to the disclaimer', 'v:start': 'started a guide', 'v:list': 'got a list of papers', 'v:print': 'printed or saved the list', 'v:share': 'shared it', 'v:done': 'finished all questions', 'v:voice': 'used voice' };
+const LABEL = { 'v:visit': 'people who used Saboot', 'v:agree': 'agreed to the disclaimer', 'v:start': 'started a guide', 'v:list': 'got a list of papers', 'v:print': 'printed or saved the list', 'v:share': 'shared it', 'v:done': 'finished all questions', 'v:voice': 'used voice', 'v:remind': 'set a deadline reminder', 'v:aid': 'found they likely qualify for a free lawyer', 'v:met': 'said they met an advocate', 'v:helped': 'said the list helped' };
 module.exports = async (req, res) => {
   if (!hasStore()) return send(res, 503, { error: 'storage not set up' });
   const today = dayKey(); const days = [];

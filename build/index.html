@@ -975,6 +975,39 @@ body.consenting{overflow:hidden}
 .overlay.consent{padding-top:max(14px,3vh)}
 @media (max-height:640px){.cs-list{max-height:20vh}.cs-lead{display:none}.cs-top{margin-bottom:4px}.dialog.cs h2{font-size:20px;margin:0 0 6px}.cs-sos{padding:6px 8px}.cs-sos .sosnum{padding:4px 9px}}
 .cs-list:focus-visible{outline:3px solid var(--go);outline-offset:4px;border-radius:6px}
+/* v31 — next steps: reminders, where to go, free lawyer, read aloud, follow-up */
+.carryhead .listen{margin-top:8px;color:var(--ink);background:rgba(255,255,255,.7);border:1px solid var(--line);border-radius:999px;padding:6px 14px;min-height:40px}
+.carryhead .listen.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.banner .remind{margin-top:8px;padding:6px 12px;min-height:38px;border:1px solid currentColor;border-radius:999px;color:inherit;background:rgba(255,255,255,.6);font-weight:700}
+.wherebox{margin:18px 0 10px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 16px 8px}
+.wherebox .lh{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-size:17px}
+.wherebox ul{margin:0;padding-left:20px}
+.wherebox li{margin:0 0 6px;line-height:1.45}
+.wherebox a{color:var(--ink);font-weight:600}
+.nextrow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--p-mint,#E3F4EC);border:0;border-radius:14px;padding:12px 14px;margin:6px 0 14px;cursor:pointer;color:var(--ink);min-height:56px}
+.nextrow>svg:first-child{flex:none}
+.nextrow span{flex:1;display:flex;flex-direction:column;line-height:1.3}
+.nextrow span b{font-size:16px}
+.nextrow span{font-size:14px;color:var(--ink2)}
+.nextrow:hover{filter:brightness(.98)}
+.dialog.aid h2,.dialog.rem h2{display:flex;align-items:center;gap:8px;font-size:21px;margin:0 0 6px}
+.aidcats{display:grid;gap:8px;margin:12px 0 16px}
+.aidcats .check{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:12px;font-size:15.5px;line-height:1.35;cursor:pointer}
+.aidcats .check input{width:20px;height:20px;flex:none;margin-top:1px}
+.aidacts,.remacts{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.aidacts .btn,.remacts .btn{justify-content:center}
+.remopts{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 6px}
+.remopts .btn{flex:1 1 90px}
+.remdate{flex:1 1 100%;display:flex;align-items:center;gap:8px;font-size:14.5px;color:var(--ink2);margin-top:4px}
+.remdate input{flex:1;padding:10px;border:1px solid var(--line);border-radius:10px;font:inherit}
+.oc{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;background:var(--p-butter,#FFF3D3);border:1px solid #F0DFAE;border-radius:14px;padding:12px 14px;margin:0 0 14px}
+.oc p{margin:0;flex:1 1 220px;line-height:1.4}
+.ocb{display:flex;flex-wrap:wrap;gap:6px}
+.ocb .btn{min-height:40px}
+@media print{.wherebox{border:1px solid #000;break-inside:avoid}.wherebox a{text-decoration:none}.wherebox a::after{content:" (" attr(href) ")";font-weight:400;font-size:12px}}
+.carryhead .fh b{color:#6B4700}
+.dialog .btn.wa,.btn.wa{background:#0E7A3D;color:#fff;border-color:#0E7A3D}
+.dialog .btn.wa:hover,.btn.wa:hover{background:#0B6633}
 </style>
 <script defer src="/_vercel/insights/script.js"></script>
 </head>
@@ -4728,6 +4761,93 @@ body.consenting{overflow:hidden}
     sources: [SRC.landAcq, S('National Highways Authority of India', 'https://nhai.gov.in'), SRC.nalsa]
   });
 
+  /* ---- Where to go with these papers: official offices only — never an advocate (Bar Council rules) ---- */
+  const O = {
+    dlsa: ['District Legal Services Authority (free legal aid) — call 15100', 'https://nalsa.gov.in'],
+    police: ['Your nearest police station — any station must take a Zero FIR', null],
+    cyber: ['Cyber crime portal or your district cyber police station — call 1930', 'https://cybercrime.gov.in'],
+    rbi: ['RBI Ombudsman (after the bank’s own complaint, or 30 days)', 'https://cms.rbi.org.in'],
+    bank: ['Your bank branch — ask for a written acknowledgement', null],
+    nch: ['National Consumer Helpline — call 1915 (free mediation first)', 'https://consumerhelpline.gov.in'],
+    cons: ['District Consumer Commission (file online on e-Jagriti)', 'https://e-jagriti.gov.in'],
+    family: ['Family Court of your district (the DLSA can help you file free)', null],
+    po: ['Protection Officer or One Stop Centre of your district — call 181', null],
+    rera: ['Your state Real Estate Regulatory Authority (RERA)', null],
+    rent: ['Rent Authority / Rent Controller, or the civil court of your district', null],
+    tehsil: ['Tehsildar / revenue office of your area', null],
+    civil: ['Civil court of your district (the DLSA can help you file free)', null],
+    labour: ['Labour Commissioner / labour office of your district', 'https://samadhan.labour.gov.in'],
+    epfo: ['EPFO grievance portal or your EPFO office', 'https://epfigms.gov.in'],
+    posh: ['Internal Committee at work, or the Local Committee (SHe-Box)', 'https://shebox.wcd.gov.in'],
+    mact: ['Motor Accident Claims Tribunal of your district', null],
+    ins: ['Insurer’s grievance cell, then Bima Bharosa / Insurance Ombudsman', 'https://bimabharosa.irdai.gov.in'],
+    madad: ['Indian embassy or consulate (MADAD portal)', 'https://madad.gov.in'],
+    msme: ['MSME Samadhaan (delayed payment council)', 'https://samadhaan.msme.gov.in'],
+    nclt: ['National Company Law Tribunal (NCLT)', 'https://nclt.gov.in'],
+    ip: ['Trade Marks Registry / IP India', 'https://ipindia.gov.in'],
+    echallan: ['eChallan portal or the virtual traffic court', 'https://echallan.parivahan.gov.in'],
+    cgrf: ['Consumer Grievance Redressal Forum of your electricity company', null],
+    senior: ['Maintenance Tribunal (SDM office) of your district — call 14567', null],
+    marriage: ['Marriage Officer / Registrar of Marriages of your district', null],
+    airsewa: ['AirSewa (flights) or the National Consumer Helpline', 'https://airsewa.gov.in'],
+    trai: ['Your operator’s appellate authority, then CPGRAMS', 'https://pgportal.gov.in'],
+    ugc: ['UGC e-Samadhaan (colleges) or District Education Officer (schools)', 'https://www.ugc.gov.in'],
+    smc: ['State Medical Council, or the Consumer Commission for compensation', null],
+    ragging: ['National Anti-Ragging Helpline 1800-180-5522', 'https://www.antiragging.in'],
+    trans: ['National Portal for Transgender Persons (ID and certificate)', 'https://transgender.dosje.gov.in'],
+    eshram: ['e-Shram registration, and your district labour office', 'https://eshram.gov.in'],
+    muni: ['Municipal corporation / ward office of your area', null],
+    sdm: ['Sub-Divisional Magistrate (SDM) for public nuisance', null],
+    coop: ['Registrar of Co-operative Societies of your district', null],
+    subreg: ['Sub-Registrar office (registration of deeds)', null],
+    cara: ['CARA (adoption) and the District Child Protection Unit', 'https://cara.wcd.gov.in'],
+    cat: ['Central / State Administrative Tribunal', 'https://cgat.gov.in'],
+    pension: ['CPENGRAMS — pension grievances', 'https://pgportal.gov.in/pension'],
+    esic: ['ESIC branch office, and the labour office of your district', 'https://www.esic.gov.in'],
+    ncsc: ['Superintendent of Police, and the National Commission for SCs / STs', 'https://ncsc.nic.in'],
+    dm: ['District Magistrate (bonded labour) — call 1098 for children', null],
+    pencil: ['PENCIL portal (child labour)', 'https://pencil.gov.in'],
+    rto: ['Your RTO, or Vahan online', 'https://vahan.parivahan.gov.in'],
+    ceir: ['Sanchar Saathi — block the phone (after the police report)', 'https://www.sancharsaathi.gov.in'],
+    track: ['Police station, and the Khoya-Paya missing children portal', 'https://trackthemissingchild.gov.in'],
+    birth: ['Birth and death registrar (municipality / panchayat)', 'https://crsorgi.gov.in'],
+    gazette: ['e-Gazette (name change publication)', 'https://egazette.gov.in'],
+    rti: ['RTI to the office concerned, and CPGRAMS', 'https://rtionline.gov.in'],
+    it: ['Income Tax e-filing portal → e-Proceedings', 'https://www.incometax.gov.in'],
+    gst: ['GST portal', 'https://www.gst.gov.in'],
+    la: ['Collector / Land Acquisition Officer, then the Land Acquisition Authority', null],
+    platform: ['The platform’s Grievance Officer (in its app or website)', null],
+    hosp: ['Government hospital (free anti-rabies vaccine), then the municipality', null],
+    ecourts: ['eCourts — check case status and next date', 'https://services.ecourts.gov.in']
+  };
+  const WHERE = {
+    'bank-account-frozen': ['bank', 'cyber', 'dlsa'], 'upi-cyber-fraud': ['cyber', 'bank', 'rbi'], 'failed-payment-debited': ['bank', 'rbi'],
+    'rental-security-deposit': ['rent', 'cons', 'dlsa'], 'unpaid-salary': ['labour', 'dlsa'], 'money-lent-not-returned': ['dlsa', 'civil'],
+    'refund-refused': ['nch', 'cons'], 'divorce-separation': ['family', 'dlsa'], 'maintenance': ['family', 'dlsa'], general: ['dlsa'],
+    'cheque-bounce': ['dlsa', 'ecourts'], 'loan-recovery': ['rbi', 'dlsa'], 'credit-card-dispute': ['bank', 'rbi'], 'credit-report-error': ['rbi'],
+    'domestic-violence': ['po', 'police', 'dlsa'], 'child-custody': ['family', 'dlsa'], 'dowry-cruelty': ['po', 'police', 'dlsa'],
+    'inheritance-partition': ['tehsil', 'civil', 'dlsa'], 'defective-product': ['nch', 'cons'], 'insurance-claim': ['ins', 'cons'],
+    'builder-delay': ['rera', 'cons'], 'eviction-tenancy': ['rent', 'dlsa'], 'land-encroachment': ['police', 'tehsil', 'civil'],
+    'wrongful-termination': ['labour', 'dlsa'], 'workplace-harassment': ['posh', 'police'], 'police-complaint': ['police', 'dlsa'],
+    'accused-arrest': ['dlsa', 'ecourts'], 'legal-notice-received': ['dlsa'], 'road-accident': ['police', 'mact', 'dlsa'],
+    'online-harassment': ['cyber', 'platform'], 'nri-property': ['madad', 'police', 'civil'], 'nri-sale-repatriation': ['subreg', 'bank'],
+    'nri-poa': ['madad', 'subreg'], 'nri-marriage': ['madad', 'family', 'dlsa'], 'nri-case-abroad': ['madad', 'ecourts', 'dlsa'], 'nri-bank-tax': ['bank', 'it'],
+    'business-unpaid': ['msme', 'civil'], 'shareholder-dispute': ['nclt'], 'partnership-dispute': ['civil'], 'contract-breach': ['civil'], 'ip-brand': ['ip', 'platform'],
+    'digital-arrest-scam': ['cyber', 'bank'], 'job-investment-scam': ['cyber', 'bank'], 'loan-app-harassment': ['cyber', 'rbi'],
+    'ecommerce-order': ['nch', 'cons'], 'travel-refund': ['airsewa', 'cons'], 'telecom-internet': ['trai', 'cons'], 'bank-service': ['bank', 'rbi'],
+    'traffic-challan': ['echallan'], 'electricity-bill': ['cgrf', 'cons'], 'court-marriage': ['marriage', 'police'], 'parents-maintenance': ['senior', 'dlsa'],
+    'death-claims': ['bank', 'tehsil', 'epfo'], 'property-purchase': ['subreg', 'rera', 'tehsil'], 'pf-gratuity': ['epfo', 'labour'],
+    'medical-negligence': ['smc', 'cons'], 'education-dispute': ['ugc', 'cons'], 'intimate-images': ['cyber', 'platform', 'police'],
+    'account-hacked': ['platform', 'cyber'], 'gaming-betting': ['cyber'], 'internship-creator-pay': ['labour', 'dlsa'], 'ragging': ['ragging', 'police'],
+    'live-in': ['po', 'dlsa'], 'gender-identity': ['trans', 'dlsa'], 'police-stop': ['dlsa'], 'gig-worker': ['eshram', 'labour'],
+    'neighbour-dispute': ['muni', 'sdm', 'police'], 'society-dispute': ['coop', 'rera'], 'land-records': ['tehsil', 'rti'], 'will-gift': ['subreg', 'senior'],
+    'adoption-guardianship': ['cara', 'family'], 'govt-service': ['cat', 'pension'], 'workplace-injury': ['esic', 'labour'], 'assault-threat': ['police', 'dlsa'],
+    'defamation': ['platform', 'police', 'dlsa'], 'lost-phone': ['police', 'ceir'], 'missing-person': ['track', 'police'], 'sexual-assault': ['po', 'police', 'dlsa'],
+    'caste-atrocity': ['police', 'ncsc', 'dlsa'], 'trafficking': ['dm', 'pencil', 'police'], 'vehicle-transfer': ['rto', 'police'], 'dog-bite': ['hosp', 'muni'],
+    'documents-correction': ['birth', 'gazette'], 'govt-benefits': ['rti', 'dlsa'], 'tax-notice': ['it', 'gst'], 'land-acquisition': ['la', 'dlsa']
+  };
+  I.forEach((i) => { i.where = (WHERE[i.id] || ['dlsa']).map((k) => ({ t: O[k][0], u: O[k][1] })); });
+
   /* ---- Directory topics now covered by full guides ---- */
   const covered = ['Guardianship or adoption', 'Housing society or RWA dispute', 'Threats, assault or extortion', 'Defamation', 'Government certificate, ID or pension problem', 'RTI (Right to Information) request', 'Workplace injury', 'Boundary or access dispute', 'Will dispute', 'Notice period or resignation dispute'];
   KB.directory = KB.directory.filter((d) => !covered.includes(d.title));
@@ -5587,6 +5707,10 @@ body.consenting{overflow:hidden}
 
   /* ---------- icons ---------- */
   const P = {
+    bell: '<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15Z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
+    speaker: '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/>',
+    pin: '<path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.3"/>',
+    scale: '<path d="M12 4v16M7 20h10M5 7h14"/><path d="m5 7-2.5 6a3 3 0 0 0 5 0Zm14 0-2.5 6a3 3 0 0 0 5 0Z"/>',
     mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3M8.5 21h7"/>',
     stop: '<rect x="7" y="7" width="10" height="10" rx="2"/>',
     family: '<circle cx="8" cy="7" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M2.5 20c.5-3.6 2.8-6 5.5-6s5 2.4 5.5 6"/><path d="M14 20c.3-2.6 1.6-4.5 3.2-4.5S20.6 17.4 21 20"/>',
@@ -5963,6 +6087,7 @@ ${JSON.stringify(map)}`;
         <div class="hart"><img src="${window.ER_BRAND.hero}" alt="" width="872" height="1320"></div>
       </div></section>
       <div class="wrap home" id="start">
+        ${outcomeCard()}
         ${saved && saved.issueId ? `<div class="resume">${ic('folder', 20)}<span><b>${esc(T('listh'))}</b> ${esc((BY_ID[saved.issueId] || {}).short || '')}</span><button class="btn go sm" data-act="resume">${esc(T('seelist'))}</button><button class="btn text sm" data-act="forget" aria-label="${esc(T('delall'))}">${ic('x', 18)}</button></div>` : ''}
         <div class="sosbar" role="note">${ic('alert', 18)}<span>${esc(X('In danger, arrested, or money just stolen?'))}</span><span class="sosnums">${[['e112', 'Emergency'], ['cy1930', 'Cyber fraud'], ['l15100', 'Legal aid']].filter(([k]) => KB.help[k]).map(([k, t]) => `<a class="sosnum" href="tel:${KB.help[k].label.replace(/\D/g, '')}" aria-label="${esc(X(t))} ${esc(KB.help[k].label)}">${ic('phone', 14)} ${esc(KB.help[k].label)} <small>${esc(X(t))}</small></a>`).join('')}</span></div>
         <h2 class="lh homeh">${esc(X('What happened to you?'))}</h2>
@@ -6205,10 +6330,12 @@ ${JSON.stringify(map)}`;
       <p style="margin-top:14px"><button class="btn text" data-act="skip">${esc(T('skip'))}</button></p>
     </div>`, { inJourney: true });
   }
+  const isDeadline = (u) => /\b\d+[\s-]*(day|days|hour|hours|week|weeks|month|months|year|years)\b|deadline|time limit|window|limit/i.test(u.title + ' ' + u.text);
   function urgentBanner(u, iss) {
     iss = iss || issue();
     const help = (u.help || []).map((h) => KB.help[h]).filter(Boolean);
-    return `<div class="banner ${u.level}" role="${u.level === 'now' ? 'alert' : 'note'}">${ic(u.level === 'info' ? 'info' : 'alert')}<div><h3>${esc(G(iss, u.id + '.t', u.title))}</h3><p>${esc(G(iss, u.id + '.x', u.text))}</p>${help.length ? `<p class="small" style="margin-top:6px">${help.map((h) => `<b>${esc(h.label)}</b> ${esc(X(h.name))}`).join(' | ')}</p>` : ''}</div></div>`;
+    const rem = isDeadline(u) ? `<button class="btn text sm remind noprint" data-act="remind" data-u="${u.id}">${ic('bell', 16)} ${esc(X('Remind me'))}</button>` : '';
+    return `<div class="banner ${u.level}" role="${u.level === 'now' ? 'alert' : 'note'}">${ic(u.level === 'info' ? 'info' : 'alert')}<div><h3>${esc(G(iss, u.id + '.t', u.title))}</h3><p>${esc(G(iss, u.id + '.x', u.text))}</p>${rem}${help.length ? `<p class="small" style="margin-top:6px">${help.map((h) => `<b>${esc(h.label)}</b> ${esc(X(h.name))}`).join(' | ')}</p>` : ''}</div></div>`;
   }
   function answer(q, val) {
     const iss = issue();
@@ -6249,6 +6376,7 @@ ${JSON.stringify(map)}`;
   const ACTION_ST = () => [['have', T('s_done')], ['find', T('s_notdone')], ['na', T('s_na')]];
   function viewList() {
     const iss = issue();
+    rememberGuide(iss.id);
     const items = E.evidence(iss, S.answers);
     const must = new Set((S.adv && S.adv.issueId === iss.id && S.adv.must) || []);
     const order = (a, b) => (must.has(b.id) - must.has(a.id)) || ((!!b.time) - (!!a.time));
@@ -6264,6 +6392,7 @@ ${JSON.stringify(map)}`;
       <button class="btn text noprint" data-go="home">${ic('back', 20)} ${esc(T('home'))}</button>
       ${S.adv && S.adv.issueId === iss.id ? advBanner(S.adv) : ''}
       <div class="carryhead"><p class="typed">${esc(S.topic ? S.topic.title : G(iss, 's', iss.short))}</p><h1>${esc(T('carry'))}</h1>
+        <button class="btn text sm listen noprint" data-act="readaloud" aria-pressed="false">${ic('speaker', 18)} <span>${esc(X('Read my list aloud'))}</span></button>
         <p class="fh">${esc(T('tickhave'))} <b>${have}/${papers.length}</b></p></div>
       ${trNote()}
       ${urg.map((u) => urgentBanner(u, iss)).join('')}
@@ -6271,6 +6400,8 @@ ${JSON.stringify(map)}`;
       <h2 class="lh">${esc(T('papers'))} <span class="muted small">(${papers.length})</span></h2>
       <div class="checks" id="evlist">${papers.map((e) => checkRow(e, iss, must.has(e.id))).join('')}</div>
       <p class="muted small" style="margin-top:10px">${esc(T('worry'))}</p>
+      ${whereBox(iss)}
+      <button class="nextrow noprint" data-act="aidcheck">${ic('scale', 20)}<span><b>${esc(X('Do I get a free lawyer?'))}</b>${esc(X('Check in 3 taps'))}</span>${ic('chev', 20)}</button>
       ${infos.map((x) => `<div class="banner info">${ic('info')}<div><p>${esc(G(iss, 'info' + iss.info.indexOf(x), x.text))}</p></div></div>`).join('')}
       ${standCard(iss, papers, have)}
       ${srcBlock(iss)}
@@ -6545,6 +6676,162 @@ ${JSON.stringify(map)}`;
     ov.querySelector('[aria-current="true"]')?.focus();
   }
 
+  /* ============ NEXT STEPS: where to go, free lawyer, reminders, read aloud, follow-up ============ */
+  // Where to go with the papers — official offices only, never an advocate (Bar Council rules).
+  function whereBox(iss) {
+    const w = iss.where || []; if (!w.length) return '';
+    const row = (x) => `<li>${x.u ? `<a href="${esc(x.u)}" target="_blank" rel="noopener">${esc(X(x.t))}</a>` : esc(X(x.t))}</li>`;
+    return `<div class="wherebox"><h2 class="lh">${ic('pin', 20)} ${esc(X('Where to go with these papers'))}</h2><ul>${w.map(row).join('')}</ul></div>`;
+  }
+
+  // Free legal aid check (Section 12, Legal Services Authorities Act, 1987). Three taps at most.
+  function showAid() {
+    TRACK.once('aidopen');
+    const cats = [['woman', 'A woman'], ['child', 'A child (under 18), or asking for a child'], ['scst', 'From a Scheduled Caste or Scheduled Tribe'], ['dis', 'A person with a disability'],
+      ['worker', 'An industrial worker'], ['custody', 'In jail, police custody or a protective home'], ['victim', 'A victim of trafficking, forced labour, a disaster, riot or caste atrocity']];
+    const ov = document.createElement('div'); ov.className = 'overlay'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-labelledby', 'aidh');
+    const result = (k) => {
+      const R = {
+        yes: ['You can get a free lawyer', 'People in this group get free legal aid whatever their income.'],
+        likely: ['You can likely get a free lawyer', 'Your income is within the usual limit. The exact limit depends on your state.'],
+        maybe: ['You may be able to get a free lawyer', 'Ask the Legal Services Authority — they will tell you in one call.'],
+        no: ['You can still get free advice', 'Even if you do not qualify for a free lawyer, Tele-Law gives free advice to everyone, and Lok Adalats settle many cases without fees.']
+      }[k];
+      TRACK.ev('aid', { x: k });
+      return `<div class="dialog wide aid"><h2 id="aidh">${esc(X(R[0]))}</h2><p>${esc(X(R[1]))}</p>
+        <div class="aidacts">${k !== 'no' ? `<a class="btn go big" href="tel:15100">${ic('phone', 18)} ${esc(X('Call 15100 — free legal aid'))}</a>` : ''}<a class="btn line" href="tel:14454">${ic('phone', 18)} ${esc(X('Tele-Law 14454 — free advice'))}</a></div>
+        <p class="small">${esc(X('Or visit the District Legal Services Authority at your district court. Take an ID and this list.'))} <a href="https://nalsa.gov.in/services/legal-aid/eligibility" target="_blank" rel="noopener">${esc(X('Who is eligible (NALSA)'))}</a></p>
+        <div class="row" style="justify-content:flex-end"><button class="btn line" data-close>${esc(X('Close'))}</button></div></div>`;
+    };
+    const step1 = `<div class="dialog wide aid"><h2 id="aidh">${esc(X('Do I get a free lawyer?'))}</h2><p class="small muted">${esc(X('Tick anything that is true for you (or the person you are helping).'))}</p>
+      <div class="aidcats">${cats.map(([v, l]) => `<label class="check"><input type="checkbox" value="${v}"> ${esc(X(l))}</label>`).join('')}</div>
+      <div class="row" style="justify-content:space-between"><button class="btn line" data-close>${esc(X('Close'))}</button><button class="btn go" data-aid="next">${esc(X('Next'))}</button></div></div>`;
+    const step2 = `<div class="dialog wide aid"><h2 id="aidh">${esc(X('Is your family’s total income below ₹3 lakh a year?'))}</h2><p class="small muted">${esc(X('The limit depends on your state — between ₹1 lakh and ₹3 lakh in most states. In Delhi it is ₹3 lakh, and ₹4 lakh for senior citizens and transgender persons.'))}</p>
+      <div class="aidcats"><button class="btn line" data-aid="inc-yes">${esc(X('Yes'))}</button><button class="btn line" data-aid="inc-no">${esc(X('No'))}</button><button class="btn line" data-aid="inc-ns">${esc(T('notsure'))}</button></div></div>`;
+    ov.innerHTML = step1; document.body.appendChild(ov);
+    const close = () => ov.remove();
+    ov.addEventListener('click', (e) => {
+      if (e.target === ov || e.target.closest('[data-close]')) return close();
+      const b = e.target.closest('[data-aid]'); if (!b) return;
+      const a = b.dataset.aid;
+      if (a === 'next') { ov.innerHTML = [...ov.querySelectorAll('input:checked')].length ? result('yes') : step2; }
+      else ov.innerHTML = result(a === 'inc-yes' ? 'likely' : a === 'inc-ns' ? 'maybe' : 'no');
+      ov.querySelector('h2').setAttribute('tabindex', '-1'); ov.querySelector('h2').focus();
+    });
+    ov.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+    ov.querySelector('h2').setAttribute('tabindex', '-1'); ov.querySelector('h2').focus();
+  }
+
+  const LBCP = { en: 'en-IN', hi: 'hi-IN', bn: 'bn-IN', te: 'te-IN', mr: 'mr-IN', ta: 'ta-IN', ur: 'ur-IN', gu: 'gu-IN', kn: 'kn-IN', or: 'or-IN', ml: 'ml-IN', pa: 'pa-IN', as: 'as-IN', ne: 'ne-NP', mai: 'hi-IN', doi: 'hi-IN', kok: 'mr-IN', sa: 'hi-IN', brx: 'hi-IN', ks: 'ur-IN', sd: 'ur-IN', sat: 'hi-IN', mni: 'bn-IN' };
+  // Deadline reminder: add to the phone's calendar (.ics) or send to their own WhatsApp.
+  function showRemind(u, iss) {
+    const title = G(iss, u.id + '.t', u.title), text = G(iss, u.id + '.x', u.text);
+    const pad = (n) => String(n).padStart(2, '0');
+    const at = (days) => { const d = new Date(); d.setDate(d.getDate() + days); d.setHours(10, 0, 0, 0); return d; };
+    let when = at(1);
+    const ov = document.createElement('div'); ov.className = 'overlay'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-labelledby', 'remh');
+    const today = new Date(); const min = today.getFullYear() + '-' + pad(today.getMonth() + 1) + '-' + pad(today.getDate());
+    const fmt = (d) => d.toLocaleDateString(LBCP[LANG] || 'en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+    const link = location.origin + '/guide/' + iss.id;
+    const msg = () => `${X('Saboot reminder')} (${fmt(when)}): ${title}. ${text} ${link}`;
+    const draw = () => {
+      ov.innerHTML = `<div class="dialog wide rem"><h2 id="remh">${ic('bell', 22)} ${esc(X('Remind me'))}</h2><p class="small"><b>${esc(title)}</b></p>
+        <div class="remopts">${[[1, 'Tomorrow'], [3, 'In 3 days'], [7, 'In 1 week']].map(([n, l]) => `<button class="btn ${when.toDateString() === at(n).toDateString() ? 'go' : 'line'}" data-rd="${n}">${esc(X(l))}</button>`).join('')}
+          <label class="remdate">${esc(X('Or pick a date'))} <input type="date" min="${min}" value="${when.getFullYear()}-${pad(when.getMonth() + 1)}-${pad(when.getDate())}"></label></div>
+        <p class="small muted">${esc(X('Reminder at 10 am on'))} <b>${esc(fmt(when))}</b></p>
+        <div class="remacts"><button class="btn go big" data-rm="cal">${ic('bell', 18)} ${esc(X('Add to my calendar'))}</button><a class="btn wa" href="https://wa.me/?text=${encodeURIComponent(msg())}" target="_blank" rel="noopener" data-rm="wa">${ic('wa', 18)} ${esc(X('Send to my WhatsApp'))}</a></div>
+        <p class="small muted">${esc(X('On WhatsApp, choose “Message yourself”. Nothing is saved by Saboot.'))}</p>
+        <div class="row" style="justify-content:flex-end"><button class="btn line" data-close>${esc(X('Close'))}</button></div></div>`;
+    };
+    const ics = () => {
+      const s = (d) => d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + 'T' + pad(d.getHours()) + pad(d.getMinutes()) + '00';
+      const e = (x) => String(x).replace(/\\/g, '\\\\').replace(/([,;])/g, '\\$1').replace(/\n/g, '\\n');
+      const now = new Date(); const stamp = now.toISOString().replace(/[-:]/g, '').slice(0, 15) + 'Z';
+      const body = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Saboot//Reminder//EN', 'CALSCALE:GREGORIAN', 'BEGIN:VEVENT', 'UID:' + Date.now() + '-' + u.id + '@saboot.org', 'DTSTAMP:' + stamp,
+        'DTSTART:' + s(when), 'DURATION:PT30M', 'SUMMARY:' + e('Saboot: ' + title), 'DESCRIPTION:' + e(text + '\n\n' + link), 'URL:' + link,
+        'BEGIN:VALARM', 'ACTION:DISPLAY', 'TRIGGER:-PT0M', 'DESCRIPTION:' + e(title), 'END:VALARM', 'BEGIN:VALARM', 'ACTION:DISPLAY', 'TRIGGER:-P1D', 'DESCRIPTION:' + e(title), 'END:VALARM',
+        'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([body], { type: 'text/calendar;charset=utf-8' })); a.download = 'saboot-reminder.ics';
+      document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+      toast(X('Reminder file saved — open it to add it to your calendar.'));
+    };
+    draw(); document.body.appendChild(ov);
+    const close = () => ov.remove();
+    ov.addEventListener('click', (e) => {
+      if (e.target === ov || e.target.closest('[data-close]')) return close();
+      const d = e.target.closest('[data-rd]'); if (d) { when = at(+d.dataset.rd); draw(); return; }
+      const m = e.target.closest('[data-rm]'); if (!m) return;
+      TRACK.ev('remind', { g: iss.id, x: m.dataset.rm });
+      if (m.dataset.rm === 'cal') { e.preventDefault(); ics(); }
+    });
+    ov.addEventListener('change', (e) => { if (e.target.type === 'date' && e.target.value) { const [y, mo, da] = e.target.value.split('-').map(Number); when = new Date(y, mo - 1, da, 10, 0, 0); draw(); } });
+    ov.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+    const f = ov.querySelector('[data-rd]'); if (f) f.focus();
+  }
+
+  // Read the list aloud: the phone's own voice when it has one for this language, otherwise the server.
+  const READ = (() => {
+    const BCP = LBCP;
+    let playing = null; let btnRef = null;
+    const setBtn = (on) => { const b = btnRef || document.querySelector('[data-act=readaloud]'); if (!b) return; b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.classList.toggle('on', on); const sp = b.querySelector('span'); if (sp) sp.textContent = on ? X('Stop reading') : X('Read my list aloud'); };
+    const text = () => {
+      const q = (sel) => [...app.querySelectorAll(sel)].map((n) => n.textContent.replace(/★/g, '').trim()).filter(Boolean);
+      const parts = [q('.carryhead .typed')[0], q('.carryhead h1')[0]];
+      q('.banner.now h3, .banner.soon h3').forEach((t) => parts.push(t));
+      const steps = [...app.querySelectorAll('.checks')];
+      steps.forEach((c) => { const h = c.previousElementSibling && c.previousElementSibling.matches('h2') ? c.previousElementSibling.textContent.replace(/\(\d+\)/, '').trim() : ''; if (h) parts.push(h); [...c.querySelectorAll('.crow h3')].forEach((n, i) => parts.push((i + 1) + '. ' + n.textContent.replace(/★/g, '').trim())); });
+      const w = q('.wherebox h2'); if (w.length) { parts.push(w[0]); q('.wherebox li').forEach((t) => parts.push(t)); }
+      return parts.filter(Boolean);
+    };
+    const voiceFor = async (lang) => {
+      const ss = window.speechSynthesis; if (!ss) return null;
+      let v = ss.getVoices(); if (!v.length) { await new Promise((r) => { const t = setTimeout(r, 900); ss.addEventListener('voiceschanged', () => { clearTimeout(t); r(); }, { once: true }); }); v = ss.getVoices(); }
+      const want = (BCP[lang] || 'en-IN').toLowerCase(), base = want.split('-')[0];
+      return v.find((x) => x.lang.toLowerCase().replace('_', '-') === want) || v.find((x) => x.lang.toLowerCase().startsWith(base + '-') || x.lang.toLowerCase() === base) || null;
+    };
+    function stop() { try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch (e) { /* ignore */ } if (playing && playing.pause) { playing.pause(); } playing = null; setBtn(false); }
+    async function start() {
+      const parts = text(); if (!parts.length) return;
+      setBtn(true); playing = {};
+      const voice = await voiceFor(LANG);
+      if (voice || (LANG === 'en' && window.speechSynthesis)) {
+        TRACK.once('read', { x: 'device', l: LANG });
+        const ss = window.speechSynthesis; ss.cancel(); let left = parts.length;
+        parts.forEach((p) => { const u = new SpeechSynthesisUtterance(p); if (voice) u.voice = voice; u.lang = voice ? voice.lang : BCP[LANG] || 'en-IN'; u.rate = 0.92; u.onend = u.onerror = () => { if (--left <= 0 && playing) stop(); }; ss.speak(u); });
+        return;
+      }
+      if (!API_OK()) { stop(); return toast(X('Reading aloud is not available in this language on this phone.')); }
+      TRACK.once('read', { x: 'server', l: LANG });
+      toast(X('Preparing the audio…'));
+      try {
+        const r = await fetch('/api/speak', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ lang: LANG, text: parts.join('. ').slice(0, 1400) }) });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok || !j.audio || !playing) { stop(); return toast(j.error ? X(j.error) : X('Reading aloud is not available right now.')); }
+        const a = new Audio('data:audio/wav;base64,' + j.audio); playing = a; a.onended = stop; a.onerror = stop; await a.play();
+      } catch (e) { stop(); toast(X('Reading aloud is not available right now.')); }
+    }
+    return { toggle(b) { btnRef = b; if (playing) stop(); else start(); }, stop };
+  })();
+
+  // Follow-up: remember (on this phone only) the last guide used, and ask once, a day or more later, whether it helped.
+  function rememberGuide(id) { const m = lsGet('saboot_last'); if (!m || m.g !== id) lsSet('saboot_last', { g: id, t: Date.now(), step: 0 }); }
+  function outcomeCard() {
+    const m = lsGet('saboot_last'); if (!m || !BY_ID[m.g] || m.done) return '';
+    if (Date.now() - (m.t || 0) < (m.again ? 7 : 1) * 864e5) return '';
+    const g = BY_ID[m.g]; const name = esc(G(g, 's', g.short));
+    if (m.step === 1) return `<div class="oc noprint" role="region" aria-label="${esc(X('Quick question'))}"><p><b>${esc(X('Did the Saboot list help you?'))}</b> <span class="muted">${name}</span></p><div class="ocb">${[['yes', 'Yes'], ['little', 'A little'], ['no', 'No']].map(([v, l]) => `<button class="btn line sm" data-act="oc" data-k="help" data-v="${v}">${esc(X(l))}</button>`).join('')}</div></div>`;
+    if (m.step === 2) { m.done = true; lsSet('saboot_last', m); return `<div class="oc noprint" role="status"><p>${ic('check', 18)} ${esc(X('Thank you — this helps us prove Saboot works.'))}</p></div>`; }
+    return `<div class="oc noprint" role="region" aria-label="${esc(X('Quick question'))}"><p><b>${esc(X('Quick question:'))}</b> ${esc(X('did you meet an advocate about'))} <b>${name}</b>?</p>
+      <div class="ocb">${[['yes', 'Yes'], ['notyet', 'Not yet'], ['noneed', 'Didn’t need to']].map(([v, l]) => `<button class="btn line sm" data-act="oc" data-k="met" data-v="${v}">${esc(X(l))}</button>`).join('')}<button class="btn text sm" data-act="oc" data-k="skip" data-v="x" aria-label="${esc(X('Not now'))}">${ic('x', 16)}</button></div></div>`;
+  }
+  function outcomeAnswer(k, v) {
+    const m = lsGet('saboot_last'); if (!m) return;
+    if (k === 'skip') { m.done = true; lsSet('saboot_last', m); return render(); }
+    if (k === 'met') { m.met = v; m.step = 1; if (v === 'notyet' && !m.again) { m.again = true; } }
+    if (k === 'help') { m.help = v; m.step = 2; TRACK.ev('oc', { g: m.g, x: m.met || '', y: v }); TRACK.flush(); if (m.met === 'notyet' && m.again && !m.asked2) { m.asked2 = true; m.step = 0; m.t = Date.now(); delete m.met; } }
+    lsSet('saboot_last', m); render();
+  }
+
   /* ============ DISCLAIMER (Bar Council of India rules) ============ */
   // Shown on the first visit and whenever the wording changes (bump CONSENT_V). Emergency numbers work before agreeing.
   const CONSENT_V = 1;
@@ -6719,12 +7006,16 @@ ${JSON.stringify(map)}`;
       case 'deep': TRACK.once('deep', { g: S.issueId }); S.stage = 'deep'; S.chapterFound = []; persist(); goQuiz(); break;
       case 'change': { const q = iss.questions.find((x) => x.id === t.dataset.q); if (!q) break; S.prefill[q.id] = S.answers[q.id]; delete S.answers[q.id]; delete S.skipped[q.id]; S.stage = q.deep ? 'deep' : 'quick'; S.history = S.history.filter((h) => h.id !== q.id); if (q.deep) S.deepDone = false; else S.quickDone = false; S.chapterFound = []; persist(); goQuiz(); break; }
       case 'savetoggle': if (t.checked) TRACK.once('save', { g: S.issueId }); saveOn = t.checked; if (saveOn) persist(); else clearSaved(); toast(saveOn ? 'Saved on this device' : 'Removed from this device'); break;
-      case 'clear': S = blank(); saveOn = false; clearSaved(); toast('Cleared'); go('home'); break;
+      case 'clear': S = blank(); saveOn = false; clearSaved(); try { localStorage.removeItem('saboot_last'); } catch (e) { /* ignore */ } toast('Cleared'); go('home'); break;
       case 'forget': clearSaved(); render(); break;
       case 'resume': { const v = loadSaved(); if (v) { S = Object.assign(blank(), v); saveOn = true; go('list'); } break; }
       case 'exit': S = blank(); saveOn = false; clearSaved(); app.innerHTML = ''; history.replaceState(null, '', '#home'); render(); break;
       case 'excl': S.excludeSensitive = t.checked; persist(); render(); break;
       case 'mic': TRACK.once('voice', { l: LANG }); VOICE.toggle(); break;
+      case 'remind': { const iss = issue(); const u = iss && (iss.urgent || []).find((x) => x.id === t.dataset.u); if (u) showRemind(u, iss); break; }
+      case 'aidcheck': showAid(); break;
+      case 'readaloud': READ.toggle(t); break;
+      case 'oc': outcomeAnswer(t.dataset.k, t.dataset.v); break;
       case 'disclaimer': consentMode = 'ask'; showConsent(true); break;
       case 'print': TRACK.once('print', { g: S.issueId }); try { window.print(); } catch (err) { /* blocked */ } document.getElementById('printhint').hidden = false; break;
       case 'copytext': try { await navigator.clipboard.writeText(reportText()); toast('Report copied as text'); } catch (err) { toast('Copy was blocked by the browser'); } break;

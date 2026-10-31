@@ -36,6 +36,7 @@ if (process.env.FAKE_TRANSLATE) {
     if (!String(u).includes('generativelanguage.googleapis.com')) return realFetch(u, o);
     const b = JSON.parse(o.body);
     const vp = b.contents[0].parts; const vt = vp.map((x) => x.text || '').join(' ');
+    if (b.generationConfig && b.generationConfig.responseModalities) { global.TTSCALLS = (global.TTSCALLS || 0) + 1; const pcm = Buffer.alloc(24000 * 2 * 0.3).toString('base64'); return { ok: true, status: 200, json: async () => ({ candidates: [{ content: { parts: [{ inlineData: { mimeType: 'audio/L16;codec=pcm;rate=24000', data: pcm } }] } }] }), text: async () => '' }; }
     if (vp.some((x) => x.inlineData) || vt.includes('legal-help search box')) {
       global.VOICECALLS = (global.VOICECALLS || 0) + 1;
       const audio = vp.find((x) => x.inlineData); const okWav = !audio || Buffer.from(audio.inlineData.data.slice(0, 16), 'base64').toString('latin1').startsWith('RIFF');

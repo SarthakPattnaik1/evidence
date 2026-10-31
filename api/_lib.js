@@ -42,7 +42,7 @@ const hashOf = (arr) => { const o = {}; if (Array.isArray(arr)) for (let i = 0; 
 const sum = (hs) => { const o = {}; for (const h of hs) for (const [k, v] of Object.entries(h || {})) o[k] = (o[k] || 0) + Number(v); return o; };
 const parse = (xs) => (xs || []).map((x) => { if (x && typeof x === 'object') return x; try { return JSON.parse(x); } catch (e) { return null; } }).filter(Boolean);
 
-const V_KINDS = ['v:visit', 'v:agree', 'v:start', 'v:list', 'v:print', 'v:share', 'v:done', 'v:voice'];
+const V_KINDS = ['v:visit', 'v:agree', 'v:start', 'v:list', 'v:print', 'v:share', 'v:done', 'v:voice', 'v:remind', 'v:aid', 'v:met', 'v:helped'];
 const store = {
   // inc: Map(field -> n); uniq: [[kind, id]]; logs: [[kind, obj]]
   async ingest(day, inc, uniq, logs) {

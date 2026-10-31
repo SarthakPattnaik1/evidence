@@ -70,6 +70,11 @@ module.exports = async function handler(req, res) {
       case 'lang': if (LANGS.has(e.x)) add('lang:' + e.x); break;
       case 'voice': add('voice:all'); if (LANGS.has(e.l)) add('voice:' + e.l); break;
       case 'consent': if (e.x === 'agree' || e.x === 'disagree') add('consent:' + e.x); break;
+      case 'oc': { if (!g) break; const met = ['yes', 'notyet', 'noneed'].includes(e.x) ? e.x : 'na'; const hp = ['yes', 'little', 'no'].includes(e.y) ? e.y : 'na'; add('oc:met:' + met); add('oc:help:' + hp); add('oc:all'); break; }
+      case 'aid': if (['yes', 'likely', 'maybe', 'no'].includes(e.x)) add('aid:' + e.x); break;
+      case 'aidopen': add('aid:open'); break;
+      case 'remind': if (g && (e.x === 'cal' || e.x === 'wa')) { add('remind:' + e.x); add('remind:' + g); } break;
+      case 'read': if (e.x === 'device' || e.x === 'server') { add('read:' + e.x); if (LANGS.has(e.l)) add('read:' + e.l); } break;
       case 'tr': if (LANGS.has(e.x)) add('tr:' + (e.ok ? 'ok' : 'fail') + ':' + e.x); break;
       case 'fb': if (g && (e.x === 'y' || e.x === 'n')) add('fb:' + g + ':' + e.x); break;
       case 'report': { if (!g) break; const k = ['law', 'paper', 'confusing', 'translation', 'other'].includes(e.x) ? e.x : 'other'; add('rep:' + g); add('rep:all'); lists.push(['report', { t: Date.now(), g, k, m: scrub(e.m).slice(0, 400), l: lang, v: clip(e.v, 20) }]); break; }
@@ -89,6 +94,9 @@ module.exports = async function handler(req, res) {
     add('h:batch');
     uniq.push(['v:visit', net]);
     for (const e of ev) {
+      if (e && e.t === 'oc' && ID.test(e.g || '')) { if (e.x === 'yes') uniq.push(['v:met', net]); if (e.y === 'yes' || e.y === 'little') uniq.push(['v:helped', net]); continue; }
+      if (e && e.t === 'aid' && (e.x === 'yes' || e.x === 'likely')) { uniq.push(['v:aid', net]); continue; }
+      if (e && e.t === 'remind') { uniq.push(['v:remind', net]); continue; }
       if (!e || !VERIFIED.has(e.t)) continue;
       if (e.t === 'consent') { if (e.x === 'agree') uniq.push(['v:agree', net]); continue; }
       if (e.t !== 'voice' && !ID.test(e.g || '')) continue;
