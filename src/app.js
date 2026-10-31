@@ -469,6 +469,27 @@ ${JSON.stringify(map)}`;
       catch (e) { return fail(X('Microphone permission is off. Allow it in your browser settings, or type instead.')); }
       const rec = new MediaRecorder(stream); const chunks = [];
       st = { kind: 'rec', rec, stream, chunks, timer: setTimeout(() => stop(false), 20000) };
+      // Stop by itself when the person stops talking: learn the room's noise for 0.3 s, then wait for speech followed by ~1.2 s of quiet.
+      try {
+        const AC = window.AudioContext || window.webkitAudioContext; const ac = new AC(); const an = ac.createAnalyser(); an.fftSize = 1024;
+        ac.createMediaStreamSource(stream).connect(an); const buf = new Float32Array(an.fftSize);
+        let floor = 0, n = 0, spoke = false, quiet = 0; const t0 = Date.now(); const me = st;
+        const tick = () => {
+          if (st !== me) { ac.close && ac.close(); return; }
+          an.getFloatTimeDomainData(buf); let sum = 0; for (let i = 0; i < buf.length; i++) sum += buf[i] * buf[i]; const rms = Math.sqrt(sum / buf.length);
+          const el = btn(); if (el) el.style.setProperty('--lvl', Math.min(1, rms * 12).toFixed(2));
+          const age = Date.now() - t0;
+          if (age < 300) { floor = (floor * n + rms) / ++n; }
+          else {
+            const thr = Math.max(0.012, floor * 2.6);
+            if (rms > thr) { spoke = true; quiet = 0; } else if (spoke) quiet += 100;
+            if (spoke && quiet >= 1200 && age > 1200) { ac.close && ac.close(); return stop(false); }
+            if (!spoke && age > 8000) { ac.close && ac.close(); return stop(false); }
+          }
+          setTimeout(tick, 100);
+        };
+        tick();
+      } catch (e) { /* no auto-stop: the person taps the square */ }
       rec.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
       rec.onstop = async () => {
         stream.getTracks().forEach((t) => t.stop());
@@ -483,7 +504,7 @@ ${JSON.stringify(map)}`;
           finish((j.text || '').trim(), j.en || '');
         } catch (e) { fail(X('Voice is not available right now. Please type instead.')); }
       };
-      rec.start(); setUI('listen'); hint(X('Listening… speak in any language, then tap the square.'));
+      rec.start(); setUI('listen'); hint(X('Listening… speak in any language. It stops when you stop.'));
     }
     // decode whatever the browser recorded (webm/opus, mp4/aac, ogg) and re-encode as 16 kHz mono 16-bit WAV, base64
     async function toWav(blob) {

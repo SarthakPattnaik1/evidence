@@ -104,14 +104,15 @@ async function viaLLM(lang, texts, call) {
 }
 // Gemini model IDs change often; try current ones in order and remember the first that works.
 let GEM_OK = null;
-const GEM_MODELS = () => [...new Set([process.env.GEMINI_MODEL, GEM_OK, 'gemini-flash-latest', 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-flash-lite-latest', 'gemini-3.5-flash-lite'].filter(Boolean))];
+// Measured live (Oct 2026): flash-lite translates a batch into Odia in ≈ 1 s with good quality; 3.x flash took ≈ 47 s.
+const GEM_MODELS = () => [...new Set([process.env.GEMINI_MODEL, GEM_OK, 'gemini-flash-lite-latest', 'gemini-3.5-flash-lite', 'gemini-2.5-flash-lite', 'gemini-flash-latest', 'gemini-3.5-flash'].filter(Boolean))];
 async function geminiCall(p) {
   let last;
   for (const model of GEM_MODELS()) {
-    for (const thinking of [true, false]) {
+    for (const thinking of [false, true]) {
       const gc = { responseMimeType: 'application/json', temperature: 0.2 };
       if (thinking) gc.thinkingConfig = { thinkingLevel: 'low' };
-      const t = withTimeout(45000);
+      const t = withTimeout(20000);
       let r;
       try {
         r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
@@ -128,7 +129,7 @@ async function geminiCall(p) {
       const txt = (await r.text()).slice(0, 300).replace(/\s+/g, ' ');
       last = new Error(`gemini ${model} ${r.status}: ${txt}`); last.status = r.status;
       if (r.status === 429) throw last;                                   // quota: other models share it
-      if (r.status === 400 && thinking && /thinking/i.test(txt)) continue; // model doesn't take thinkingConfig: retry without
+      if (r.status === 400 && thinking && /thinking/i.test(txt)) break;    // model doesn't take thinkingConfig
       break;                                                               // 400/401/403/404: try the next model
     }
   }

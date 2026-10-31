@@ -26,32 +26,33 @@ async function readBody(req) {
   return new Promise((resolve) => { let d = ''; req.on('data', (c) => { d += c; if (d.length > MAX_AUDIO + 4096) { resolve({ tooBig: true }); req.destroy(); } }); req.on('end', () => { try { resolve(JSON.parse(d || '{}')); } catch (e) { resolve({}); } }); req.on('error', () => resolve({})); });
 }
 
-let GEM_OK = null;
-const MODELS = () => [...new Set([process.env.GEMINI_VOICE_MODEL, GEM_OK, 'gemini-flash-latest', 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-flash-lite-latest'].filter(Boolean))];
-async function gemini(parts) {
-  let last;
-  for (const model of MODELS()) {
-    const c = new AbortController(); const timer = setTimeout(() => c.abort(), 25000);
-    let r;
-    try {
-      r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-        method: 'POST', signal: c.signal, headers: { 'content-type': 'application/json', 'x-goog-api-key': process.env.GEMINI_API_KEY },
-        body: JSON.stringify({ contents: [{ role: 'user', parts }], generationConfig: { responseMimeType: 'application/json', temperature: 0 } })
-      });
-    } catch (e) { clearTimeout(timer); last = new Error('network/timeout'); continue; }
-    clearTimeout(timer);
-    if (r.ok) {
-      const j = await r.json(); GEM_OK = model;
-      const txt = ((((j.candidates || [])[0] || {}).content || {}).parts || []).filter((x) => !x.thought).map((x) => x.text || '').join('');
-      const m = txt.match(/\{[\s\S]*\}/); if (!m) throw new Error('bad model output');
-      return JSON.parse(m[0]);
-    }
-    last = new Error('gemini ' + model + ' ' + r.status); last.status = r.status;
-    if (r.status === 429) throw last;
-  }
-  throw last || new Error('no model');
+// Fastest models first (measured live Oct 2026: flash-lite ≈ 1–1.5 s for transcription; 3.x flash ≈ 20–45 s).
+const MODELS = () => [...new Set([process.env.GEMINI_VOICE_MODEL, 'gemini-flash-lite-latest', 'gemini-3.5-flash-lite', 'gemini-2.5-flash-lite', 'gemini-flash-latest'].filter(Boolean))];
+async function once(model, parts, signal) {
+  const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+    method: 'POST', signal, headers: { 'content-type': 'application/json', 'x-goog-api-key': process.env.GEMINI_API_KEY },
+    body: JSON.stringify({ contents: [{ role: 'user', parts }], generationConfig: { responseMimeType: 'application/json', temperature: 0 } })
+  });
+  if (!r.ok) { const e = new Error('gemini ' + model + ' ' + r.status); e.status = r.status; throw e; }
+  const j = await r.json();
+  const txt = ((((j.candidates || [])[0] || {}).content || {}).parts || []).filter((x) => !x.thought).map((x) => x.text || '').join('');
+  const m = txt.match(/\{[\s\S]*\}/); if (!m) throw new Error('bad model output');
+  return JSON.parse(m[0]);
 }
-
+// Hedged: start the fastest model; if it has not answered in HEDGE ms (or fails), also start the next one. First good answer wins.
+async function gemini(parts, HEDGE = 3500) {
+  const models = MODELS(); const ctl = new AbortController(); const stop = setTimeout(() => ctl.abort(), 25000);
+  return new Promise((resolve, reject) => {
+    let started = 0, failed = 0, done = false, last; const timers = [];
+    const launch = () => {
+      if (done || started >= models.length) return; const model = models[started++];
+      if (started < models.length) timers.push(setTimeout(launch, HEDGE));
+      once(model, parts, ctl.signal).then((v) => { if (!done) { done = true; timers.forEach(clearTimeout); clearTimeout(stop); ctl.abort(); resolve(v); } })
+        .catch((e) => { last = e; failed++; if (!done) { if (started < models.length) launch(); else if (failed >= started) { done = true; clearTimeout(stop); reject(last); } } });
+    };
+    launch();
+  });
+}
 
 // Voice prompt. Tested live (Oct 2026) with synthetic speech in Odia, Tamil, Hindi, Bengali, Telugu, Malayalam, Kannada.
 // Odia was being heard as Bengali, so the prompt spells out how to tell close languages apart and to prefer the app language.
@@ -105,3 +106,4 @@ const handler = async (req, res) => {
 };
 module.exports = handler;
 module.exports.PROMPT = PROMPT;
+module.exports.transcribe = (lang, audio) => gemini([{ inlineData: { mimeType: 'audio/wav', data: audio } }, { text: PROMPT(lang) }]);

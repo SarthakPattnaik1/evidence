@@ -920,3 +920,5 @@ footer.foot{background:#F6F1E8}
 .voicehint{margin:8px 4px 0;font-size:14.5px;color:var(--ink2)}
 .searchbox.listening + .voicehint{color:#8A1C14;font-weight:600}
 @media (max-width:420px){.searchbox .mic{width:44px;height:44px}}
+.searchbox.listening .mic{box-shadow:0 0 0 calc(4px + var(--lvl,0) * 14px) rgba(179,38,30,.22);animation:none;transition:box-shadow .1s}
+@media (prefers-reduced-motion:reduce){.searchbox.listening .mic{transition:none}}

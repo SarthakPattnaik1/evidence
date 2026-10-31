@@ -41,6 +41,7 @@ module.exports = async (req, res) => {
       const rate = Number((/rate=(\d+)/.exec(s.audio.mimeType || '') || [])[1] || 24000);
       const audio = wav(s.audio.data, rate);
       const prompt = require('./voice.js').PROMPT(u.searchParams.get('app') || 'en');
+      if (u.searchParams.get('prod')) { const t1 = Date.now(); try { const o = await require('./voice.js').transcribe(u.searchParams.get('app') || 'en', audio); return { l, said: SAY[l], prod: { ms: Date.now() - t1, out: o } }; } catch (e) { return { l, prod: { ms: Date.now() - t1, err: e.message } }; } }
       const r = await call(stt, [{ inlineData: { mimeType: 'audio/wav', data: audio } }, { text: prompt }], Object.assign({ responseMimeType: 'application/json', temperature: 0 }, sttCfg));
       return { l, said: SAY[l], ttsMs: s.ms, kb: Math.round(audio.length * 0.75 / 1024), stt: { ok: r.ok, ms: r.ms, out: (r.text || r.err || '').slice(0, 300) } };
     }));
