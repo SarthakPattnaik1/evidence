@@ -40,7 +40,7 @@ async function visitor(b, { geo, mobile, lang, guide, answers, search, call, dee
   // Admin
   const ctx = await b.newContext({ viewport: { width: 1366, height: 900 } }); const p = await ctx.newPage(); const errs = []; p.on('pageerror', (e) => errs.push(e.message));
   await p.goto(B + '/admin'); await wait(500);
-  await p.fill('#p', 'wrong'); await p.click('#lf button'); await wait(900); console.log('bad login:', await p.textContent('#lerr'));
+  await p.fill('#u', 'admin@example.com'); await p.fill('#p', 'wrong'); await p.click('#lf button'); await wait(900); console.log('bad login:', await p.textContent('#lerr'));
   await p.fill('#p', 'test-pass-123'); await p.click('#lf button'); await wait(1500);
   console.log('tiles:', (await p.textContent('#tiles')).replace(/\s+/g, ' '));
   console.log('funnel:', (await p.textContent('#funnel')).replace(/\s+/g, ' '));

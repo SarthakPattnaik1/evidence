@@ -91,8 +91,8 @@ select{border:1px solid var(--line);border-radius:8px;padding:5px 8px;background
     <div class="logo" style="margin-bottom:6px"><img src="/mark.png?v=2" alt="" style="width:auto;height:24px;border-radius:0"> Saboot admin</div>
     <p class="sub">Sign in to see how people use Saboot. Only anonymous counts are stored.</p>
     <form id="lf">
-      <label for="u">Username</label><input id="u" name="user" autocomplete="username" value="admin" required>
-      <label for="p">Password</label><input id="p" name="pass" type="password" autocomplete="current-password" required autofocus>
+      <label for="u">Email</label><input id="u" name="user" type="email" autocomplete="username" inputmode="email" required autofocus>
+      <label for="p">Password</label><input id="p" name="pass" type="password" autocomplete="current-password" required>
       <button class="btn go" type="submit">Sign in</button>
       <div class="err" id="lerr" role="alert"></div>
     </form>

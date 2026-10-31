@@ -25,6 +25,7 @@ function cmd([c, k, ...a]) {
 if (process.env.STORE === 'supabase') Object.assign(process.env, { SUPABASE_URL: 'http://127.0.0.1:' + PORT, SUPABASE_SERVICE_ROLE_KEY: 'svc-test' });
 else Object.assign(process.env, { KV_REST_API_URL: 'http://127.0.0.1:' + PORT + '/__redis', KV_REST_API_TOKEN: 't' });
 process.env.ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'test-pass-123';
+process.env.ADMIN_USER = process.env.ADMIN_USER || 'admin@example.com';
 // Fake PostgREST: /rest/v1/rpc/<fn> runs the function in a local Postgres (PG_URL), like Supabase does.
 let pg = null; if (process.env.STORE === 'supabase') { const { Pool } = require(process.env.PG_MODULE || 'pg'); pg = new Pool({ connectionString: process.env.PG_URL }); }
 const SIG = { pa_ingest: ['p_day', 'p_inc', 'p_uniq', 'p_logs'], pa_stats: ['p_days', 'p_prev'], pa_login_hit: ['p_ip'], pa_login_clear: ['p_ip'], pa_tr_get: ['p_lang', 'p_h'], pa_tr_put: ['p_lang', 'p_items'] };

@@ -78,6 +78,33 @@
           "value": "public, max-age=86400"
         }
       ]
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "admin.saboot.org"
+        }
+      ],
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+        }
+      ]
     }
   ],
   "functions": {
@@ -92,6 +119,39 @@
     }
   },
   "redirects": [
+    {
+      "source": "/admin(.html)?",
+      "has": [
+        {
+          "type": "host",
+          "value": "saboot.org"
+        }
+      ],
+      "destination": "https://admin.saboot.org/",
+      "permanent": false
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "admin.saboot.org"
+        }
+      ],
+      "destination": "/admin",
+      "permanent": false
+    },
+    {
+      "source": "/guide/:p*",
+      "has": [
+        {
+          "type": "host",
+          "value": "admin.saboot.org"
+        }
+      ],
+      "destination": "https://saboot.org/guide/:p*",
+      "permanent": false
+    },
     {
       "source": "/:path*",
       "has": [

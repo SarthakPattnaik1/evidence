@@ -1,5 +1,6 @@
 // Admin API: /api/admin?a=login|logout|me|stats
-// Set ADMIN_PASSWORD (and optionally ADMIN_USER, default "admin"; ADMIN_SECRET to sign sessions) in Vercel.
+// Served at https://admin.saboot.org. Sign-in: ADMIN_USER (the admin's email) and ADMIN_PASSWORD, both set in
+// Vercel → Settings → Environment Variables (never in this repo). ADMIN_SECRET signs sessions.
 const { backend, hasStore, store, daysBack, ip, hmac, cookies, body, send, crypto, sum } = require('./_lib.js');
 
 const COOKIE = 'saboot_admin';
@@ -28,7 +29,7 @@ module.exports = async function handler(req, res) {
     const b = await body(req);
     const user = process.env.ADMIN_USER || 'admin';
     const ok = eq(String(b.user || '').trim().toLowerCase(), user.toLowerCase()) & eq(String(b.pass || ''), process.env.ADMIN_PASSWORD);
-    if (!ok) { await new Promise((r) => setTimeout(r, 600)); return send(res, 401, { error: 'Wrong username or password.' }); }
+    if (!ok) { await new Promise((r) => setTimeout(r, 600)); return send(res, 401, { error: 'Wrong email or password.' }); }
     if (hasStore()) { try { await store.loginClear(who); } catch (e) { /* ignore */ } }
     return send(res, 200, { ok: true, user }, { 'set-cookie': setCookie(token(user), TTL) });
   }

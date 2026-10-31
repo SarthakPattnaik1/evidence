@@ -77,7 +77,7 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   await human(false); await human(true); await wait(800);
   // Admin view
   const c3 = await b.newContext({ viewport: { width: 1366, height: 900 } }); const a = await c3.newPage();
-  await a.goto(B + '/admin'); await wait(400); await a.fill('#p', 'test-pass-123'); await a.click('#lf button'); await wait(1500);
+  await a.goto(B + '/admin'); await wait(400); await a.fill('#u', 'admin@example.com'); await a.fill('#p', 'test-pass-123'); await a.click('#lf button'); await wait(1500);
   const vt = (await a.textContent('#vtiles')).replace(/\s+/g, ' '); const tn = (await a.textContent('#trustnote')).replace(/\s+/g, ' ');
   console.log('verified:', vt); console.log('trust:', tn);
   const n = (label) => Number(((new RegExp(label + '\\s*([\\d,]+)').exec(vt) || [])[1] || '0').replace(/,/g, ''));
