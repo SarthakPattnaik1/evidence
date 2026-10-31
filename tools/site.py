@@ -2,7 +2,7 @@
 service worker, privacy and terms pages. Called from build.py."""
 import json, os, re, base64, subprocess, html, pathlib
 
-BASE = os.environ.get('SITE_URL', 'https://evidence-orpin.vercel.app').rstrip('/')
+BASE = os.environ.get('SITE_URL', 'https://saboot.org').rstrip('/')
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / 'build'
 e = lambda s: html.escape(str(s or ''), quote=True)

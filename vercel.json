@@ -90,5 +90,18 @@
     "api/admin.js": {
       "maxDuration": 20
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.saboot.org"
+        }
+      ],
+      "destination": "https://saboot.org/:path*",
+      "permanent": true
+    }
+  ]
 }

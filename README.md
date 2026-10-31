@@ -6,7 +6,7 @@ Saboot (सबूत, “proof”) is a free tool for people in India facing a l
 
 Made by [Sarthak Pattnaik](https://www.linkedin.com/in/sarthakad) and [Subhankar Das](https://www.linkedin.com/in/subhankar-das-311030b1/).
 
-Live: https://evidence-orpin.vercel.app
+Live: https://saboot.org
 
 > **Status: draft content.** No guide has yet been reviewed by a practising advocate. Each guide says so until a review is recorded in `src/reviews.js`. Saboot is a preparation tool — it is not legal advice, does not recommend advocates, and takes no fees.
 
