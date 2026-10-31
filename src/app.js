@@ -13,6 +13,7 @@
   const P = {
     bell: '<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15Z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
     hourglass: '<path d="M6 3h12M6 21h12M7 3c0 5 10 5 10 9s-10 4-10 9M17 3c0 5-10 5-10 9"/>',
+    access: '<circle cx="12" cy="4.5" r="1.9"/><path d="M4.5 8.5 12 10l7.5-1.5M12 10v4.5M12 14.5 9 21M12 14.5 15 21"/>',
     speaker: '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/>',
     pin: '<path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.3"/>',
     scale: '<path d="M12 4v16M7 20h10M5 7h14"/><path d="m5 7-2.5 6a3 3 0 0 0 5 0Zm14 0-2.5 6a3 3 0 0 0 5 0Z"/>',
@@ -313,6 +314,7 @@ ${JSON.stringify(map)}`;
         <button class="brand" data-go="home" aria-label="Saboot home"><img class="bicon" src="${window.ER_BRAND.icon}" alt="" width="34" height="28"><img class="bwordimg" src="${window.ER_BRAND.word}" alt="Saboot" width="80" height="26"></button>
         <button class="nav navq" data-go="questions" aria-label="${esc(T('q'))}">${ic('q', 18)}<span class="lbl-long">${esc(T('q').replace(/\?$/, ''))}</span></button>
         <button class="nav" data-go="help">${ic('phone', 18)}<span class="lbl-long">${esc(T('help').replace(/\?$/, ''))}</span><span class="lbl-short">${esc(H('nav_help', 'Help'))}</span></button>
+        <button class="nav axbtn" data-act="ax" aria-label="${esc(X('Accessibility: bigger text, contrast, read aloud'))}" title="${esc(X('Accessibility'))}">${ic('access', 20)}</button>
         <button class="nav lang" data-act="lang" aria-label="Language: ${esc(LMETA[LANG].name)}. Change language">${ic('globe', 18)}<span>${esc(LMETA[LANG].native)}</span></button>
         ${sensitive ? `<a class="nav exit" data-act="exit" href="https://www.google.com" target="_blank" rel="noopener noreferrer" title="Clears this page and opens a neutral website">${ic('x', 18)}<span>Exit</span></a>` : ''}
       </div></header>
@@ -336,7 +338,7 @@ ${JSON.stringify(map)}`;
   }
 
   function render() {
-    applyLangDom();
+    applyLangDom(); hush();
     const raw = (location.hash || '').slice(1);
     if (raw.startsWith('a-')) { applyAdvLink(raw); return; }
     const [view, ...rest] = raw.split('-'); const arg = rest.join('-');
@@ -647,11 +649,12 @@ ${JSON.stringify(map)}`;
       ${urg.map((u) => urgentBanner(u, iss)).join('')}
       <form id="qform" data-q="${q.id}">
         <fieldset><legend><h1 class="qtext">${esc(G(iss, q.id + '.t', q.text))}</h1></legend>
-          <div class="opts">${q.options.map((o) => `<label class="opt"><input type="radio" name="a" value="${o.id}" ${cur === o.id ? 'checked data-pre="1"' : ''}><span class="dot" aria-hidden="true"></span><span>${esc(G(iss, q.id + '.' + o.id, o.label))}</span></label>`).join('')}</div>
+          <div class="opts" role="radiogroup">${q.options.map((o) => `<label class="opt"><input type="radio" name="a" value="${o.id}" ${cur === o.id ? 'checked data-pre="1"' : ''}><span class="dot" aria-hidden="true"></span><span>${esc(G(iss, q.id + '.' + o.id, o.label))}</span></label>`).join('')}</div>
         </fieldset>
+        <button type="submit" class="btn go big qnext" id="qnext" ${AX.confirm ? '' : 'hidden'}>${esc(X('Next'))} ${ic('arrow', 18)}</button>
       </form>
       <details class="why"><summary>${esc(T('why'))}</summary><p>${esc(G(iss, q.id + '.w', q.why))}</p></details>
-      <p style="margin-top:14px"><button class="btn text" data-act="skip">${esc(T('skip'))}</button></p>
+      <p class="qfoot"><button class="btn text" data-act="skip">${esc(T('skip'))}</button><button class="btn text" data-act="sayq">${ic('speaker', 18)} ${esc(X('Read aloud'))}</button></p>
     </div>`, { inJourney: true });
   }
   const isDeadline = (u) => /\b\d+[\s-]*(day|days|hour|hours|week|weeks|month|months|year|years)\b|deadline|time limit|window|limit/i.test(u.title + ' ' + u.text);
@@ -815,11 +818,16 @@ ${JSON.stringify(map)}`;
       todo: items.filter((e) => e.action && !['have', 'na'].includes(S.status[e.id])), annex, urgent: E.urgent(iss, S.answers).filter((u) => u.level !== 'info'), lqs: E.lawyerQs(iss, S.answers),
       chrono: [...S.chrono].sort((a, b) => (a.date || '9999').localeCompare(b.date || '9999')) };
   }
+  const ACCESS_NEEDS = [['step', 'Step-free access (wheelchair, ramp, ground floor)'], ['isl', 'Sign-language interpreter'], ['print', 'Papers in large print, Braille or a readable digital file'],
+    ['audio', 'Things explained aloud, slowly'], ['time', 'Extra time and breaks'], ['support', 'A support person with me'], ['video', 'Joining by phone or video'], ['easy', 'Simple words and one step at a time']];
+  const ACCESS_EN = { step: 'step-free access (wheelchair/ramp/ground floor)', isl: 'a sign-language interpreter', print: 'documents in large print, Braille or an accessible digital format', audio: 'oral explanation of documents',
+    time: 'extra time and breaks', support: 'a support person present', video: 'participation by phone or video where possible', easy: 'plain-language explanation, one step at a time' };
   function reportHTML(d) {
     const iss = d.iss; const li = (arr, f) => arr.length ? `<ul>${arr.map((x) => `<li>${f(x)}</li>`).join('')}</ul>` : '<p class="muted">None recorded.</p>';
     return `<p class="meta">Saboot preparation pack. Prepared ${esc(fmtDate(today()))}. Content v${esc(KB.version)} (${esc(KB.reviewed.label)}).</p>
       <h1>Papers for my lawyer</h1><p><b>${esc(S.topic ? S.topic.title : iss.title)}</b></p>
       ${S.adv && S.adv.issueId === iss.id && S.adv.name ? `<p class="meta">Prepared at the request of ${esc(S.adv.name)}.</p>` : ''}
+      ${(S.access || []).length ? `<p class="instr axrep"><b>Access needs (person with disability):</b> ${S.access.map((k) => esc(ACCESS_EN[k] || k)).join('; ')}. Reasonable accommodation may be sought under section 12 of the Rights of Persons with Disabilities Act, 2016; free legal aid is available under section 12(d) of the Legal Services Authorities Act, 1987.</p>` : ''}
       ${d.urgent.length ? `<p class="instr" style="background:var(--tape-l)">Flagged for prompt attention: ${d.urgent.map((u) => esc(u.title)).join('; ')}.</p>` : ''}
       <h2>A. Matter overview: what I told the tool</h2>
       <p class="meta">These are my own answers and have not been checked by anyone.${S.excludeSensitive && d.shown.length < Object.keys(S.answers).length ? ' Some sensitive answers are left out at my request.' : ''}</p>
@@ -847,6 +855,9 @@ ${JSON.stringify(map)}`;
       <div class="toolbar noprint"><button class="btn text" data-go="list">${ic('back', 18)} ${esc(T('listh'))}</button><button class="btn go" data-act="print">${ic('file', 18)} Print or save as PDF</button>${downloads ? '<button class="btn line" data-act="download">Download</button>' : ''}<button class="btn line" data-act="copytext">${esc(X('Copy as text'))}</button></div>
       <div class="panel noprint" style="margin:0 0 16px">
         <label class="check"><input type="checkbox" data-act="excl" ${S.excludeSensitive ? 'checked' : ''}> Leave out my answers to sensitive questions</label>
+        <details class="axneeds" ${(S.access || []).length ? 'open' : ''}><summary>${ic('access', 18)} ${esc(X('Do you need any support at meetings or hearings?'))} <span class="muted small">(${esc(X('optional'))})</span></summary>
+          <div class="axgrid">${ACCESS_NEEDS.map(([k, l]) => `<label class="check"><input type="checkbox" data-access="${k}" ${(S.access || []).includes(k) ? 'checked' : ''}> ${esc(X(l))}</label>`).join('')}</div>
+          <p class="small muted" style="margin:6px 0 0">${esc(X('This goes on the page for your advocate so they can ask the court for it.'))} <button class="btn text sm" data-act="disab">${esc(X('Your rights'))}</button></p></details>
         <label class="f" style="margin-top:12px">Anything else your advocate should know? (optional)<textarea class="t" id="notes" rows="2" maxlength="500">${esc(S.notes)}</textarea></label>
         <p class="small muted" style="margin:8px 0 0">${ic('lock', 14)} A printed or downloaded file can stay on this device and in print queues.</p>
         <p class="small muted" id="printhint" hidden style="margin:6px 0 0">If nothing happened, use your browser menu → Print, or Ctrl+P (⌘P on Mac).</p>
@@ -949,6 +960,7 @@ ${JSON.stringify(map)}`;
       ['Work, PF & students', 'briefcase', ['posh', 'samadhan', 'epfo', 'ugc']],
       ['Home & property', 'house', ['rera']],
       ['NRI & abroad', 'globe', ['madad', 'ncwnri', 'passport']],
+      ['Disability rights', 'access', ['ccpd', 'udid']],
       ['Courts, traffic & business', 'file', ['ecourts', 'echallan', 'mca', 'msmeodr']]
     ].map(([t, icn, ks]) => [t, icn, ks.filter((k) => KB.help[k])]).filter((g) => g[2].length);
     const num = (h) => h.label.replace(/\D/g, '');
@@ -958,6 +970,7 @@ ${JSON.stringify(map)}`;
       <h2 class="lh" style="margin-top:20px">${esc(X('Call now'))}</h2>
       <div class="callgrid">${CALL.filter(([k]) => KB.help[k]).map(([k, short]) => { const h = KB.help[k]; return `<a class="callbtn${h.label.length > 6 ? ' long' : ''}" href="tel:${num(h)}" title="${esc(h.name)}">${ic('phone', 18)}<b>${esc(h.label)}</b><span>${esc(X(short))}</span></a>`; }).join('')}</div>
       <p class="small muted" style="margin:8px 0 0">${esc(X('Free legal aid covers women, children, people with disabilities, people in custody and those below the income limit — call 15100 to ask.'))}</p>
+      <button class="axcta" data-act="disab">${ic('access', 22)}<span><b>${esc(X('If you have a disability'))}</b><small>${esc(X('Free lawyer whatever your income, support in court, and where to complain'))}</small></span>${ic('chev', 18)}</button>
       <h2 class="lh" style="margin-top:22px">${esc(X('Complaint portals'))}</h2>
       <p class="small muted" style="margin:0 0 8px">${esc(X('Tap an area to see the official place to complain.'))}</p>
       <div class="acc">${GROUPS.map(([t, icn, ks]) => `<details class="accg"><summary>${ic(icn, 20)}<b>${esc(X(t))}</b><span class="cnt">${ks.length}</span>${ic('down', 18)}</summary><div class="grid">${ks.map((k) => helpCard(KB.help[k])).join('')}</div></details>`).join('')}</div>
@@ -991,6 +1004,83 @@ ${JSON.stringify(map)}`;
     ov.querySelector('form').addEventListener('submit', (e) => { e.preventDefault(); const f = new FormData(e.target); TRACK.ev('report', { g: iss.id, x: String(f.get('k')), m: String(f.get('m') || '').slice(0, 400), v: KB.version }); TRACK.flush && TRACK.flush(); close(); toast(X('Thank you — sent to the Saboot team.')); });
     setTimeout(() => { const t = ov.querySelector('input'); if (t) t.focus(); }, 30);
   }
+  /* ============ ACCESSIBILITY: easier to see, hear and tap ============
+     For low vision: bigger text and stronger contrast. For blind and low-literacy users: questions read aloud
+     with the phone's own voice (free, offline-capable, in the chosen language). For tremor, cerebral palsy or
+     switch users: choices wait for "Next" instead of jumping ahead on a slipped tap. For vestibular and
+     attention needs: no motion. Settings stay on this phone only. */
+  const AX_KEY = 'saboot_a11y';
+  const AX = Object.assign({ size: 0, contrast: false, calm: false, speak: false, confirm: false }, lsGet(AX_KEY) || {});
+  function calmMotion() { return !!AX.calm || matchMedia('(prefers-reduced-motion: reduce)').matches; }
+  function axApply() {
+    const h = document.documentElement;
+    h.classList.toggle('fs1', AX.size === 1); h.classList.toggle('fs2', AX.size === 2);
+    h.classList.toggle('hc', !!AX.contrast); h.classList.toggle('rm', !!AX.calm);
+  }
+  axApply();
+  let qSpeaking = false;
+  function hush() { if (!qSpeaking) return; qSpeaking = false; try { window.speechSynthesis.cancel(); } catch (e) { /* ignore */ } }
+  async function sayQuestion() {
+    const form = document.getElementById('qform'); if (!form) return;
+    const ss = window.speechSynthesis; if (!ss) { toast(X('Reading aloud is not available on this phone.')); return; }
+    const q = form.querySelector('.qtext')?.textContent.trim() || '';
+    const opts = [...form.querySelectorAll('.opt')].map((o, i) => (i + 1) + '. ' + o.textContent.trim() + '.');
+    const voice = await READ.bestVoice(LANG);
+    if (!voice && LANG !== 'en') { toast(X('Your phone has no voice for this language. Add one in your phone’s text-to-speech settings.')); return; }
+    try { READ.stop(); } catch (e) { /* ignore */ }
+    ss.cancel(); qSpeaking = true;
+    const u = new SpeechSynthesisUtterance([q.replace(/([^?.!।])$/, '$1.'), ...opts].join(' '));
+    if (voice) u.voice = voice; u.lang = voice ? voice.lang : 'en-IN'; u.rate = 0.92;
+    u.onend = u.onerror = () => { qSpeaking = false; };
+    ss.speak(u); TRACK.once('sayq', { l: LANG });
+  }
+  function showAx() {
+    const ov = document.createElement('div'); ov.className = 'overlay'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-labelledby', 'axh');
+    const sw = (k, t, d) => `<label class="axsw"><input type="checkbox" data-ax="${k}" ${AX[k] ? 'checked' : ''}><span><b>${esc(X(t))}</b><small>${esc(X(d))}</small></span></label>`;
+    ov.innerHTML = `<div class="dialog wide ax"><h2 id="axh" tabindex="-1">${esc(X('Make Saboot easier to use'))}</h2>
+      <fieldset class="axsize"><legend>${esc(X('Text size'))}</legend><div class="seg">${['A', 'A+', 'A++'].map((l, i) => `<label class="segb s${i}"><input type="radio" name="axsize" value="${i}" ${AX.size === i ? 'checked' : ''}><span>${l}</span></label>`).join('')}</div></fieldset>
+      ${sw('contrast', 'Stronger contrast', 'Darker text, clearer borders and underlined links.')}
+      ${sw('speak', 'Read each question aloud', 'Uses your phone’s voice. Press 1, 2, 3… to answer.')}
+      ${sw('confirm', 'Ask before moving on', 'Choose an answer, then press Next. Helps if a tap slips or your hand shakes.')}
+      ${sw('calm', 'Less movement', 'No sliding or animation.')}
+      <button class="btn line axlink" data-act="disab">${ic('access', 18)} ${esc(X('Rights and free help for persons with disabilities'))}</button>
+      <p class="small muted" style="margin:10px 0 0">${esc(X('These settings stay on this phone.'))} ${esc(X('Screen readers (TalkBack, VoiceOver) also work with Saboot.'))}</p>
+      <div class="row" style="justify-content:flex-end;margin-top:8px"><button class="btn go" data-close>${esc(X('Done'))}</button></div></div>`;
+    document.body.appendChild(ov);
+    const close = () => { ov.remove(); render(); };
+    ov.addEventListener('change', (e) => {
+      const i = e.target; if (i.name === 'axsize') AX.size = Number(i.value); else if (i.dataset.ax) AX[i.dataset.ax] = i.checked;
+      lsSet(AX_KEY, AX); axApply(); TRACK.ev('ax', { x: i.dataset.ax || 'size', y: i.dataset.ax ? (i.checked ? 1 : 0) : AX.size });
+    });
+    ov.addEventListener('click', (e) => { if (e.target === ov || e.target.closest('[data-close]')) close(); else if (e.target.closest('[data-act="disab"]')) { ov.remove(); showDisab(); } });
+    ov.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+    ov.querySelector('h2').focus();
+  }
+  // Facts checked 31 Oct 2026 against the Acts (RPwD Act 2016 ss.12, 32, 34, 92; LSA Act 1987 s.12(d)) and ccpd.nic.in.
+  function showDisab() {
+    TRACK.once('disab');
+    const ov = document.createElement('div'); ov.className = 'overlay'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-labelledby', 'dish');
+    const pt = (h, b) => `<li><b>${esc(X(h))}</b><p>${esc(X(b))}</p></li>`;
+    ov.innerHTML = `<div class="dialog wide disab"><h2 id="dish" tabindex="-1">${esc(X('If you have a disability'))}</h2>
+      <div class="aidacts"><a class="btn go big" href="tel:15100">${ic('phone', 18)} ${esc(X('Call 15100 — free legal aid'))}</a></div>
+      <ol class="dpts">
+        ${pt('A free lawyer, whatever your income.', 'Free legal aid covers every person with a disability (Legal Services Authorities Act, 1987, s. 12(d)). Call 15100 or visit the legal aid office at your district court.')}
+        ${pt('Ask the court for the support you need.', 'Courts, police and commissions must be accessible to you (RPwD Act, 2016, s. 12). Ask through your lawyer for step-free access, a sign-language interpreter, large-print or Braille papers, breaks, a support person, or joining by video.')}
+        ${pt('Treated unfairly because of disability?', 'Complain free to the Chief Commissioner for Persons with Disabilities — online, by post or to ccpd@nic.in. No lawyer, no fee, no need to go in person. For a state government office, go to your State Commissioner.')}
+        ${pt('Insulted or threatened in public?', 'Humiliating a person with disability in public view is a crime: 6 months to 5 years in jail (s. 92). Report it to the police.')}
+        ${pt('Jobs and colleges', 'At least 4% of government jobs (s. 34) and 5% of seats in government and aided colleges (s. 32) are reserved for people with a benchmark disability (40% or more).')}
+        ${pt('Keep ready', 'UDID card or disability certificate, any refusal letter, photos of the place you could not enter, and names of people who saw it.')}
+      </ol>
+      <div class="aidacts"><a class="btn line" href="https://ccpd.nic.in" target="_blank" rel="noopener">${esc(X('Complain to the Chief Commissioner'))}</a><a class="btn line" href="https://www.swavlambancard.gov.in" target="_blank" rel="noopener">${esc(X('Apply for a UDID card'))}</a></div>
+      <p class="small muted">${esc(X('Sources'))}: Rights of Persons with Disabilities Act, 2016 (ss. 12, 32, 34, 92) · Legal Services Authorities Act, 1987 (s. 12) · <a href="https://ccpd.nic.in" target="_blank" rel="noopener">ccpd.nic.in</a> · <a href="https://nalsa.gov.in/legal-aid/" target="_blank" rel="noopener">nalsa.gov.in</a></p>
+      <div class="row" style="justify-content:flex-end"><button class="btn line" data-close>${esc(X('Close'))}</button></div></div>`;
+    document.body.appendChild(ov);
+    const close = () => ov.remove();
+    ov.addEventListener('click', (e) => { if (e.target === ov || e.target.closest('[data-close]')) close(); });
+    ov.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+    ov.querySelector('h2').focus();
+  }
+
   function showLang() {
     const ov = document.createElement('div'); ov.className = 'overlay'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-labelledby', 'langh');
     ov.innerHTML = `<div class="dialog wide"><h2 id="langh">${esc(T('lang'))}</h2><p class="small muted">${esc(T('auto'))}</p>
@@ -1240,7 +1330,7 @@ ${JSON.stringify(map)}`;
       if (await device(lines, my)) return;
       stop(); toast(X('Reading aloud is not available right now.'));
     }
-    return { toggle(b) { btnRef = b; if (playing) stop(); else start(); }, stop, script, chunks };
+    return { toggle(b) { btnRef = b; if (playing) stop(); else start(); }, stop, script, chunks, bestVoice };
   })();
 
   // Follow-up: remember (on this phone only) the last guide used, and ask once, a day or more later, whether it helped.
@@ -1337,7 +1427,7 @@ ${JSON.stringify(map)}`;
   /* ============ events ============ */
   function flyToTray(names) {
     const tray = document.getElementById('tray'); const cnt = document.getElementById('traycount');
-    if (!tray || !names.length || issue().sensitive || matchMedia('(prefers-reduced-motion: reduce)').matches) { if (names.length) announce(names.length + ' record' + (names.length > 1 ? 's' : '') + ' added to your file'); return; }
+    if (!tray || !names.length || issue().sensitive || calmMotion()) { if (names.length) announce(names.length + ' record' + (names.length > 1 ? 's' : '') + ' added to your file'); return; }
     const from = document.querySelector('.qtext').getBoundingClientRect(); const to = tray.getBoundingClientRect();
     const final = Number(cnt.textContent); const shown = names.slice(0, 3); cnt.textContent = final - names.length;
     shown.forEach((n, i) => {
@@ -1359,9 +1449,14 @@ ${JSON.stringify(map)}`;
     if (form) {
       const qq = issue().questions.find((x) => x.id === form.dataset.q);
       let done = false; const pick = (v) => { if (done) return; done = true; form.classList.add('picked'); setTimeout(() => answer(qq, v), 220); };
-      form.addEventListener('change', (e) => { if (e.target.name === 'a') pick(e.target.value); });
-      form.addEventListener('click', (e) => { const i = e.target.closest('input[name=a]'); if (i && i.dataset.pre) pick(i.value); });
-      form.addEventListener('submit', (e) => e.preventDefault());
+      // Arrow keys move through the choices without answering (screen readers, switch access, keyboards);
+      // in "ask before moving on" mode every choice waits for Next. Taps and number keys answer at once.
+      let byArrow = false; const nx = document.getElementById('qnext');
+      form.addEventListener('keydown', (e) => { if (/^Arrow/.test(e.key)) byArrow = true; if (e.key === 'Enter' && form.querySelector('input[name=a]:checked')) { e.preventDefault(); form.requestSubmit ? form.requestSubmit() : form.dispatchEvent(new Event('submit', { cancelable: true })); } });
+      form.addEventListener('change', (e) => { if (e.target.name !== 'a') return; if (AX.confirm || byArrow) { byArrow = false; if (nx) nx.hidden = false; return; } pick(e.target.value); });
+      form.addEventListener('click', (e) => { const i = e.target.closest('input[name=a]'); if (i && i.dataset.pre && !AX.confirm) pick(i.value); });
+      form.addEventListener('submit', (e) => { e.preventDefault(); const c = form.querySelector('input[name=a]:checked'); if (c) pick(c.value); else { announce(X('Choose an answer first')); form.querySelector('input[name=a]')?.focus(); } });
+      if (AX.speak) sayQuestion();
     }
     const cf = document.getElementById('chronoform');
     if (cf) cf.addEventListener('submit', (e) => { e.preventDefault(); const f = new FormData(cf); S.chrono.push({ id: Date.now().toString(36), date: f.get('date') || '', approx: !!f.get('approx'), text: String(f.get('text')).trim() }); persist(); render(); announce('Event added'); });
@@ -1382,6 +1477,12 @@ ${JSON.stringify(map)}`;
     const k = e.key; let idx = /^[1-9]$/.test(k) ? Number(k) - 1 : -1;
     const inputs = form.querySelectorAll('input[name=a]'); if (idx < 0 || idx >= inputs.length) return;
     e.preventDefault(); const inp = inputs[idx]; inp.checked = true; inp.dispatchEvent(new Event('change', { bubbles: true })); inp.focus();
+  });
+  document.addEventListener('change', (e) => {
+    const c = e.target.closest('[data-access]'); if (!c) return;
+    const k = c.dataset.access; const set = new Set(S.access || []); if (c.checked) set.add(k); else set.delete(k);
+    S.access = ACCESS_NEEDS.map(([x]) => x).filter((x) => set.has(x)); persist();
+    const r = document.getElementById('report'); if (r) r.innerHTML = reportHTML(reportData());
   });
   document.addEventListener('submit', (e) => {
     const f = e.target.closest('[data-addrec]'); if (!f) return; e.preventDefault();
@@ -1414,11 +1515,14 @@ ${JSON.stringify(map)}`;
     switch (t.dataset.act) {
       case 'toshelf': document.getElementById('shelf').scrollIntoView({ behavior: 'smooth' }); break;
       case 'lang': showLang(); break;
+      case 'ax': showAx(); break;
+      case 'disab': showDisab(); break;
+      case 'sayq': sayQuestion(); break;
       case 'begin': startIssue(t.dataset.id, t.dataset.topic != null ? KB.directory[Number(t.dataset.topic)] : null); enterGuide(); break;
       case 'skip': { const q = currentQ(); if (q) { S.skipped[q.id] = true; S.history.push({ id: q.id, stage: S.stage, skip: true }); persist(); nextAfter(q); } break; }
       case 'qback': { if (!S.history.length) break; syncQuiz(String(S.history.length - 1)); history.replaceState(null, '', '#quiz-' + S.history.length); render(); break; }
       case 'toen': setLang('en'); break;
-      case 'getstarted': { const st = document.getElementById('start'); if (st) st.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); setTimeout(() => document.getElementById('matter')?.focus({ preventScroll: true }), 400); break; }
+      case 'getstarted': { const st = document.getElementById('start'); if (st) st.scrollIntoView({ behavior: calmMotion() ? 'auto' : 'smooth' }); setTimeout(() => document.getElementById('matter')?.focus({ preventScroll: true }), 400); break; }
       case 'quit': go(S.topic ? 'cat-' + S.topic.cat : 'cat-' + issue().cat); break;
       case 'showlist': S.pendingUrgent = null; S.chapterFound = []; go('list'); break;
       case 'ackurgent': S.ackUrgent[S.pendingUrgent] = true; S.pendingUrgent = null; persist(); if (currentQ()) goQuiz(); else { finishStage(); go('list'); } break;

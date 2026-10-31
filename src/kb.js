@@ -29,6 +29,8 @@
     cio: { label: 'Ombudsman', name: 'Insurance Ombudsman (Council for Insurance Ombudsmen)', detail: 'Free route for many claim rejections after the insurer replies or 30 days pass.', href: 'https://www.cioins.co.in' },
     rera: { label: 'RERA', name: 'Your state Real Estate Regulatory Authority', detail: 'Complaints against registered real-estate projects and builders. Each state has its own portal.', href: null },
     posh: { label: 'SHe-Box', name: 'SHe-Box (sexual harassment at work)', detail: 'Government portal to register workplace sexual-harassment complaints.', href: 'https://shebox.wcd.gov.in' },
+    ccpd: { label: 'CCPD', name: 'Chief Commissioner for Persons with Disabilities', detail: 'Free complaint if you are denied a right because of disability — by post, email (ccpd@nic.in) or online. No lawyer needed. Complaints about a state government office go to your State Commissioner.', href: 'https://ccpd.nic.in' },
+    udid: { label: 'UDID', name: 'UDID card and disability certificate', detail: 'Apply online for the Unique Disability ID card that proves your disability everywhere in India.', href: 'https://www.swavlambancard.gov.in' },
     samadhan: { label: 'SAMADHAN', name: 'Labour dispute portal (Ministry of Labour)', detail: 'Online filing of certain workplace disputes.', href: 'https://samadhan.labour.gov.in' }
   };
 

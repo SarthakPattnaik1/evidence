@@ -73,6 +73,9 @@ module.exports = async function handler(req, res) {
       case 'oc': { if (!g) break; const met = ['yes', 'notyet', 'noneed'].includes(e.x) ? e.x : 'na'; const hp = ['yes', 'little', 'no'].includes(e.y) ? e.y : 'na'; add('oc:met:' + met); add('oc:help:' + hp); add('oc:all'); break; }
       case 'aid': if (['yes', 'likely', 'maybe', 'no'].includes(e.x)) add('aid:' + e.x); break;
       case 'aidopen': add('aid:open'); break;
+      case 'ax': if (['size', 'contrast', 'speak', 'confirm', 'calm'].includes(e.x)) add('ax:' + e.x + ':' + Math.max(0, Math.min(2, Number(e.y) | 0))); break;
+      case 'disab': add('ax:disab'); break;
+      case 'sayq': add('ax:sayq'); if (LANGS.has(e.l)) add('ax:sayq:' + e.l); break;
       case 'remind': if (g && (e.x === 'cal' || e.x === 'wa')) { add('remind:' + e.x); add('remind:' + g); } break;
       case 'read': if (e.x === 'device' || e.x === 'server') { add('read:' + e.x); if (LANGS.has(e.l)) add('read:' + e.l); } break;
       case 'tr': if (LANGS.has(e.x)) add('tr:' + (e.ok ? 'ok' : 'fail') + ':' + e.x); break;
