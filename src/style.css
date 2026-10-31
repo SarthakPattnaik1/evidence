@@ -1058,3 +1058,9 @@ html.hc .opt:has(input:checked){background:#FFF6C2;box-shadow:inset 0 0 0 3px #0
 .axgrid{display:grid;gap:8px;margin-top:10px}
 .report .axrep{background:#EEF3FB}
 @media (max-width:420px){.nav.axbtn{padding:8px 6px}}
+
+/* v35: right-to-left (Urdu, Sindhi, Kashmiri) — the hero illustration is drawn to bleed off the right edge;
+   when the layout mirrors, mirror the picture too so its cut edge stays against the screen edge (no hard line
+   down the middle). Direction arrows point the way the page reads. */
+@media (min-width:820px){ html[dir=rtl] .hart img{transform:scaleX(-1)} }
+html[dir=rtl] .i-dir{transform:scaleX(-1)}

@@ -1082,6 +1082,12 @@ html.hc .opt:has(input:checked){background:#FFF6C2;box-shadow:inset 0 0 0 3px #0
 .axgrid{display:grid;gap:8px;margin-top:10px}
 .report .axrep{background:#EEF3FB}
 @media (max-width:420px){.nav.axbtn{padding:8px 6px}}
+
+/* v35: right-to-left (Urdu, Sindhi, Kashmiri) — the hero illustration is drawn to bleed off the right edge;
+   when the layout mirrors, mirror the picture too so its cut edge stays against the screen edge (no hard line
+   down the middle). Direction arrows point the way the page reads. */
+@media (min-width:820px){ html[dir=rtl] .hart img{transform:scaleX(-1)} }
+html[dir=rtl] .i-dir{transform:scaleX(-1)}
 </style>
 <script defer src="/_vercel/insights/script.js"></script>
 </head>
@@ -6042,7 +6048,7 @@ html.hc .opt:has(input:checked){background:#FFF6C2;box-shadow:inset 0 0 0 3px #0
     flag: '<path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/>',
     q: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17v.5"/>'
   };
-  const ic = (n, s = 20) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n] || ''}</svg>`;
+  const ic = (n, s = 20) => `<svg${['arrow', 'back', 'chev'].includes(n) ? ' class="i-dir"' : ''} width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n] || ''}</svg>`;
 
   /* ---------- helpers ---------- */
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
