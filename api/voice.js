@@ -52,9 +52,23 @@ async function gemini(parts) {
   throw last || new Error('no model');
 }
 
+
+// Voice prompt. Tested live (Oct 2026) with synthetic speech in Odia, Tamil, Hindi, Bengali, Telugu, Malayalam, Kannada.
+// Odia was being heard as Bengali, so the prompt spells out how to tell close languages apart and to prefer the app language.
+const PROMPT = (lang) => {
+  const name = LANG[lang] || LANG.en;
+  return 'Transcribe this voice recording. A person in India is describing a legal problem.\n'
+    + 'Step 1 — identify the language actually spoken. It can be any Indian language (Hindi, Bengali, Odia, Assamese, Tamil, Telugu, Kannada, Malayalam, Marathi, Gujarati, Punjabi, Urdu, Maithili, Santali, Nepali, Konkani, Manipuri, Bodo, Dogri, Kashmiri, Sindhi, Sanskrit) or English, often mixed with English words.\n'
+    + 'Close languages: Odia, Bengali and Assamese sound alike. Odia uses words like ମୁଁ (mun), ମୋ (mo), କଣ (kana), କରିବି (karibi), ଅଛି (achhi), କରିଛି (karichhi), ପଡ଼ୋଶୀ (padoshi). Bengali uses আমি (ami), আমার (amar), করব (korbo), আছে (achhe). Assamese uses মই (moi), মোৰ (mor). Hindi and Marathi, Hindi and Urdu, Tamil and Malayalam, Kannada and Telugu are also close — listen for their own words.\n'
+    + (lang !== 'en' ? 'The app is set to ' + name + '. If the speech could be ' + name + ', it is ' + name + '.\n' : '')
+    + 'Step 2 — write exactly what they said in that language’s own script (Odia in ଓଡ଼ିଆ script, Bengali in বাংলা, Tamil in தமிழ், Hindi in देवनागरी, Urdu in اردو, Santali in Ol Chiki, Manipuri in Meitei Mayek). Never write one language in another language’s script.\n'
+    + 'Step 3 — give a short, plain English phrase (max 12 words) saying what legal problem they describe.\n'
+    + 'If there is no clear speech, use empty strings. Do not add advice. Reply only as JSON: {"lang": "<ISO 639-1 or 639-3 code>", "text": "...", "en": "..."}';
+};
+
 const clean = (s, n) => String(s || '').replace(/[\u0000-\u001f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, n);
 
-module.exports = async (req, res) => {
+const handler = async (req, res) => {
   const configured = !!process.env.GEMINI_API_KEY;
   if (req.method === 'GET') return send(res, 200, { ok: configured, provider: configured ? 'gemini' : null });
   if (req.method !== 'POST') return send(res, 405, { error: 'method' });
@@ -80,11 +94,7 @@ module.exports = async (req, res) => {
       if (!audio || audio.length > MAX_AUDIO || !/^[A-Za-z0-9+/=]+$/.test(audio.slice(0, 2000))) return send(res, 400, { error: 'bad audio' });
       const out = await gemini([
         { inlineData: { mimeType: 'audio/wav', data: audio } },
-        { text: 'This is a person in India describing a legal problem by voice. The app is set to ' + name + ', but they may speak ANY Indian language '
-          + '(Hindi, Bengali, Odia, Tamil, Telugu, Marathi, Gujarati, Kannada, Malayalam, Punjabi, Assamese, Urdu, Maithili, Santali, Nepali, Konkani, Manipuri, Bodo, Dogri, Kashmiri, Sindhi, Sanskrit or English), often mixed with English words. '
-          + 'First identify the language actually spoken. Transcribe exactly what they said, in the script normally used for that language (for example Odia in Odia script, Tamil in Tamil script). '
-          + 'Then give a short, plain English phrase (max 12 words) for what legal problem they describe. If there is no clear speech, return empty strings. Do not add advice. '
-          + 'Reply only as JSON: {"lang": "<ISO 639 code of the spoken language>", "text": "...", "en": "..."}' }
+        { text: PROMPT(lang) }
       ]);
       return send(res, 200, { text: clean(out.text, 300), en: clean(out.en, 160), spoken: clean(out.lang, 8) });
     }
@@ -93,3 +103,5 @@ module.exports = async (req, res) => {
     return send(res, e.status === 429 ? 429 : 502, { error: e.status === 429 ? 'Voice is busy right now. Please type instead.' : 'Could not understand the recording. Please try again or type.' });
   }
 };
+module.exports = handler;
+module.exports.PROMPT = PROMPT;

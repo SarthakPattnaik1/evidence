@@ -36,11 +36,11 @@ module.exports = async (req, res) => {
     const sttCfg = u.searchParams.get('think') === 'off' ? { thinkingConfig: { thinkingBudget: 0 } } : u.searchParams.get('think') === 'min' ? { thinkingConfig: { thinkingLevel: 'minimal' } } : {};
     const langs = (u.searchParams.get('l') || 'or,ta,hi').split(',');
     const out = await Promise.all(langs.map(async (l) => {
-      const s = await call(tts, [{ text: 'Say naturally: ' + SAY[l] }], { responseModalities: ['AUDIO'], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } } });
+      const s = await call(tts, [{ text: SAY[l] }], { responseModalities: ['AUDIO'], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } } });
       if (!s.ok || !s.audio) return { l, tts: { ok: false, ms: s.ms, err: s.err || 'no audio' } };
       const rate = Number((/rate=(\d+)/.exec(s.audio.mimeType || '') || [])[1] || 24000);
       const audio = wav(s.audio.data, rate);
-      const prompt = 'This is a person in India describing a legal problem by voice. The app is set to English, but they may speak ANY Indian language, often mixed with English words. First identify the language actually spoken. Transcribe exactly what they said, in the script normally used for that language. Then give a short, plain English phrase (max 12 words) for what legal problem they describe. Reply only as JSON: {"lang": "...", "text": "...", "en": "..."}';
+      const prompt = require('./voice.js').PROMPT(u.searchParams.get('app') || 'en');
       const r = await call(stt, [{ inlineData: { mimeType: 'audio/wav', data: audio } }, { text: prompt }], Object.assign({ responseMimeType: 'application/json', temperature: 0 }, sttCfg));
       return { l, said: SAY[l], ttsMs: s.ms, kb: Math.round(audio.length * 0.75 / 1024), stt: { ok: r.ok, ms: r.ms, out: (r.text || r.err || '').slice(0, 300) } };
     }));
