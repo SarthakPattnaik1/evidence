@@ -102,6 +102,17 @@
       ],
       "destination": "https://saboot.org/:path*",
       "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "evidence-orpin.vercel.app"
+        }
+      ],
+      "destination": "https://saboot.org/:path*",
+      "permanent": true
     }
   ]
 }
