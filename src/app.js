@@ -86,13 +86,13 @@
   let sampler = null;
   try { if (window.claude && window.claude.use) window.claude.use('sample').then((s) => { sampler = s; }).catch(() => {}); } catch (e) { /* none */ }
   /* Pre-translated dictionary (English -> language), built ahead of time and served as /tr/<lang>.json. */
-  let DICT = {}; let DICTLANG = 'en'; const dictTried = {};
+  let DICT = {}; let DICTLANG = 'en'; const dictTried = {}; let dictBusy = 0;
   function dictLoad() {
     if (LANG === 'en' || DICTLANG === LANG || dictTried[LANG] || !/^https?:$/.test(location.protocol)) return;
-    const L0 = LANG; dictTried[L0] = 1;
+    const L0 = LANG; dictTried[L0] = 1; dictBusy++;
     fetch('/tr/' + L0 + '.json?v=' + encodeURIComponent(KB.version)).then((r) => (r.ok ? r.json() : null)).then((d) => {
       if (d && typeof d === 'object' && LANG === L0) { DICT = d; DICTLANG = L0; if (Object.keys(d).length) safeRender(); }
-    }).catch(() => {});
+    }).catch(() => {}).finally(() => { dictBusy--; });
   }
   const D = (en) => (DICTLANG === LANG && en ? DICT[en] : undefined);
   function T(key, vars) {
@@ -281,17 +281,21 @@ ${JSON.stringify(map)}`;
   /* Switching to a language that is not pre-translated: instead of the page changing in waves as each batch of
      translation arrives, keep it dimmed behind "Translating…" and show it once, already translated (max 9 s). */
   let trWaitT = null;
+  /* Applies to EVERY language, including the 16 with a hand-written menu: their page text (guides, home cards,
+     buttons) still arrives in batches. If everything is already on the phone, the page is shown at once. */
   function trWait() {
     clearTimeout(trWaitT); const body = document.body;
-    if (LANG === 'en' || uiReady(LANG)) { body.classList.remove('trwait'); return; }
+    if (LANG === 'en') { body.classList.remove('trwait'); return; }
+    const busyNow = () => Object.keys(pending).length + xFly.size + XQ.size + dictBusy;
+    if (!busyNow()) { body.classList.remove('trwait'); return; }   // all text already here: no dimming at all
     body.classList.add('trwait'); const t0 = Date.now(); let quiet = 0;
     const tick = () => {
-      const busy = Object.keys(pending).length + xFly.size + XQ.size;
-      quiet = busy ? 0 : quiet + 1;
-      if (quiet >= 3 || Date.now() - t0 > 9000) { body.classList.remove('trwait'); applyLangDom(); safeRender(); return; }
+      quiet = busyNow() ? 0 : quiet + 1;
+      // Draw the final page while still dimmed, then reveal it: nothing changes after it appears.
+      if (quiet >= 3 || Date.now() - t0 > 10000) { applyLangDom(); clearTimeout(srT); const y = window.scrollY; render(); window.scrollTo(0, y); body.classList.remove('trwait'); return; }
       trWaitT = setTimeout(tick, 200);
     };
-    trWaitT = setTimeout(tick, 250);
+    trWaitT = setTimeout(tick, 200);
   }
   function trNote() { return translated() ? `<p class="trnote">${ic('globe', 16)} ${esc(trFailed[LANG] && !Object.keys(pending).length ? T('enonly') : T('auto'))} <button class="btn text" data-act="toen">${esc(T('en'))}</button></p>` : ''; }
 
@@ -305,7 +309,7 @@ ${JSON.stringify(map)}`;
     while (S.history.length > k) { const last = S.history.pop(); S.prefill[last.id] = S.answers[last.id]; delete S.answers[last.id]; delete S.skipped[last.id]; S.stage = last.stage; changed = true; }
     if (changed) { if (S.stage === 'quick') S.quickDone = false; else S.deepDone = false; E.prune(issue(), S.answers); persist(); }
   }
-  window.addEventListener('hashchange', render);
+  window.addEventListener('hashchange', () => { render(); trWait(); });
 
   function shell(inner, opt = {}) {
     const sensitive = !!(issue() && issue().sensitive && opt.inJourney);
