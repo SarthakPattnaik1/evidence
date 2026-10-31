@@ -7,7 +7,7 @@ const css = !fs.existsSync(F) ? '' : [['Bricolage Grotesque', 'bricolage-grotesq
   .map(([f, p, w]) => `@font-face{font-family:"${f}";font-weight:${w};src:url(data:font/woff2;base64,${fs.readFileSync(F + p).toString('base64')}) format("woff2")}`).join('\n');
 const url = 'file://' + require('path').resolve(__dirname, '../build/index.html') + '';
 (async () => {
-  const b = await chromium.launch(); const errs = [];
+  const b = require('./_consent.js')(await chromium.launch()); const errs = [];
   const page = async (vp) => { const p = await b.newPage({ viewport: vp }); p.on('pageerror', (e) => errs.push(e.message));
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: css })); return p; };
   const shot = (p, n, full) => p.screenshot({ path: '' + require('path').resolve(__dirname, 'shots') + '/' + n + '.png', fullPage: !!full });

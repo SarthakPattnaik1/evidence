@@ -922,3 +922,32 @@ footer.foot{background:#F6F1E8}
 @media (max-width:420px){.searchbox .mic{width:44px;height:44px}}
 .searchbox.listening .mic{box-shadow:0 0 0 calc(4px + var(--lvl,0) * 14px) rgba(179,38,30,.22);animation:none;transition:box-shadow .1s}
 @media (prefers-reduced-motion:reduce){.searchbox.listening .mic{transition:none}}
+/* v30 — disclaimer (Bar Council) */
+body.consenting{overflow:hidden}
+.overlay.consent{z-index:90;background:rgba(11,31,54,.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);align-items:start;overflow-y:auto;padding:max(16px,4vh) 14px}
+.dialog.cs{max-width:620px;padding:22px 24px 20px;border-radius:20px;box-shadow:0 24px 60px -20px rgba(11,31,54,.45);outline:none;margin:0 auto}
+.cs-top{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.cs-top b{font-family:var(--display);font-size:20px;font-weight:800;color:var(--ink);letter-spacing:-.02em}
+.cs-lang{margin-left:auto;display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--ink2)}
+.cs-lang select{border:0;background:transparent;font:inherit;font-size:14.5px;color:var(--ink);max-width:140px}
+.dialog.cs h2{font-size:clamp(22px,4vw,28px);margin:4px 0 4px}
+.cs-lead{margin:0 0 10px;color:var(--ink2)}
+.cs-list{margin:0 0 12px;padding-left:22px;max-height:min(46vh,420px);overflow-y:auto;font-size:15.5px;line-height:1.5;color:var(--ink)}
+.cs-list li{margin:0 0 8px;padding-left:2px}
+.cs-list li::marker{color:var(--go);font-weight:700}
+.cs-sos{background:#FDF0EE;border:1px solid #F1CFC9;border-radius:12px;padding:8px 10px;margin:10px 0 14px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;color:#8A1C14;font-size:14px;font-weight:600}
+.cs-sos .sosnums{display:flex;gap:6px;flex-wrap:wrap}
+.cs-sos .sosnum{display:inline-flex;align-items:center;gap:5px;background:#B3261E;color:#fff;border-radius:999px;padding:5px 11px;text-decoration:none;font-size:13.5px}
+.cs-sos .sosnum span{font-weight:500;opacity:.9}
+.cs-btns{display:flex;gap:10px;flex-wrap:wrap}
+.cs-btns .btn{flex:1 1 180px;justify-content:center}
+.cs-help{list-style:none;padding:0;margin:8px 0 16px;display:grid;gap:8px}
+.cs-help a{display:block;padding:12px 14px;border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);background:var(--paper)}
+.cs-help b{font-size:18px;margin-right:8px;color:#B3261E}
+@media (max-width:480px){.dialog.cs{padding:18px 16px}.cs-list{font-size:15px;max-height:44vh}}
+@media (max-width:480px){.cs-list{max-height:30vh}.cs-sos{margin:8px 0 10px}.dialog.cs h2{font-size:22px}.cs-lead{margin-bottom:6px}.cs-btns .btn{flex:1 1 120px;min-height:48px}}
+@media (max-height:700px){.cs-list{max-height:24vh}}
+.cs-list{max-height:min(34vh,330px)}
+.overlay.consent{padding-top:max(14px,3vh)}
+@media (max-height:640px){.cs-list{max-height:20vh}.cs-lead{display:none}.cs-top{margin-bottom:4px}.dialog.cs h2{font-size:20px;margin:0 0 6px}.cs-sos{padding:6px 8px}.cs-sos .sosnum{padding:4px 9px}}
+.cs-list:focus-visible{outline:3px solid var(--go);outline-offset:4px;border-radius:6px}

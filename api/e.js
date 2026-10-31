@@ -2,6 +2,11 @@
 // Each batch only increments daily counters; unique visitors are counted with a HyperLogLog over a
 // hash of (IP + browser + a salt that changes every day), so nobody can be followed across days.
 const { hasStore, store, dayKey, ip, hmac, body, send } = require('./_lib.js');
+const { check: checkToken } = require('./s.js');
+// Only pages served from these hosts may report. Scripts can fake this header, so it is a first filter, not the only one.
+const ORIGIN_OK = /^https?:\/\/(saboot\.org|www\.saboot\.org|[a-z0-9-]+\.vercel\.app|localhost(:\d+)?|127\.0\.0\.1(:\d+)?)(\/|$)/i;
+// Things a verified person did (counted once per network per day, so repeats cannot inflate them).
+const VERIFIED = new Set(['start', 'list', 'print', 'share', 'done', 'voice', 'consent']);
 
 const ID = /^[a-z0-9][a-z0-9_-]{0,47}$/;
 const ROUTES = new Set(['home', 'cat', 'start', 'topic', 'quiz', 'brk', 'urgent', 'list', 'answers', 'timeline', 'report', 'questions', 'q', 'myths', 'advocates', 'help', 'about', 'a', 'other']);
@@ -27,8 +32,20 @@ module.exports = async function handler(req, res) {
 
   const day = dayKey(); const inc = new Map(); const lists = [];
   const add = (f, n = 1) => inc.set(f, (inc.get(f) || 0) + n);
+
+  // 1. Must come from our own pages, with a valid signed session token issued by /api/s to this browser.
+  const origin = String(req.headers.origin || req.headers.referer || '');
+  const tok = checkToken(b.k, ua);
+  if (!ORIGIN_OK.test(origin) || !tok) {
+    add(!ORIGIN_OK.test(origin) ? 'x:origin' : 'x:token', ev.length);   // rejected events are counted, never used
+    try { await store.ingest(day, inc, [], []); } catch (err) { /* ignore */ }
+    return send(res, 202, { ok: false });
+  }
+  // 2. Human signals from the page: 1 = tapped/clicked/typed, 2 = page visible ≥ 3 s, 4 = not automated (navigator.webdriver false).
+  const hflags = Number.isInteger(b.h) ? b.h : 0; const human = (hflags & 7) === 7;
+  const net = hmac('net|' + day + '|' + ip(req)).slice(0, 16);   // one per network per day; salted daily, cannot be reversed to an IP
   const lang = LANGS.has(b.l) ? b.l : 'en';
-  const sid = typeof b.s === 'string' && /^[a-z0-9]{8,24}$/.test(b.s) ? b.s : '';
+  const sid = tok.sid;
 
   if (b.first) {
     add('dev:' + (b.d === 'm' ? 'm' : b.d === 't' ? 't' : 'd'));
@@ -52,6 +69,7 @@ module.exports = async function handler(req, res) {
       case 'pick': { if (!ID.test(e.g || '')) break; add('search:pick'); const q = scrub(e.x); if (q.length >= 3) lists.push(['search', { t: Date.now(), q, g: e.g, l: lang }]); break; }
       case 'lang': if (LANGS.has(e.x)) add('lang:' + e.x); break;
       case 'voice': add('voice:all'); if (LANGS.has(e.l)) add('voice:' + e.l); break;
+      case 'consent': if (e.x === 'agree' || e.x === 'disagree') add('consent:' + e.x); break;
       case 'tr': if (LANGS.has(e.x)) add('tr:' + (e.ok ? 'ok' : 'fail') + ':' + e.x); break;
       case 'fb': if (g && (e.x === 'y' || e.x === 'n')) add('fb:' + g + ':' + e.x); break;
       case 'report': { if (!g) break; const k = ['law', 'paper', 'confusing', 'translation', 'other'].includes(e.x) ? e.x : 'other'; add('rep:' + g); add('rep:all'); lists.push(['report', { t: Date.now(), g, k, m: scrub(e.m).slice(0, 400), l: lang, v: clip(e.v, 20) }]); break; }
@@ -66,6 +84,17 @@ module.exports = async function handler(req, res) {
   const uniq = [['u', vis]];
   if (sid) uniq.push(['s', sid]);
   if (sid && ev.some((x) => x && x.t === 'list')) uniq.push(['sl', sid]);
+  // 3. Verified, de-duplicated counts: distinct networks per day where a real person did each thing.
+  if (human) {
+    add('h:batch');
+    uniq.push(['v:visit', net]);
+    for (const e of ev) {
+      if (!e || !VERIFIED.has(e.t)) continue;
+      if (e.t === 'consent') { if (e.x === 'agree') uniq.push(['v:agree', net]); continue; }
+      if (e.t !== 'voice' && !ID.test(e.g || '')) continue;
+      uniq.push(['v:' + e.t, net]);
+    }
+  } else add('x:nothuman', 1);
   try { await store.ingest(day, inc, uniq, lists); } catch (err) { console.error('[e] store', err.message); return send(res, 202, { ok: false }); }
   return send(res, 202, { ok: true });
 };

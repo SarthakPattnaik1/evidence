@@ -23,7 +23,7 @@ async function visitor(b, { geo, mobile, lang, guide, answers, search, call, dee
   if (errs.length) console.log('page errors', errs);
 }
 (async () => {
-  const b = await chromium.launch({ args: ['--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36'] });
+  const b = require('./_consent.js')(await chromium.launch({ args: ['--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36'] }));
   const V = [
     { geo: 'IN-OR', mobile: true, lang: 'or', guide: 'upi-cyber-fraud', answers: 9, call: '1930', fb: 'y' },
     { geo: 'IN-MH', mobile: true, guide: 'cheque-bounce', answers: 3 },

@@ -2,7 +2,7 @@
 const { chromium } = require('playwright');
 const URL = process.env.URL || 'http://localhost:8790/';
 (async () => {
-  const b = await chromium.launch({ args: ['--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream', '--user-agent=Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/130 Mobile Safari/537.36'] });
+  const b = require('./_consent.js')(await chromium.launch({ args: ['--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream', '--user-agent=Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/130 Mobile Safari/537.36'] }));
   const errs = []; const fails = [];
   const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, permissions: ['microphone'] });
   const p = await ctx.newPage(); p.on('pageerror', (e) => errs.push(e.message));

@@ -42,6 +42,7 @@ const hashOf = (arr) => { const o = {}; if (Array.isArray(arr)) for (let i = 0; 
 const sum = (hs) => { const o = {}; for (const h of hs) for (const [k, v] of Object.entries(h || {})) o[k] = (o[k] || 0) + Number(v); return o; };
 const parse = (xs) => (xs || []).map((x) => { if (x && typeof x === 'object') return x; try { return JSON.parse(x); } catch (e) { return null; } }).filter(Boolean);
 
+const V_KINDS = ['v:visit', 'v:agree', 'v:start', 'v:list', 'v:print', 'v:share', 'v:done', 'v:voice'];
 const store = {
   // inc: Map(field -> n); uniq: [[kind, id]]; logs: [[kind, obj]]
   async ingest(day, inc, uniq, logs) {
@@ -54,18 +55,27 @@ const store = {
   async stats(cur, prev) {
     if (backend() === 'supabase') {
       const j = await rpc('pa_stats', { p_days: cur, p_prev: prev });
-      return { days: j.days.map((x) => ({ d: x.d, h: x.h || {}, u: +x.u, s: +x.s, sl: +x.sl })), prevH: j.prev || {}, uCur: +j.ucur, uPrev: +j.uprev, sCur: +j.scur, sPrev: +j.sprev, slCur: +j.slcur, slPrev: +j.slprev, search: parse(j.search), errors: parse(j.err), reports: parse(j.rep) };
+      return { days: j.days.map((x) => ({ d: x.d, h: x.h || {}, u: +x.u, s: +x.s, sl: +x.sl })), prevH: j.prev || {}, uCur: +j.ucur, uPrev: +j.uprev, sCur: +j.scur, sPrev: +j.sprev, slCur: +j.slcur, slPrev: +j.slprev, v: j.v || {}, vPrev: j.vprev || {}, search: parse(j.search), errors: parse(j.err), reports: parse(j.rep) };
     }
     const cmds = [];
     cur.forEach((d) => cmds.push(['HGETALL', 'pa:d:' + d], ['PFCOUNT', 'pa:u:' + d], ['PFCOUNT', 'pa:s:' + d], ['PFCOUNT', 'pa:sl:' + d]));
     prev.forEach((d) => cmds.push(['HGETALL', 'pa:d:' + d]));
     for (const k of ['u', 's', 'sl']) cmds.push(['PFCOUNT', ...cur.map((d) => 'pa:' + k + ':' + d)], ['PFCOUNT', ...prev.map((d) => 'pa:' + k + ':' + d)]);
+    for (const k of V_KINDS) cmds.push(['PFCOUNT', ...cur.map((d) => 'pa:' + k + ':' + d)], ['PFCOUNT', ...prev.map((d) => 'pa:' + k + ':' + d)]);
     cmds.push(['LRANGE', 'pa:search', 0, 999], ['LRANGE', 'pa:err', 0, 59], ['LRANGE', 'pa:report', 0, 199]);
     const r = await pipe(cmds); let i = 0;
     const days = cur.map((d) => ({ d, h: hashOf(r[i++]), u: r[i++] || 0, s: r[i++] || 0, sl: r[i++] || 0 }));
     const prevH = sum(prev.map(() => hashOf(r[i++])));
     const [uCur, uPrev, sCur, sPrev, slCur, slPrev] = [r[i++], r[i++], r[i++], r[i++], r[i++], r[i++]].map((x) => x || 0);
-    return { days, prevH, uCur, uPrev, sCur, sPrev, slCur, slPrev, search: parse(r[i++]), errors: parse(r[i++]), reports: parse(r[i++]) };
+    const v = {}, vPrev = {}; for (const k of V_KINDS) { v[k] = r[i++] || 0; vPrev[k] = r[i++] || 0; }
+    return { days, prevH, uCur, uPrev, sCur, sPrev, slCur, slPrev, v, vPrev, search: parse(r[i++]), errors: parse(r[i++]), reports: parse(r[i++]) };
+  },
+  // Verified per-day totals for the public ledger.
+  async ledger(days) {
+    if (backend() === 'supabase') return (await rpc('pa_ledger', { p_days: days })) || [];
+    const cmds = []; days.forEach((d) => { V_KINDS.forEach((k) => cmds.push(['PFCOUNT', 'pa:' + k + ':' + d])); cmds.push(['HMGET', 'pa:d:' + d, 'x:origin', 'x:token']); });
+    const r = await pipe(cmds); let i = 0;
+    return days.map((d) => { const v = {}; V_KINDS.forEach((k) => { const n = r[i++] || 0; if (n) v[k] = n; }); const x = r[i++] || []; return { d, v, rejected: (+x[0] || 0) + (+x[1] || 0) }; });
   },
   async loginHit(ip) {
     if (backend() === 'supabase') return Number(await rpc('pa_login_hit', { p_ip: ip })) || 0;

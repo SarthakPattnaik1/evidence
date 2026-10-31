@@ -1,5 +1,5 @@
 const { chromium } = require('playwright');
-(async () => { const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 375, height: 740 } }); const out = [];
+(async () => { const b = require('./_consent.js')(await chromium.launch()); const p = await b.newPage({ viewport: { width: 375, height: 740 } }); const out = [];
   const q = async () => (await p.locator('.qtext').count()) ? (await p.textContent('.qtext')).trim().slice(0, 40) : (await p.locator('.carryhead').count() ? 'LIST' : 'OTHER:' + p.url().split('#')[1]);
   await p.goto('file://' + require('path').resolve(__dirname, '../build/index.html') + '#cat-shopping'); await p.waitForTimeout(200);
   await p.click('[data-play="ecommerce-order"]'); await p.waitForTimeout(300); out.push('start ' + await q());

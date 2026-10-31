@@ -1,0 +1,42 @@
+name: Impact ledger
+# Commits the public, hash-chained daily totals from https://saboot.org/api/impact to impact/ledger.json every night.
+# The git history gives each day's numbers an independent, timestamped public record.
+on:
+  schedule:
+    - cron: '41 19 * * *'   # 01:11 India time, after the day has closed
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch ledger
+        run: |
+          curl -fsS https://saboot.org/api/impact -o /tmp/ledger.json || { echo "ledger not available yet"; exit 0; }
+          python3 - <<'PY'
+          import json, hashlib, os
+          new = json.load(open('/tmp/ledger.json'))
+          old = json.load(open('impact/ledger.json')) if os.path.exists('impact/ledger.json') else {'days': []}
+          # Refuse to overwrite history: any day already recorded must keep the same numbers and hash.
+          was = {d['d']: d for d in old.get('days', [])}
+          for d in new['days']:
+              if d['d'] in was and (was[d['d']]['hash'] != d['hash']):
+                  raise SystemExit('History changed for ' + d['d'] + ' — not overwriting. Investigate.')
+          # Re-verify the chain
+          prev = 'saboot-ledger-v1'
+          for d in new['days']:
+              e = {'d': d['d'], 'v': d['v'], 'rejected': d['rejected']}
+              h = hashlib.sha256((prev + '|' + json.dumps(e, separators=(',', ':'), ensure_ascii=False)).encode()).hexdigest()
+              if h != d['hash']: raise SystemExit('Hash chain broken at ' + d['d'])
+              prev = h
+          new.pop('generated', None)
+          json.dump(new, open('impact/ledger.json', 'w'), indent=1, ensure_ascii=False)
+          PY
+      - name: Commit
+        run: |
+          git config user.name "saboot-ledger-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add impact/ledger.json
+          git diff --cached --quiet && echo "No change" || (git commit -m "Impact ledger $(date -u +%F) [skip translate]" && git push)

@@ -76,6 +76,8 @@ returns jsonb language sql stable set search_path = public as $$
     'sprev', (select count(distinct h) from pa_uniq where day = any(p_prev) and kind = 's'),
     'slcur', (select count(distinct h) from pa_uniq where day = any(p_days) and kind = 'sl'),
     'slprev',(select count(distinct h) from pa_uniq where day = any(p_prev) and kind = 'sl'),
+    'v',     (select coalesce(jsonb_object_agg(kind, c), '{}'::jsonb) from (select kind, count(distinct h) c from pa_uniq where day = any(p_days) and kind like 'v:%' group by kind) v),
+    'vprev', (select coalesce(jsonb_object_agg(kind, c), '{}'::jsonb) from (select kind, count(distinct h) c from pa_uniq where day = any(p_prev) and kind like 'v:%' group by kind) v),
     'search',(select coalesce(jsonb_agg(data order by id desc), '[]'::jsonb) from (select id, data from pa_log where kind = 'search' order by id desc limit 1000) s),
     'err',   (select coalesce(jsonb_agg(data order by id desc), '[]'::jsonb) from (select id, data from pa_log where kind = 'err' order by id desc limit 60) e),
     'rep',   (select coalesce(jsonb_agg(data order by id desc), '[]'::jsonb) from (select id, data from pa_log where kind = 'report' order by id desc limit 200) r)
@@ -137,3 +139,14 @@ do $$ begin
     grant execute on function public.pa_tr_put(text, jsonb)  to service_role;
   end if;
 end $$;
+
+-- Verified daily totals for the public impact ledger (/api/impact): distinct networks per day where a real person did each thing.
+create or replace function public.pa_ledger(p_days date[])
+returns jsonb language sql stable set search_path = public as $$
+  select coalesce(jsonb_agg(jsonb_build_object('d', to_char(d, 'YYYY-MM-DD'), 'v',
+    (select coalesce(jsonb_object_agg(kind, c), '{}'::jsonb) from (select kind, count(*) c from pa_uniq where day = d and kind like 'v:%' group by kind) x),
+    'rejected', (select coalesce(sum(n), 0) from pa_daily where day = d and field in ('x:origin', 'x:token'))) order by d), '[]'::jsonb)
+  from unnest(p_days) d
+$$;
+revoke all on function public.pa_ledger(date[]) from public, anon, authenticated;
+grant execute on function public.pa_ledger(date[]) to service_role;

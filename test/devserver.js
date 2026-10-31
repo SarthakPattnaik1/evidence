@@ -11,6 +11,7 @@ function cmd([c, k, ...a]) {
     case 'HINCRBY': { const h = get(() => new Map()); h.set(a[0], (h.get(a[0]) || 0) + Number(a[1])); return h.get(a[0]); }
     case 'HGETALL': { const h = db.get(k); return h ? [...h].flat().map(String) : []; }
     case 'EXPIRE': return 1;
+    case 'HMGET': { const h = db.get(k); return a.map((f) => (h && h.has(f) ? String(h.get(f)) : null)); }
     case 'PFADD': { const s = get(() => new Set()); a.forEach((x) => s.add(x)); return 1; }
     case 'PFCOUNT': { const u = new Set(); [k, ...a].forEach((kk) => (db.get(kk) || new Set()).forEach((x) => u.add(kk + '|' + x))); return u.size; }
     case 'LPUSH': { const l = get(() => []); a.forEach((x) => l.unshift(x)); return l.length; }
@@ -63,7 +64,7 @@ http.createServer(async (req, res) => {
   const m = u.pathname.match(/^\/api\/([a-z]+)$/);
   if (m && fs.existsSync(path.join(ROOT, 'api', m[1] + '.js'))) {
     res.status = (c) => { res.statusCode = c; return res; }; res.json = (o) => { res.setHeader('content-type', 'application/json'); res.end(JSON.stringify(o)); };
-    req.headers['x-forwarded-for'] = req.headers['x-forwarded-for'] || '10.0.0.' + (Math.floor(Math.random() * 3) + 1);
+    req.headers['x-forwarded-for'] = req.headers['x-forwarded-for'] || process.env.FIXED_IP || '10.0.0.' + (Math.floor(Math.random() * 3) + 1);
     if (req.headers['x-test-geo']) { const [c, r] = req.headers['x-test-geo'].split('-'); req.headers['x-vercel-ip-country'] = c; req.headers['x-vercel-ip-country-region'] = r; }
     if (m[1] === 'e') { const orig = req.on.bind(req); let buf=''; req.on('data', (c) => (buf += c)); req.on('end', () => { try { const j = JSON.parse(buf); console.log('E', j.s, j.e.map((x) => x.t).join(',')); } catch (e) { console.log('E?', buf.slice(0, 80)); } }); }
     if (m[1] === 'e') { const oe = res.end.bind(res); res.end = (d) => { console.log('R', res.statusCode, String(d).slice(0, 60)); return oe(d); }; }

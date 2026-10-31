@@ -114,6 +114,12 @@ select{border:1px solid var(--line);border-radius:8px;padding:5px 8px;background
 
     <div class="grid g4" id="tiles"></div>
 
+    <div class="sec card" id="trustcard">
+      <div class="sechead"><h2>Verified people</h2><p>Numbers you can stand behind — counted once per network per day, only real people (tap or typing, page visible 3 s+, not automated), only through pages that got a signed session code. These undercount shared Wi-Fi, so say "at least".</p></div>
+      <div class="grid g4" id="vtiles" style="margin-top:6px"></div>
+      <p class="small" id="trustnote" style="margin:10px 0 0"></p>
+    </div>
+
     <div class="sec card">
       <div class="sechead"><h2>Daily activity</h2><p>Visitors, and lists of papers made</p></div>
       <div class="legend"><span><i style="background:var(--series-1)"></i>Visitors</span><span><i style="background:var(--series-2)"></i>Lists made</span></div>
@@ -335,6 +341,12 @@ select{border:1px solid var(--line);border-radius:8px;padding:5px 8px;background
   }
 
   function render() {
+    { const V = (DATA.verified || {}).cur || {}, VP = (DATA.verified || {}).prev || {}; const cc = DATA.cur || {};
+      const VL = [['v:visit', 'People'], ['v:agree', 'Agreed to disclaimer'], ['v:start', 'Started a guide'], ['v:list', 'Got a list of papers'], ['v:print', 'Printed / saved'], ['v:share', 'Shared'], ['v:done', 'Answered every question'], ['v:voice', 'Used voice']];
+      const vt = $('#vtiles'); if (vt) vt.innerHTML = VL.map(([k, l]) => `<div class="card tile"><div class="lab">${l}</div><div class="num">${fmt(V[k] || 0)}</div>${delta(V[k] || 0, VP[k] || 0)}</div>`).join('');
+      const rej = (cc['x:origin'] || 0) + (cc['x:token'] || 0), nh = cc['x:nothuman'] || 0, agree = cc['consent:agree'] || 0, dis = cc['consent:disagree'] || 0;
+      const tn = $('#trustnote'); if (tn) tn.innerHTML = `Rejected (fake or outside pages): <b>${fmt(rej)}</b> events · batches without human signals (ignored for verified counts): <b>${fmt(nh)}</b> · disclaimer: <b>${fmt(agree)}</b> agreed, <b>${fmt(dis)}</b> disagreed · public, hash-chained daily record: <a href="/api/impact" target="_blank" rel="noopener">/api/impact</a> (committed nightly to GitHub: impact/ledger.json).`;
+    }
     const c = DATA.cur || {}, p = DATA.prev || {};
     const tiles = [
       ['Visitors (unique each day)', DATA.uniq.cur, DATA.uniq.prev],

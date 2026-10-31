@@ -307,7 +307,7 @@ ${JSON.stringify(map)}`;
       <div class="fmark"><img class="fm" src="${window.ER_BRAND.icon}" alt="" width="53" height="44"><div><img class="fw" src="${window.ER_BRAND.word}" alt="Saboot" width="97" height="32"><b>Saboot</b><span>${esc(X('Know what to bring. Meet your lawyer prepared.'))}</span></div></div>
       <p style="max-width:62em">${f('f_disc')}</p>
       <p class="small muted madeby">${esc(X('Made by'))} <a class="plink" href="https://www.linkedin.com/in/sarthakad" target="_blank" rel="noopener">Sarthak Pattnaik</a> ${esc(X('and'))} <a class="plink" href="https://www.linkedin.com/in/subhankar-das-311030b1/" target="_blank" rel="noopener">Subhankar Das</a>.</p>
-      <div class="row"><button data-go="about">${f('f_about')}</button><button data-go="advocates">${f('f_adv')}</button><button data-go="myths">${f('f_myth')}</button><button data-go="help">${f('f_help')}</button><button data-act="reportissue">${esc(X('Report a problem'))}</button>${S.issueId ? `<button data-act="clear">${f('f_clear')}</button>` : ''}${/^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname) ? `<a class="flink" href="/guide">${esc(X('All guides'))}</a><a class="flink" href="/privacy">${esc(X('Privacy'))}</a><a class="flink" href="/terms">${esc(X('Terms'))}</a>` : ''}</div>
+      <div class="row"><button data-go="about">${f('f_about')}</button><button data-act="disclaimer">${esc(X('Disclaimer'))}</button><button data-go="advocates">${f('f_adv')}</button><button data-go="myths">${f('f_myth')}</button><button data-go="help">${f('f_help')}</button><button data-act="reportissue">${esc(X('Report a problem'))}</button>${S.issueId ? `<button data-act="clear">${f('f_clear')}</button>` : ''}${/^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname) ? `<a class="flink" href="/guide">${esc(X('All guides'))}</a><a class="flink" href="/privacy">${esc(X('Privacy'))}</a><a class="flink" href="/terms">${esc(X('Terms'))}</a>` : ''}</div>
       ${/^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname) && /^#?(home)?$/.test(location.hash) ? '<a class="adminlink" href="/admin" rel="nofollow">Admin</a>' : ''}
     </div></footer>`;
   }
@@ -326,6 +326,7 @@ ${JSON.stringify(map)}`;
     };
     app.innerHTML = busy ? viewBusy() : (map[view] || (() => viewHome()))();
     try { VOICE.sync(); } catch (e) { /* voice is optional */ }
+    try { if (document.getElementById('consent')) refreshConsent(false); } catch (e) { /* ignore */ }
     const h = app.querySelector('h1');
     if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
     try { trackRender(); } catch (e) { /* never break the app for analytics */ }
@@ -968,6 +969,78 @@ ${JSON.stringify(map)}`;
     ov.querySelector('[aria-current="true"]')?.focus();
   }
 
+  /* ============ DISCLAIMER (Bar Council of India rules) ============ */
+  // Shown on the first visit and whenever the wording changes (bump CONSENT_V). Emergency numbers work before agreeing.
+  const CONSENT_V = 1;
+  const consented = () => { const c = lsGet('saboot_consent'); return !!(c && c.v === CONSENT_V); };
+  let consentMode = 'ask';
+  function consentHTML() {
+    const tel = (n, t) => `<a class="sosnum" href="tel:${n}">${ic('phone', 16)}<b>${n}</b><span>${esc(X(t))}</span></a>`;
+    const help = `<div class="cs-sos" role="note"><span>${ic('alert', 16)} ${esc(X('In danger right now?'))}</span><div class="sosnums">${tel('112', 'Emergency')}${tel('15100', 'Legal aid')}${tel('1930', 'Cyber fraud')}</div></div>`;
+    const langSel = `<label class="cs-lang">${ic('globe', 16)}<span class="sr">${esc(T('lang'))}</span><select data-cslang>${I18N.LANGS.map((l) => `<option value="${l.code}" ${l.code === LANG ? 'selected' : ''}>${esc(l.native)}</option>`).join('')}</select></label>`;
+    if (consentMode === 'no') return `<div class="dialog cs" tabindex="-1">
+      <div class="cs-top"><img src="${window.ER_BRAND.icon}" alt="" width="34" height="28"><b>Saboot</b>${langSel}</div>
+      <h2 id="csh">${esc(X('That is okay. You can still get free help'))}</h2>
+      <ul class="cs-help">
+        <li><a href="tel:15100"><b>15100</b> ${esc(X('NALSA free legal aid — a free lawyer if you are eligible'))}</a></li>
+        <li><a href="tel:112"><b>112</b> ${esc(X('Emergency — police, ambulance, fire'))}</a></li>
+        <li><a href="tel:181"><b>181</b> ${esc(X('Women helpline'))}</a></li>
+        <li><a href="tel:1930"><b>1930</b> ${esc(X('Cyber fraud — call fast if money was taken'))}</a></li>
+        <li><a href="tel:1098"><b>1098</b> ${esc(X('Child helpline'))}</a></li>
+      </ul>
+      <div class="cs-btns"><button class="btn go" data-cs="back">${esc(X('Go back and read again'))}</button><a class="btn line" href="https://nalsa.gov.in" rel="noopener">${esc(X('Leave Saboot'))}</a></div>
+    </div>`;
+    const pts = [
+      'The Bar Council of India does not allow advocates to advertise or ask for work. Saboot is made by advocates, so please read this before you continue.',
+      'You are visiting Saboot on your own wish, to get general information. No one from Saboot has advertised to you, invited you, or offered you anything.',
+      'Saboot is a free tool to help you prepare. It is not a law firm and does not give legal advice.',
+      'Using Saboot does not create an advocate–client relationship with anyone.',
+      'Saboot does not recommend, refer you to, or advertise any advocate. Choose any advocate you trust, or call 15100 for free legal aid.',
+      'The information is general. It may be incomplete or out of date, and guides are not yet reviewed by an advocate unless they say so. Check with an advocate before you act.',
+      'Saboot and its makers are not responsible for any decision you take based on this information.',
+      'Your answers stay on your device. Voice and searches in other languages are turned into text by Google and not stored.'
+    ];
+    return `<div class="dialog cs" tabindex="-1">
+      <div class="cs-top"><img src="${window.ER_BRAND.icon}" alt="" width="34" height="28"><b>Saboot</b>${langSel}</div>
+      <h2 id="csh">${esc(X('Disclaimer'))}</h2>
+      <p class="cs-lead">${esc(X('Please read and agree to continue.'))}</p>
+      <ol class="cs-list" tabindex="0" aria-label="${esc(X('Disclaimer'))}">${pts.map((t) => `<li>${esc(X(t))}</li>`).join('')}</ol>
+      <p class="small">${esc(X('By clicking "I agree", you confirm that you have read and accept the above, and our'))} <a href="/terms" target="_blank" rel="noopener">${esc(X('Terms'))}</a> ${esc(X('and'))} <a href="/privacy" target="_blank" rel="noopener">${esc(X('Privacy'))}</a>.</p>
+      ${help}
+      <div class="cs-btns"><button class="btn go big" data-cs="agree">${esc(X('I agree'))}</button><button class="btn line" data-cs="disagree">${esc(X('I disagree'))}</button></div>
+    </div>`;
+  }
+  function showConsent(force) {
+    if (!force && consented()) return;
+    let ov = document.getElementById('consent');
+    if (!ov) {
+      ov = document.createElement('div'); ov.id = 'consent'; ov.className = 'overlay consent'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-labelledby', 'csh');
+      document.body.appendChild(ov); document.body.classList.add('consenting');
+      ov.addEventListener('click', (e) => {
+        const b = e.target.closest('[data-cs]'); if (!b) return;
+        const a = b.dataset.cs;
+        if (a === 'agree') { lsSet('saboot_consent', { v: CONSENT_V, t: new Date().toISOString().slice(0, 10) }); TRACK.once('consent', { x: 'agree' }); ov.remove(); document.body.classList.remove('consenting'); const h = app.querySelector('h1'); if (h) h.focus({ preventScroll: true }); return; }
+        if (a === 'disagree') { TRACK.once('consent', { x: 'disagree' }); consentMode = 'no'; }
+        if (a === 'back') consentMode = 'ask';
+        refreshConsent(true);
+      });
+      ov.addEventListener('change', (e) => { if (e.target.matches('[data-cslang]')) setLang(e.target.value); });
+      ov.addEventListener('keydown', (e) => {
+        if (e.key !== 'Tab') return;
+        const f = [...ov.querySelectorAll('a[href],button,select')]; if (!f.length) return;
+        if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); } else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+      });
+    }
+    refreshConsent(true);
+  }
+  function refreshConsent(focus) {
+    const ov = document.getElementById('consent'); if (!ov) return;
+    const sel = document.activeElement && document.activeElement.matches && document.activeElement.matches('[data-cslang]');
+    ov.innerHTML = consentHTML();
+    if (focus) { const d = ov.querySelector('.cs'); if (d) d.focus({ preventScroll: true }); }
+    if (sel) { const s2 = ov.querySelector('[data-cslang]'); if (s2) s2.focus(); }
+  }
+
   /* ============ events ============ */
   function flyToTray(names) {
     const tray = document.getElementById('tray'); const cnt = document.getElementById('traycount');
@@ -1076,6 +1149,7 @@ ${JSON.stringify(map)}`;
       case 'exit': S = blank(); saveOn = false; clearSaved(); app.innerHTML = ''; history.replaceState(null, '', '#home'); render(); break;
       case 'excl': S.excludeSensitive = t.checked; persist(); render(); break;
       case 'mic': TRACK.once('voice', { l: LANG }); VOICE.toggle(); break;
+      case 'disclaimer': consentMode = 'ask'; showConsent(true); break;
       case 'print': TRACK.once('print', { g: S.issueId }); try { window.print(); } catch (err) { /* blocked */ } document.getElementById('printhint').hidden = false; break;
       case 'copytext': try { await navigator.clipboard.writeText(reportText()); toast('Report copied as text'); } catch (err) { toast('Copy was blocked by the browser'); } break;
       case 'download': if (!downloads) break;
@@ -1094,14 +1168,24 @@ ${JSON.stringify(map)}`;
     const on = /^https:$/.test(location.protocol) && !/claude\.ai|anthropic|claudeusercontent|localhost$/.test(location.hostname) && navigator.doNotTrack !== '1' && window.doNotTrack !== '1';
     const forced = /^http:$/.test(location.protocol) && /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && /saboot_track=1/.test(document.cookie + location.search);
     if (!on && !forced) return { ev() {}, once() {}, flush() {} };
+    setTimeout(() => getTok && getTok(), 0);
     let sid = ''; try { sid = sessionStorage.getItem('pa_s') || ''; if (!sid) { sid = Math.random().toString(36).slice(2, 12) + Date.now().toString(36).slice(-4); sessionStorage.setItem('pa_s', sid); } } catch (e) { sid = Math.random().toString(36).slice(2, 14); }
     const seen = new Set(); let q = []; let first = true; let timer = null;
+    // Signed session token from the server (proves events came through a real page load) and human signals.
+    let tok = ''; let tokP = null; let hf = navigator.webdriver ? 0 : 4; let visMs = 0; let visAt = document.visibilityState === 'visible' ? Date.now() : 0;
+    const getTok = () => tokP || (tokP = fetch('/api/s', { credentials: 'omit' }).then((r) => r.json()).then((j) => { tok = j.k || ''; }).catch(() => { tokP = null; }));
+    try { tok = sessionStorage.getItem('pa_k') || ''; } catch (e) { /* private mode */ }
+    ['pointerdown', 'touchstart', 'keydown'].forEach((t) => addEventListener(t, () => { hf |= 1; }, { once: true, passive: true, capture: true }));
+    const vis = () => { if (visAt) visMs += Date.now() - visAt; visAt = document.visibilityState === 'visible' ? Date.now() : 0; if (visMs + (visAt ? Date.now() - visAt : 0) >= 3000) hf |= 2; };
+    setTimeout(vis, 3100); addEventListener('visibilitychange', vis);
     const ref = (() => { try { const r = document.referrer && new URL(document.referrer); return r && r.hostname !== location.hostname ? r.hostname : ''; } catch (e) { return ''; } })();
     const utm = (() => { try { return new URLSearchParams(location.search).get('utm_source') || ''; } catch (e) { return ''; } })();
     const dev = () => (Math.min(screen.width, innerWidth) < 640 ? 'm' : Math.min(screen.width, innerWidth) < 1024 ? 't' : 'd');
     function flush() {
       if (!q.length) return; clearTimeout(timer); timer = null;
-      const payload = { s: sid, l: LANG, d: dev(), e: q.splice(0, 60) };
+      if (!tok) { getTok().then(() => { if (tok) { try { sessionStorage.setItem('pa_k', tok); } catch (e) { /* ignore */ } flush(); } }); return; }
+      vis();
+      const payload = { k: tok, h: hf, l: LANG, d: dev(), e: q.splice(0, 60) };
       if (first) { payload.first = 1; payload.r = ref; payload.u = utm; first = false; }
       const body = JSON.stringify(payload);
       try { if (!(navigator.sendBeacon && navigator.sendBeacon('/api/e', new Blob([body], { type: 'application/json' })))) fetch('/api/e', { method: 'POST', body, headers: { 'content-type': 'application/json' }, keepalive: true }).catch(() => {}); } catch (e) { /* ignore */ }
@@ -1150,4 +1234,5 @@ ${JSON.stringify(map)}`;
   try { const fi = document.createElement('link'); fi.rel = 'icon'; fi.href = window.ER_BRAND.icon; document.head.appendChild(fi); } catch (e) { /* none */ }
   applyLangDom(); dictLoad();
   render();
+  showConsent();
 })();
