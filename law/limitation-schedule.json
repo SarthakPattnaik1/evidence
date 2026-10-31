@@ -1,0 +1,1253 @@
+{
+ "act": "The Limitation Act, 1963 (36 of 1963)",
+ "source": "https://www.thc.nic.in/Central Governmental Acts/Limitation Act, 2019.pdf",
+ "source_sha256": "508feabba1a8039d2d30fd74ddfec2155d912c44c63f988947f95e0a5a92176c",
+ "fetched": "2026-10-31",
+ "note": "Parsed from the official PDF with pdftotext -layout. 'raw' is the text as printed; articles with sub-limbs are marked complex and must be read from 'raw'.",
+ "articles": [
+  {
+   "art": 1,
+   "division": "Suits",
+   "part": "PART I.—SUITS RELATING TO ACCOUNTS",
+   "description": "For the balance due on a mutual, open and current account, where there have been reciprocal demands between the parties.",
+   "period": "Three years.",
+   "starts": "The close of the year in which the last item admitted or proved is entered in the account; such year to be computed as in the account.",
+   "raw": "1. For the balance due on a mutual,             Three years.       The close of the year in which the last\n     open and current account, where                                 item admitted or proved is entered in\n     there have been reciprocal                                      the account; such year to be computed\n     demands between the parties.                                    as in the account."
+  },
+  {
+   "art": 2,
+   "division": "Suits",
+   "part": "PART I.—SUITS RELATING TO ACCOUNTS",
+   "description": "Against a factor for an account.",
+   "period": "Three years.",
+   "starts": "When the account is, during the continuance of the agency, demanded and refused or, where no such demand is made, when the agency terminates.",
+   "raw": "2. Against a factor for an account.             Three years.       When the account is, during the\n                                                                     continuance of the agency, demanded\n                                                                     and refused or, where no such demand\n                                                                     is made, when the agency terminates."
+  },
+  {
+   "art": 3,
+   "division": "Suits",
+   "part": "PART I.—SUITS RELATING TO ACCOUNTS",
+   "description": "By a principal against his agent for movable property received by the latter and not accounted for.",
+   "period": "Three years.",
+   "starts": "When the account is, during the continuance of the agency, demanded and refused or, where no such demand is made, when the agency terminates.",
+   "raw": "3. By a principal against his agent for         Three years.       When the account is, during the\n     movable property received by the                                continuance of the agency, demanded\n     latter and not accounted for.                                   and refused or, where no such demand\n                                                                     is made, when the agency terminates."
+  },
+  {
+   "art": 4,
+   "division": "Suits",
+   "part": "PART I.—SUITS RELATING TO ACCOUNTS",
+   "description": "Other suits by principals against agents for neglect or misconduct.",
+   "period": "Three years.",
+   "starts": "When the neglect or misconduct becomes known to the plaintiff.",
+   "raw": "4. Other suits by principals against            Three years.       When the neglect or misconduct becomes\n     agents for neglect or misconduct.                               known to the plaintiff."
+  },
+  {
+   "art": 5,
+   "division": "Suits",
+   "part": "PART I.—SUITS RELATING TO ACCOUNTS",
+   "description": "For an account and a share of the profits of a dissolved partnership.",
+   "period": "Three years.",
+   "starts": "The date of the dissolution.",
+   "raw": "5. For an account and a share of the            Three years.       The date of the dissolution.\n     profits of a dissolved partnership."
+  },
+  {
+   "art": 6,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "For a seaman’s wages",
+   "period": "Three years.",
+   "starts": "The end of the voyage during which the wages are earned.",
+   "raw": "6.   For a seaman’s wages                       Three years.       The end of the voyage during which the\n                                                                     wages are earned."
+  },
+  {
+   "art": 7,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "For wages in the case of any other person.",
+   "period": "Three years.",
+   "starts": "When the wages accrue due.",
+   "raw": "7.   For wages in the case of any other         Three years.       When the wages accrue due.\n        person."
+  },
+  {
+   "art": 8,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "For the price of food or drink sold by the keeper of a hotel, tavern or lodging-house.",
+   "period": "Three years.",
+   "starts": "When the food or drink is delivered.",
+   "raw": "8.   For the price of food or drink sold        Three years.       When the food or drink is delivered.\n        by the keeper of a hotel, tavern\n        or lodging-house."
+  },
+  {
+   "art": 9,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "For the price of lodging.",
+   "period": "Three years.",
+   "starts": "When the price becomes payable.",
+   "raw": "9.   For the price of lodging.                  Three years.       When the price becomes payable."
+  },
+  {
+   "art": 10,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "Against a carrier for compensation for losing or injuring goods.",
+   "period": "Three years.",
+   "starts": "When the loss or injury occurs.",
+   "raw": "10. Against a carrier for compensation          Three years.       When the loss or injury occurs.\n      for losing or injuring goods."
+  },
+  {
+   "art": 11,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "Against a carrier for compensation for non-delivery of, or delay in delivering, goods.",
+   "period": "Three years.",
+   "starts": "When the goods ought to be delivered.",
+   "raw": "11. Against a carrier for compensation          Three years.       When the goods ought to be delivered.\n      for non-delivery of, or delay in\n      delivering, goods."
+  },
+  {
+   "art": 12,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "For the hire of animals, vehicles, boats or household furniture.",
+   "period": "Three years.",
+   "starts": "When the hire becomes payable.",
+   "raw": "12. For the hire of animals, vehicles,          Three years.       When the hire becomes payable.\n       boats or household furniture."
+  },
+  {
+   "art": 13,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "For the balance of money advanced in payment of goods to be delivered.",
+   "period": "Three years.",
+   "starts": "When the goods ought to be delivered.",
+   "raw": "13. For the balance of money advanced           Three years.       When the goods ought to be delivered.\n       in payment of goods to be\n       delivered."
+  },
+  {
+   "art": 14,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "For the price of goods sold and delivered where no fixed period of credit is agreed upon.",
+   "period": "Three years.",
+   "starts": "The date of the delivery of the goods.",
+   "raw": "14. For the price of goods sold and             Three years.       The date of the delivery of the goods.\n       delivered where no fixed period\n       of credit is agreed upon."
+  },
+  {
+   "art": 15,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "For the price of goods sold and delivered to be paid for after the expiry of a fixed period of credit.",
+   "period": "Three years.",
+   "starts": "When the period of credit expires.",
+   "raw": "15. For the price of goods sold and             Three years.       When the period of credit expires.\n       delivered to be paid for after the\n       expiry of a fixed period of\n       credit."
+  },
+  {
+   "art": 16,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "For the price of goods sold and delivered to be paid for by a bill of exchange, no such bill being given.",
+   "period": "Three years.",
+   "starts": "When the period of the proposed bill elapses.",
+   "raw": "16. For the price of goods sold and             Three years.        When the period of the proposed bill\n       delivered to be paid for by a bill                             elapses.\n       of exchange, no such bill being\n       given."
+  },
+  {
+   "art": 17,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "For the price of trees or growing crops sold by the plaintiff to the defendant where no fixed period of credit is agreed upon.",
+   "period": "Three years.",
+   "starts": "The date of the sale.",
+   "raw": "17. For the price of trees or growing           Three years.        The date of the sale.\n       crops sold by the plaintiff to the\n       defendant where no fixed period\n       of credit is agreed upon."
+  },
+  {
+   "art": 18,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "For the price of work done by the plaintiff for the defendant at his request, where no time has been fixed for payment.",
+   "period": "Three years.",
+   "starts": "When the work is done.",
+   "raw": "18. For the price of work done by the           Three years.        When the work is done.\n       plaintiff for the defendant at his\n       request, where no time has been\n       fixed for payment."
+  },
+  {
+   "art": 19,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "For money payable for money lent.",
+   "period": "Three years.",
+   "starts": "When the loan is made.",
+   "raw": "19. For money payable for money lent.           Three years.        When the loan is made."
+  },
+  {
+   "art": 20,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "Like suit when the lender has given a cheque for the money.",
+   "period": "Three years.",
+   "starts": "When the cheque is paid.",
+   "raw": "20. Like suit when the lender has given         Three years.        When the cheque is paid.\n       a cheque for the money."
+  },
+  {
+   "art": 21,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "For money lent under an agreement that it shall be payable on demand.",
+   "period": "Three years.",
+   "starts": "When the loan is made.",
+   "raw": "21. For money lent under an agreement           Three years.        When the loan is made.\n       that it shall be payable on\n       demand."
+  },
+  {
+   "art": 22,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "For money deposited under an agreement that it shall be payable on demand, including money of a customer in the hands of his banker so payable.",
+   "period": "Three years.",
+   "starts": "When the demand is made.",
+   "raw": "22. For money deposited under an                Three years.        When the demand is made.\n       agreement that it shall be\n       payable on demand, including\n       money of a customer in the\n       hands of his banker so payable."
+  },
+  {
+   "art": 23,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "For money payable to the plaintiff for money paid for the defendant.",
+   "period": "Three years.",
+   "starts": "When the money is paid.",
+   "raw": "23. For money payable to the plaintiff          Three years.        When the money is paid.\n       for money paid for the\n       defendant."
+  },
+  {
+   "art": 24,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "For money payable by the defendant to the plaintiff for money received by the defendant, for the plaintiff's use.",
+   "period": "Three years.",
+   "starts": "When the money is received.",
+   "raw": "24. For money payable by the                    Three years.        When the money is received.\n       defendant to the plaintiff for\n       money     received      by      the\n       defendant, for the plaintiff's use."
+  },
+  {
+   "art": 25,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "For money payable for interest upon money due from the defendant to the plaintiff.",
+   "period": "Three years.",
+   "starts": "When the interest becomes due.",
+   "raw": "25. For money payable for interest              Three years.        When the interest becomes due.\n       upon money due from the\n       defendant to the plaintiff."
+  },
+  {
+   "art": 26,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "For money payable to the plaintiff for money found to be due from the defendant to the plaintiff on accounts stated between them.",
+   "period": "Three years.",
+   "starts": "When the accounts are stated in writing signed by the defendant or his agent duly authorised in this behalf, unless where the debt is, by a simultaneous agreement in writing signed as aforesaid, made payable at a future time, and then when that time arrives.",
+   "raw": "26. For money payable to the plaintiff          Three years.        When the accounts are stated in writing\n       for money found to be due from                                  signed by the defendant or his agent\n       the defendant to the plaintiff on                               duly authorised in this behalf, unless\n       accounts stated between them.                                   where the debt is, by a simultaneous\n                                                                       agreement in writing signed as\n                                                                       aforesaid, made payable at a future\n                                                                       time, and then when that time arrives."
+  },
+  {
+   "art": 27,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "For compensation for breach of a promise to do anything at a specified time, or upon the happening of a specified contingency.",
+   "period": "Three years.",
+   "starts": "When the time specified arrives or the contingency happens.",
+   "raw": "27. For compensation for breach of a            Three years.        When the time specified arrives or the\n       promise to do anything at a                                     contingency happens.\n       specified time, or upon the\n       happening of a specified\n       contingency."
+  },
+  {
+   "art": 28,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "On a single bond, where a day is specified for payment.",
+   "period": "Three years.",
+   "starts": "The day so specified.",
+   "raw": "28. On a single bond, where a day is            Three years.        The day so specified.\n      specified for payment."
+  },
+  {
+   "art": 29,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "On a single bond, where no such day is specified.",
+   "period": "Three years.",
+   "starts": "The date of executing the bond.",
+   "raw": "29. On a single bond, where no such             Three years.        The date of executing the bond.\n      day is specified."
+  },
+  {
+   "art": 30,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "On a bond subject to a condition.",
+   "period": "Three years.",
+   "starts": "When the condition is broken.",
+   "raw": "30. On a bond subject to a condition.           Three years.        When the condition is broken."
+  },
+  {
+   "art": 31,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "On a bill of exchange or promissory note payable at a fixed time after date.",
+   "period": "Three years.",
+   "starts": "When the bill or note falls due.",
+   "raw": "31.   On a bill of exchange or promissory        Three years.      When the bill or note falls due.\n        note payable at a fixed time after\n        date."
+  },
+  {
+   "art": 32,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "On a bill of exchange payable at sight, or after sight, but not at a fixed time.",
+   "period": "Three years.",
+   "starts": "When the bill is presented.",
+   "raw": "32.   On a bill of exchange payable at           Three years.    When the bill is presented.\n        sight, or after sight, but not at a\n        fixed time."
+  },
+  {
+   "art": 33,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "On a bill of exchange accepted payable at a particular place.",
+   "period": "Three years.",
+   "starts": "When the bill is presented at that place.",
+   "raw": "33.   On a bill of exchange accepted             Three years.    When the bill is presented at that place.\n        payable at a particular place."
+  },
+  {
+   "art": 34,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "On a bill of exchange or promissory note payable at a fixed time after sight or after demand.",
+   "period": "Three years.",
+   "starts": "When the fixed time expires.",
+   "raw": "34.   On a bill of exchange or promissory        Three years.    When the fixed time expires.\n        note payable at a fixed time after\n        sight or after demand."
+  },
+  {
+   "art": 35,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "On a bill of exchange or promissory note payable on demand and not accompanied by any writing restraining or postponing the right to sue.",
+   "period": "Three years.",
+   "starts": "The date of the bill or note.",
+   "raw": "35.   On a bill of exchange or promissory        Three years.    The date of the bill or note.\n        note payable on demand and not\n        accompanied by any writing\n        restraining or postponing the\n        right to sue."
+  },
+  {
+   "art": 36,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "On a promissory note or bond payable by instalments.",
+   "period": "Three years.",
+   "starts": "The expiration of the first term of payment as to the part then payable; and for the other parts, the expiration of the respective terms of payment.",
+   "raw": "36.   On a promissory note or bond               Three years.    The expiration of the first term of\n        payable by instalments.                                     payment as to the part then payable;\n                                                                    and for the other parts, the expiration\n                                                                    of the respective terms of payment."
+  },
+  {
+   "art": 37,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "On a promissory note or bond payable by instalments, which provides that, if default be made in payment of one or more instalments, the whole shall be due.",
+   "period": "Three years.",
+   "starts": "When the default is made, unless where the payee or obligee waives the benefit of the provision and then when fresh default is made in respect of which there is no such waiver.",
+   "raw": "37. On a promissory note or bond                 Three years.    When the default is made, unless where\n       payable by instalments, which                                the payee or obligee waives the\n       provides that, if default be made                            benefit of the provision and then\n       in payment of one or more                                    when fresh default is made in respect\n       instalments, the whole shall be                              of which there is no such waiver.\n       due."
+  },
+  {
+   "art": 38,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "On a promissory note given by the maker to a third person to be delivered to the payee after a certain event should happen.",
+   "period": "Three years.",
+   "starts": "The date of the delivery to the payee.",
+   "raw": "38. On a promissory note given by the            Three years.    The date of the delivery to the payee.\n       maker to a third person to be\n       delivered to the payee after a\n       certain event should happen."
+  },
+  {
+   "art": 39,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "On a dishonoured foreign bill where protest has been made and notice given.",
+   "period": "Three years.",
+   "starts": "When the notice is given.",
+   "raw": "39. On a dishonoured foreign bill                Three years.    When the notice is given.\n       where protest has been made\n       and notice given."
+  },
+  {
+   "art": 40,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "By the payee against the drawer of a bill of exchange, which has been dishonoured bynon- acceptance.",
+   "period": "Three years.",
+   "starts": "The date of the refusal to accept.",
+   "raw": "40. By the payee against the drawer of           Three years.    The date of the refusal to accept.\n       a bill of exchange, which has\n       been      dishonoured       bynon-\n       acceptance."
+  },
+  {
+   "art": 41,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "By the acceptor of an accommodation-bill against the drawer.",
+   "period": "Three years.",
+   "starts": "When the acceptor pays the amount of the bill.",
+   "raw": "41. By     the     acceptor      of    an        Three years.    When the acceptor pays the amount of the\n       accommodation-bill against the                               bill.\n       drawer."
+  },
+  {
+   "art": 42,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "By a surety against the principal debtor.",
+   "period": "Three years.",
+   "starts": "When the surety pays the creditor.",
+   "raw": "42. By  a surety against the principal           Three years.    When the surety pays the creditor.\n       debtor."
+  },
+  {
+   "art": 43,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "By a surety against a co-surety.",
+   "period": "Three years.",
+   "starts": "When the surety pays anything in excess of his own share.",
+   "raw": "43. By a surety against a co-surety.             Three years.    When the surety pays anything in excess\n                                                                    of his own share."
+  },
+  {
+   "art": 44,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "(a) On a policy of insurance when the sum insured is payable after proof of the death has been given to or received by the insurers. (b) On a policy of insurance when the sum insured is payable after proof of the loss has been given to or received by the insurers.",
+   "period": "Three years.; Three years.",
+   "starts": "The date of the death of the deceased, or where the claim on the policy is denied, either partly or wholly, the date of such denial. The date of the occurrence causing the loss, or where the claim on the policy is denied, either partly or wholly, the date of such denial.",
+   "raw": "44. (a) On a policy of insurance when            Three years.    The date of the death of the deceased, or\n       the sum insured is payable after                             where the claim on the policy is\n       proof of the death has been                                  denied, either partly or wholly, the\n       given to or received by the                                  date of such denial.\n       insurers.\n    (b) On a policy of insurance when            Three years.    The date of the occurrence causing the\n       the sum insured is payable after                             loss, or where the claim on the policy\n       proof of the loss has been given                             is denied, either partly or wholly, the\n       to or received by the insurers.                              date of such denial.",
+   "complex": true
+  },
+  {
+   "art": 45,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "By the assured to recover premia paid under a policy voidable at the election of the insurers.",
+   "period": "Three years.",
+   "starts": "When the insurers elect to avoid the policy.",
+   "raw": "45. By the assured to recover premia          Three years.        When the insurers elect to avoid the\n      paid under a policy voidable at                                policy.\n      the election of the insurers."
+  },
+  {
+   "art": 46,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "Under the Indian Succession Act, 1925 (39 of 1925), section 360 or section 361, to compel a refund by a person to whom an executor or administrator has paid a legacy or distributed assets.",
+   "period": "Three years.",
+   "starts": "The date of the payment or distribution.",
+   "raw": "46. Under the Indian Succession Act,          Three years.        The date of the payment or distribution.\n      1925 (39 of 1925), section 360\n      or section 361, to compel a\n      refund by a person to whom an\n      executor or administrator has\n      paid a legacy or distributed\n      assets."
+  },
+  {
+   "art": 47,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "For money paid upon an existing consideration which afterwards fails.",
+   "period": "Three years.",
+   "starts": "The date of the failure.",
+   "raw": "47. For money paid upon an existing           Three years.        The date of the failure.\n       consideration which afterwards\n       fails."
+  },
+  {
+   "art": 48,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "For contribution by a party who has paid the whole or more than his share of the amount due under a joint decree, or by a sharer in a joint estate who has paid the whole or more than his share of the amount of revenue due from himself and his co-sharers.",
+   "period": "Three years.",
+   "starts": "The date of the payment in excess of the plaintiff’s own share.",
+   "raw": "48. For contribution by a party who has       Three years.        The date of the payment in excess of the\n       paid the whole or more than his                               plaintiff’s own share.\n       share of the amount due under a\n       joint decree, or by a sharer in a\n       joint estate who has paid the\n       whole or more than his share of\n       the amount of revenue due from\n       himself and his co-sharers."
+  },
+  {
+   "art": 49,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "By a co-trustee to enforce against the estate of a deceased trustee a claim for contribution.",
+   "period": "Three years.",
+   "starts": "When the right to contribution accrues.",
+   "raw": "49. By a co-trustee to enforce against        Three years.        When the right to contribution accrues.\n      the estate of a deceased trustee a\n      claim for contribution."
+  },
+  {
+   "art": 50,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "By the manager of a joint estate of an undivided family for contribution, in respect of a payment made by him on account of the estate.",
+   "period": "Three years.",
+   "starts": "The date of the payment.",
+   "raw": "50. By the manager of a joint estate of       Three years.        The date of the payment.\n      an undivided family for\n      contribution, in respect of a\n      payment made by him on\n      account of the estate."
+  },
+  {
+   "art": 51,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "For the profits of immovable property belonging to the plaintiff which have been wrongfully received by the defendant.",
+   "period": "Three years.",
+   "starts": "When the profits are received.",
+   "raw": "51. For the profits of immovable              Three years.        When the profits are received.\n       property belonging to the\n       plaintiff which have been\n       wrongfully received by the\n       defendant."
+  },
+  {
+   "art": 52,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "For arrears of rent.",
+   "period": "Three years.",
+   "starts": "When the arrears become due.",
+   "raw": "52. For arrears of rent.                      Three years.        When the arrears become due."
+  },
+  {
+   "art": 53,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "By a vendor of immovable property for personal payment of unpaid purchase-money.",
+   "period": "Three years.",
+   "starts": "The time fixed for completing the sale, or (where the title is accepted after the time fixed for completion) the date of the acceptance.",
+   "raw": "53. By a vendor of immovable property         Three years.        The time fixed for completing the sale,\n      for personal payment of unpaid                                 or (where the title is accepted after\n      purchase-money.                                                the time fixed for completion) the\n                                                                     date of the acceptance."
+  },
+  {
+   "art": 54,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "For specific performance of a contract.",
+   "period": "Three years.",
+   "starts": "The date fixed for the performance, or, if no such date is fixed, when the plaintiff has notice that performance is refused.",
+   "raw": "54. For specific performance of a             Three years.        The date fixed for the performance, or, if\n       contract.                                                      no such date is fixed, when the\n                                                                      plaintiff has notice that performance\n                                                                      is refused."
+  },
+  {
+   "art": 55,
+   "division": "Suits",
+   "part": "PART II.—SUITS RELATING TO CONTRACTS",
+   "description": "For compensation for the breach of any contract, express or implied not herein specially provided for.",
+   "period": "Three years.",
+   "starts": "When the contract is broken or (where there are successive breaches) when the breach in respect of which the suit is instituted occurs or (where the breach is continuing) when it ceases.",
+   "raw": "55. For compensation for the breach of        Three years.        When the contract is broken or (where\n       any contract, express or implied                              there are successive breaches) when\n       not herein specially provided                                 the breach in respect of which the\n       for.                                                          suit is instituted occurs or (where the\n                                                                     breach is continuing) when it ceases."
+  },
+  {
+   "art": 56,
+   "division": "Suits",
+   "part": "PART III.—SUITS RELATING TO DECLARATIONS",
+   "description": "To declare the forgery of an instrument issued or registered.",
+   "period": "Three years.",
+   "starts": "When the issue or registration becomes known to the plaintiff.",
+   "raw": "56. To declare the forgery of an                  Three years.        When the issue or registration becomes\n      instrument issued or registered.                                   known to the plaintiff."
+  },
+  {
+   "art": 57,
+   "division": "Suits",
+   "part": "PART III.—SUITS RELATING TO DECLARATIONS",
+   "description": "To obtain a declaration that an alleged adoption is invalid, or never, in fact, took place.",
+   "period": "Three years.",
+   "starts": "When the alleged adoption becomes known to the plaintiff.",
+   "raw": "57. To obtain a declaration that an               Three years.        When the alleged adoption becomes\n      alleged adoption is invalid, or                                    known to the plaintiff.\n      never, in fact, took place."
+  },
+  {
+   "art": 58,
+   "division": "Suits",
+   "part": "PART III.—SUITS RELATING TO DECLARATIONS",
+   "description": "To obtain any other declaration.",
+   "period": "Three years.",
+   "starts": "When the right to sue first accrues.",
+   "raw": "58. To obtain any other declaration.              Three years.        When the right to sue first accrues."
+  },
+  {
+   "art": 59,
+   "division": "Suits",
+   "part": "PART IV.—SUITS RELATING TO DECREES AND INSTRUMENTS",
+   "description": "To cancel or set aside an instrument or decree or for the rescission of a contract.",
+   "period": "Three years.",
+   "starts": "When the facts entitling the plaintiff to have the instrument or decree cancelled or set aside or the contract rescinded first become known to him.",
+   "raw": "59. To cancel or set aside an instrument          Three years.        When the facts entitling the plaintiff to\n       or decree or for the rescission of                                have the instrument or decree\n       a contract.                                                       cancelled or set aside or the contract\n                                                                         rescinded first become known to him."
+  },
+  {
+   "art": 60,
+   "division": "Suits",
+   "part": "PART IV.—SUITS RELATING TO DECREES AND INSTRUMENTS",
+   "description": "To set aside a transfer of property made by the guardian of a ward— (a) by the ward who has attained Three years. When the ward attains majority. majority; (b)by the ward’s legal representative— (i) when the ward dies within Three years. When the ward attains majority. three years from the date of attaining majority. (ii) when the ward dies before Three years. When the ward dies. attaining majority.",
+   "period": "Three years.; Three years.; Three years.",
+   "starts": "",
+   "raw": "60. To set aside a transfer of property\n      made by the guardian of a\n      ward—\n        (a) by the ward who has attained          Three years.        When the ward attains majority.\n          majority;\n        (b)by     the    ward’s        legal\n          representative—\n          (i) when the ward dies within           Three years.        When the ward attains majority.\n             three years from the date of\n             attaining majority.\n          (ii) when the ward dies before          Three years.        When the ward dies.\n             attaining majority.",
+   "complex": true
+  },
+  {
+   "art": 61,
+   "division": "Suits",
+   "part": "PART V.—SUITS RELATING TO IMMOVABLE PROPERTY",
+   "description": "By a mortgagor— (a)to redeem or recover Thirty years. When the right to redeem or to recover possession of immovable possession accrues. property mortgaged; (b)to recover possession of Twelve years. When the transfer becomes known to the immovable property mortgaged plaintiff. and afterwards transferred by the mortgagee for a valuable consideration; (c) to recover surplus collections Three years. When the mortgagor re-enters on the received by the mortgagee after mortgaged property. the mortgage has been satisfied.",
+   "period": "Thirty years.; Twelve years.; Three years.",
+   "starts": "",
+   "raw": "61. By a mortgagor—\n        (a)to   redeem     or    recover          Thirty years.       When the right to redeem or to recover\n          possession    of    immovable                                  possession accrues.\n          property mortgaged;\n        (b)to recover possession of              Twelve years.        When the transfer becomes known to the\n          immovable property mortgaged                                   plaintiff.\n          and afterwards transferred by\n          the mortgagee for a valuable\n          consideration;\n        (c) to recover surplus collections        Three years.        When the mortgagor re-enters on the\n          received by the mortgagee after                                mortgaged property.\n          the     mortgage    has    been\n          satisfied.",
+   "complex": true
+  },
+  {
+   "art": 62,
+   "division": "Suits",
+   "part": "PART V.—SUITS RELATING TO IMMOVABLE PROPERTY",
+   "description": "To enforce payment of money secured by a mortgage or otherwise charged upon immovable property.",
+   "period": "Twelve years.",
+   "starts": "When the money sued for becomes due.",
+   "raw": "62. To enforce payment of money                  Twelve years.        When the money sued for becomes due.\n      secured by a mortgage or\n      otherwise    charged upon\n      immovable property."
+  },
+  {
+   "art": 63,
+   "division": "Suits",
+   "part": "PART V.—SUITS RELATING TO IMMOVABLE PROPERTY",
+   "description": "By a mortgagee— (a) for foreclosure; Thirty years. When the money secured by the mortgage becomes due. (b) for possession of immovable Twelve years. When the mortgagee becomes entitled to property mortgaged. possession.",
+   "period": "Thirty years.; Twelve years.",
+   "starts": "",
+   "raw": "63. By a mortgagee—\n        (a) for foreclosure;                      Thirty years.       When the money secured by the mortgage\n                                                                         becomes due.\n        (b) for possession of immovable          Twelve years.        When the mortgagee becomes entitled to\n          property mortgaged.                                            possession.",
+   "complex": true
+  },
+  {
+   "art": 64,
+   "division": "Suits",
+   "part": "PART V.—SUITS RELATING TO IMMOVABLE PROPERTY",
+   "description": "For possession of immovable property based on previous possession and not on title, when the plaintiff while in possession of the property has been dispossessed.",
+   "period": "Twelve years.",
+   "starts": "The date of dispossession.",
+   "raw": "64. For possession of immovable           Twelve years. The date of dispossession.\n       property based on previous\n       possession and not on title, when\n       the plaintiff while in possession\n       of the property has been\n       dispossessed."
+  },
+  {
+   "art": 65,
+   "division": "Suits",
+   "part": "PART V.—SUITS RELATING TO IMMOVABLE PROPERTY",
+   "description": "For possession of immovable property or any interest therein based on title. Explanation.—For the purposes of this article— (a)where the suit is by a remainderman, a reversioner (other than a landlord) or a devisee, the possession of the defendant shall be deemed to become adverse only when the estate of the remainderman, reversioner or devisee, as the case may be, falls into possession; (b) where the suit is by a Hindu or Muslim entitled to the possession of immovable property on the death of a Hindu or Muslim female, the possession of the defendant shall be deemed to become adverse only when the female dies; (c)where the suit is by a purchaser at a sale in execution of a decree when the judgment- debtor was out of possession at the date of the sale, the purchaser shall be deemed to be a representative of the judgment-debtor who was out of possession.",
+   "period": "Twelve years.",
+   "starts": "When the possession of the defendant becomes adverse to the plaintiff.",
+   "raw": "65. For possession of immovable           Twelve years. When the possession of the defendant\n       property or any interest therein                     becomes adverse to the plaintiff.\n       based on title.\n    Explanation.—For the purposes of\n       this article—\n       (a)where the suit is by a\n         remainderman, a reversioner\n         (other than a landlord) or a\n         devisee, the possession of the\n         defendant shall be deemed to\n         become adverse only when the\n         estate of the remainderman,\n         reversioner or devisee, as the\n         case may be, falls into\n         possession;\n       (b) where the suit is by a Hindu\n         or Muslim entitled to the\n         possession     of    immovable\n         property on the death of a\n         Hindu or Muslim female, the\n         possession of the defendant\n         shall be deemed to become\n         adverse only when the female\n         dies;\n       (c)where the suit is by a\n         purchaser at a sale in execution\n         of a decree when the judgment-\n         debtor was out of possession at\n         the date of the sale, the\n         purchaser shall be deemed to\n         be a representative of the\n         judgment-debtor who was out\n         of possession."
+  },
+  {
+   "art": 66,
+   "division": "Suits",
+   "part": "PART V.—SUITS RELATING TO IMMOVABLE PROPERTY",
+   "description": "For possession of immovable property when the plaintiff has become entitled to possession by reason of any forfeiture or breach of condition.",
+   "period": "Twelve years.",
+   "starts": "When the forfeiture is incurred or the condition is broken.",
+   "raw": "66. For possession of immovable           Twelve years. When the forfeiture is incurred or the\n       property when the plaintiff has                      condition is broken.\n       become entitled to possession by\n       reason of any forfeiture or breach\n       of condition."
+  },
+  {
+   "art": 67,
+   "division": "Suits",
+   "part": "PART V.—SUITS RELATING TO IMMOVABLE PROPERTY",
+   "description": "By a landlord to recover possession from a tenant.",
+   "period": "Twelve years.",
+   "starts": "When the tenancy is determined.",
+   "raw": "67. By a landlord to recover possession   Twelve years. When the tenancy is determined.\n       from a tenant."
+  },
+  {
+   "art": 68,
+   "division": "Suits",
+   "part": "PART VI.—SUITS RELATING TO MOVABLE PROPERTY",
+   "description": "For specific movable property lost, or acquired by theft, or dishonest misappropriation or conversion.",
+   "period": "Three years.",
+   "starts": "When the person having the right to the possession of the property first learns in whose possession it is.",
+   "raw": "68. For specific movable property lost,   Three years.  When the person having the right to the\n       or acquired by theft, or dishonest                  possession of the property first learns\n       misappropriation or conversion.                     in whose possession it is."
+  },
+  {
+   "art": 69,
+   "division": "Suits",
+   "part": "PART VI.—SUITS RELATING TO MOVABLE PROPERTY",
+   "description": "For other specific movable property.",
+   "period": "Three years.",
+   "starts": "When the property is wrongfully taken.",
+   "raw": "69. For other specific movable property.  Three years.  When the property is wrongfully taken."
+  },
+  {
+   "art": 70,
+   "division": "Suits",
+   "part": "PART VI.—SUITS RELATING TO MOVABLE PROPERTY",
+   "description": "To recover movable property deposited or pawned from a depositary or pawnee.",
+   "period": "Three years.",
+   "starts": "limitation The date of refusal after demand.",
+   "raw": "70. To     recover movable property        Three years.        The date of refusal after demand.\n         deposited or pawned from a\n         depositary or pawnee.\n                                               limitation"
+  },
+  {
+   "art": 71,
+   "division": "Suits",
+   "part": "PART VI.—SUITS RELATING TO MOVABLE PROPERTY",
+   "description": "To recover movable property deposited or pawned, and afterwards bought from the depository or pawnee for a valuable consideration.",
+   "period": "Three years.",
+   "starts": "When the sale becomes known to the plaintiff.",
+   "raw": "71. To      recover movable property          Three years.   When the sale becomes known to the\n         deposited or pawned, and                               plaintiff.\n         afterwards bought from the\n         depository or pawnee for a\n         valuable consideration."
+  },
+  {
+   "art": 72,
+   "division": "Suits",
+   "part": "PART VII.—SUITS RELATING TO TORT",
+   "description": "For compensation for doing or for omitting to do an act alleged to be in pursuance of any enactment in force for the time being in the territories to which this Act extends.",
+   "period": "One year.",
+   "starts": "When the act or omission takes place.",
+   "raw": "72. For compensation for doing or for          One year.     When the act or omission takes place.\n       omitting to do an act alleged to\n       be in pursuance of any enactment\n       in force for the time being in the\n       territories to which this Act\n       extends."
+  },
+  {
+   "art": 73,
+   "division": "Suits",
+   "part": "PART VII.—SUITS RELATING TO TORT",
+   "description": "For compensation for false imprisonment.",
+   "period": "One year.",
+   "starts": "When the imprisonment ends.",
+   "raw": "73. For    compensation      for      false    One year.     When the imprisonment ends.\n       imprisonment."
+  },
+  {
+   "art": 74,
+   "division": "Suits",
+   "part": "PART VII.—SUITS RELATING TO TORT",
+   "description": "For compensation for a malicious prosecution.",
+   "period": "One year.",
+   "starts": "When the plaintiff is acquitted or the prosecution is otherwise terminated.",
+   "raw": "74. For compensation for a malicious           One year.     When the plaintiff is acquitted or the\n       prosecution.                                            prosecution is otherwise terminated."
+  },
+  {
+   "art": 75,
+   "division": "Suits",
+   "part": "PART VII.—SUITS RELATING TO TORT",
+   "description": "For compensation for libel.",
+   "period": "One year.",
+   "starts": "When the libel is published.",
+   "raw": "75. For compensation for libel.                One year.     When the libel is published."
+  },
+  {
+   "art": 76,
+   "division": "Suits",
+   "part": "PART VII.—SUITS RELATING TO TORT",
+   "description": "For compensation for slander.",
+   "period": "One year.",
+   "starts": "When the words are spoken, or, if the words are not actionable in themselves, when the special damage complained of results.",
+   "raw": "76. For compensation for slander.              One year.     When the words are spoken, or, if the\n                                                               words are not actionable in\n                                                               themselves, when the special damage\n                                                               complained of results."
+  },
+  {
+   "art": 77,
+   "division": "Suits",
+   "part": "PART VII.—SUITS RELATING TO TORT",
+   "description": "For compensation for loss of service occasioned by the seduction of the plaintiff’s servant or daughter.",
+   "period": "One year.",
+   "starts": "When the loss occurs.",
+   "raw": "77. For compensation for loss of service       One year.     When the loss occurs.\n       occasioned by the seduction of\n       the    plaintiff’s  servant    or\n       daughter."
+  },
+  {
+   "art": 78,
+   "division": "Suits",
+   "part": "PART VII.—SUITS RELATING TO TORT",
+   "description": "For compensation for inducing a person to break a contract with the plaintiff.",
+   "period": "One year.",
+   "starts": "The date of the breach.",
+   "raw": "78. For compensation for inducing a            One year.     The date of the breach.\n       person to break a contract with\n       the plaintiff."
+  },
+  {
+   "art": 79,
+   "division": "Suits",
+   "part": "PART VII.—SUITS RELATING TO TORT",
+   "description": "For compensation for an illegal, irregular or excessive distress.",
+   "period": "One year.",
+   "starts": "The date of the distress.",
+   "raw": "79. For compensation for an illegal,           One year.     The date of the distress.\n       irregular or excessive distress."
+  },
+  {
+   "art": 80,
+   "division": "Suits",
+   "part": "PART VII.—SUITS RELATING TO TORT",
+   "description": "For compensation for wrongful seizure of movable property under legal process.",
+   "period": "One year.",
+   "starts": "The date of the seizure.",
+   "raw": "80. For compensation for wrongful              One year.     The date of the seizure.\n       seizure of movable property\n       under legal process."
+  },
+  {
+   "art": 81,
+   "division": "Suits",
+   "part": "PART VII.—SUITS RELATING TO TORT",
+   "description": "By executors, administrators or representatives under the Legal Representatives’ Suits Act, 1855 (12 of 1855).",
+   "period": "One year.",
+   "starts": "The date of the death of the person wronged.",
+   "raw": "81. By executors, administrators or            One year.     The date of the death of the person\n       representatives under the Legal                          wronged.\n       Representatives’ Suits Act, 1855\n       (12 of 1855)."
+  },
+  {
+   "art": 82,
+   "division": "Suits",
+   "part": "PART VII.—SUITS RELATING TO TORT",
+   "description": "By executors, administrators or representatives under the Indian Fatal Accidents Act, 1855 (13 of 1855).",
+   "period": "Two years.",
+   "starts": "The date of the death of the person killed.",
+   "raw": "82. By executors, administrators or            Two years.    The date of the death of the person killed.\n       representatives under the Indian\n       Fatal Accidents Act, 1855 (13 of\n       1855)."
+  },
+  {
+   "art": 83,
+   "division": "Suits",
+   "part": "PART VII.—SUITS RELATING TO TORT",
+   "description": "Under the Legal Representatives’ Suits Act, 1855 (12 of 1855), against an executor, an administrator or any other representative.",
+   "period": "Two years.",
+   "starts": "When the wrong complained of is done.",
+   "raw": "83. Under the Legal Representatives’           Two years.    When the wrong complained of is done.\n       Suits Act, 1855 (12 of 1855),\n       against     an    executor,   an\n       administrator or any other\n       representative."
+  },
+  {
+   "art": 84,
+   "division": "Suits",
+   "part": "PART VII.—SUITS RELATING TO TORT",
+   "description": "Against one who, having a right to use property for specific purposes, perverts it to other purposes.",
+   "period": "Two years.",
+   "starts": "When the perversion first becomes known to the person injured thereby.",
+   "raw": "84. Against one who, having a right to         Two years.    When the perversion first becomes known\n       use     property   for   specific                        to the person injured thereby.\n       purposes, perverts it to other\n       purposes."
+  },
+  {
+   "art": 85,
+   "division": "Suits",
+   "part": "PART VII.—SUITS RELATING TO TORT",
+   "description": "For compensation for obstructing a way or a water-course.",
+   "period": "Three years.",
+   "starts": "The date of the obstruction.",
+   "raw": "85. For compensation for obstructing a        Three years.      The date of the obstruction.\n       way or a water-course."
+  },
+  {
+   "art": 86,
+   "division": "Suits",
+   "part": "PART VII.—SUITS RELATING TO TORT",
+   "description": "For compensation for diverting a water-course.",
+   "period": "Three years.",
+   "starts": "The date of the diversion.",
+   "raw": "86. For compensation for diverting a          Three years.      The date of the diversion.\n       water-course."
+  },
+  {
+   "art": 87,
+   "division": "Suits",
+   "part": "PART VII.—SUITS RELATING TO TORT",
+   "description": "For compensation for trespass upon immovable property.",
+   "period": "Three years.",
+   "starts": "The date of the trespass.",
+   "raw": "87. For compensation for trespass upon        Three years.      The date of the trespass.\n       immovable property."
+  },
+  {
+   "art": 88,
+   "division": "Suits",
+   "part": "PART VII.—SUITS RELATING TO TORT",
+   "description": "For compensation for infringing copyright or any other exclusive privilege.",
+   "period": "Three years.",
+   "starts": "The date of the infringement.",
+   "raw": "88. For compensation for infringing           Three years.      The date of the infringement.\n       copyright or any other exclusive\n       privilege."
+  },
+  {
+   "art": 89,
+   "division": "Suits",
+   "part": "PART VII.—SUITS RELATING TO TORT",
+   "description": "To restrain waste.",
+   "period": "Three years.",
+   "starts": "When the waste begins.",
+   "raw": "89. To restrain waste.                        Three years.      When the waste begins."
+  },
+  {
+   "art": 90,
+   "division": "Suits",
+   "part": "PART VII.—SUITS RELATING TO TORT",
+   "description": "For compensation for injury caused by an injunction wrongfully obtained.",
+   "period": "Three years.",
+   "starts": "When the injunction ceases.",
+   "raw": "90. For compensation for injury caused        Three years.      When the injunction ceases.\n       by an injunction wrongfully\n       obtained."
+  },
+  {
+   "art": 91,
+   "division": "Suits",
+   "part": "PART VII.—SUITS RELATING TO TORT",
+   "description": "For compensation,— (a)for wrongfully taking or detaining Three years. When the person having the right to the any specific movable possession of the property first learns property lost, oracquired by theft, in whose possession it is. or dishonest misappropriation, or conversion; (b) for wrongfully taking or injuring Three years. When the property is wrongfully taken or or wrongfully detaining any other injured, or when the detainer’s specific movable property. possession becomes unlawful.",
+   "period": "Three years.; Three years.",
+   "starts": "",
+   "raw": "91. For compensation,—\n    (a)for wrongfully taking or detaining     Three years.      When the person having the right to the\n       any specific               movable                          possession of the property first learns\n       property lost, oracquired by theft,                         in whose possession it is.\n       or dishonest misappropriation, or\n       conversion;\n    (b) for wrongfully taking or injuring     Three years.      When the property is wrongfully taken or\n       or wrongfully detaining any other                           injured, or when the detainer’s\n       specific movable property.                                  possession becomes unlawful.",
+   "complex": true
+  },
+  {
+   "art": 92,
+   "division": "Suits",
+   "part": "PART VIII.—SUITS RELATING TO TRUSTS AND TRUST PROPERTY",
+   "description": "To recover possession of immovable property conveyed or bequeathed in trust and afterwards transferred by the trustee for a valuable consideration.",
+   "period": "Twelve years.",
+   "starts": "When the transfer becomes known to the plaintiff.",
+   "raw": "92. To recover possession of immovable       Twelve years.      When the transfer becomes known to the\n       property conveyed or bequeathed                             plaintiff.\n       in trust and afterwards transferred\n       by the trustee for a valuable\n       consideration."
+  },
+  {
+   "art": 93,
+   "division": "Suits",
+   "part": "PART VIII.—SUITS RELATING TO TRUSTS AND TRUST PROPERTY",
+   "description": "To recover possession of movable property conveyed or bequeathed in trust and afterwards transferred by the trustee for a valuable consideration.",
+   "period": "Three years.",
+   "starts": "When the transfer becomes known to the plaintiff.",
+   "raw": "93. To recover possession of movable          Three years.      When the transfer becomes known to the\n       property conveyed or bequeathed                              plaintiff.\n       in trust and afterwards transferred\n       by the trustee for a valuable\n       consideration."
+  },
+  {
+   "art": 94,
+   "division": "Suits",
+   "part": "PART VIII.—SUITS RELATING TO TRUSTS AND TRUST PROPERTY",
+   "description": "To set aside a transfer of immovable property comprised in a Hindu, Muslim or Buddhist religious or charitable endowment, made by a manager thereof for a valuable consideration.",
+   "period": "Twelve years.",
+   "starts": "When the transfer becomes known to the plaintiff.",
+   "raw": "94. To set aside a transfer of immovable     Twelve years.      When the transfer becomes known to the\n       property comprised in a Hindu,                               plaintiff.\n       Muslim or Buddhist religious or\n       charitable endowment, made by a\n       manager thereof for a valuable\n       consideration."
+  },
+  {
+   "art": 95,
+   "division": "Suits",
+   "part": "PART VIII.—SUITS RELATING TO TRUSTS AND TRUST PROPERTY",
+   "description": "To set aside a transfer of movable property comprised in a Hindu, Muslim or Buddhist religious or charitable endowment, made by a manager thereof for a valuable consideration.",
+   "period": "Three years.",
+   "starts": "When the transfer becomes known to the plaintiff.",
+   "raw": "95. To set aside a transfer of movable        Three years.      When the transfer becomes known to the\n       property comprised in a Hindu,                               plaintiff.\n       Muslim or Buddhist religious or\n       charitable endowment, made by a\n       manager thereof for a valuable\n       consideration."
+  },
+  {
+   "art": 96,
+   "division": "Suits",
+   "part": "PART VIII.—SUITS RELATING TO TRUSTS AND TRUST PROPERTY",
+   "description": "By the manager of Hindu, Muslim or Buddhist religious or charitable endowment to recover possession of movable or immovable properly comprised in the endowment which has been transferred by a previous manager for a valuable consideration.",
+   "period": "Twelve years.",
+   "starts": "The date of death, resignation or removal of the transferor or the date of appointment of the plaintiff as manager of the endowment, whichever is later.",
+   "raw": "96. By the manager of Hindu, Muslim or       Twelve years.      The date of death, resignation or removal\n       Buddhist religious or charitable                             of the transferor or the date of\n       endowment to recover possession                              appointment of the plaintiff as\n       of movable or immovable                                      manager of the endowment,\n       properly comprised in the                                    whichever is later.\n       endowment which has been\n       transferred by a previous\n       manager       for    a     valuable\n       consideration."
+  },
+  {
+   "art": 97,
+   "division": "Suits",
+   "part": "PART IX.—SUITS RELATING TO MISCELLANEOUS MATTERS",
+   "description": "To enforce a right of pre-emption whether the right is founded on law or general usage or on special contract.",
+   "period": "One year.",
+   "starts": "When the purchaser take under the sale sought to be impeached, physical possession of the whole or part of the property sold, or, where the subject matter of the sale does not admit of physical possession of the whole or part of the property, when the instrument of sale is registered.",
+   "raw": "97.    To enforce a right of pre-emption         One year.       When the purchaser take under the sale\n          whether the right is founded on                            sought to be impeached, physical\n          law or general usage or on                                 possession of the whole or part of the\n          special contract.                                          property sold, or, where the subject\n                                                                     matter of the sale does not admit of\n                                                                     physical possession of the whole or part\n                                                                     of the property, when the instrument of\n                                                                     sale is registered."
+  },
+  {
+   "art": 98,
+   "division": "Suits",
+   "part": "PART IX.—SUITS RELATING TO MISCELLANEOUS MATTERS",
+   "description": "By a person against whom 1[an order referred to in rule 63 or in rule 103] of Order XXI of the Code of Civil Procedure, 1908 (5 of 1908), or an order under section 28 of thePresidency Small Cause Courts Act, 1882 (15 of 1882), has been made, to establish the right which he claims to the property comprised in the order.",
+   "period": "One year.",
+   "starts": "The date of the final order.",
+   "raw": "98.    By a person against whom 1[an             One year.       The date of the final order.\n          order referred to in rule 63 or in\n          rule 103] of Order XXI of the\n          Code of Civil Procedure, 1908\n          (5 of 1908), or an order under\n          section 28 of thePresidency\n          Small Cause Courts Act, 1882\n          (15 of 1882), has been made, to\n          establish the right which he\n          claims      to    the    property\n          comprised in the order."
+  },
+  {
+   "art": 99,
+   "division": "Suits",
+   "part": "PART IX.—SUITS RELATING TO MISCELLANEOUS MATTERS",
+   "description": "To set aside a sale by a civil or revenue court or a sale for arrears of Government revenue or for any demand recoverable as such arrears.",
+   "period": "One year.",
+   "starts": "When the sale is confirmed or would otherwise have become final and conclusive had no such suit been brought.",
+   "raw": "99.    To set aside a sale by a civil or         One year.       When the sale is confirmed or would\n          revenue court or a sale for                                otherwise have become final and\n          arrears of Government revenue                              conclusive had no such suit been\n          or for any demand recoverable                              brought.\n          as such arrears."
+  },
+  {
+   "art": 100,
+   "division": "Suits",
+   "part": "PART IX.—SUITS RELATING TO MISCELLANEOUS MATTERS",
+   "description": "To alter or set aside any decision or order of a civil court in any proceeding other than a suit or any act or order of an officer of Government in his official capacity.",
+   "period": "One year.",
+   "starts": "The date of the final decision or order by the court or the date of the act or order of the officer, as the case may be.",
+   "raw": "100.   To alter or set aside any decision        One year.       The date of the final decision or order by the\n          or order of a civil court in any                           court or the date of the act or order of\n          proceeding other than a suit or                            the officer, as the case may be.\n          any act or order of an officer of\n          Government in his official\n          capacity."
+  },
+  {
+   "art": 101,
+   "division": "Suits",
+   "part": "PART IX.—SUITS RELATING TO MISCELLANEOUS MATTERS",
+   "description": "Upon a judgment, including a foreign judgment, or a recognisance.",
+   "period": "Three years.",
+   "starts": "The date of the judgment or recognisance.",
+   "raw": "101.   Upon a judgment, including a               Three years.     The date of the judgment or recognisance.\n          foreign      judgment,      or    a\n          recognisance."
+  },
+  {
+   "art": 102,
+   "division": "Suits",
+   "part": "PART IX.—SUITS RELATING TO MISCELLANEOUS MATTERS",
+   "description": "For property which the plaintiff has conveyed while insane.",
+   "period": "Three years.",
+   "starts": "When the plaintiff is restored to sanity and has knowledge of the conveyance.",
+   "raw": "102.   For property which the plaintiff has       Three years.     When the plaintiff is restored to sanity\n          conveyed while insane.                                       and has knowledge of the conveyance."
+  },
+  {
+   "art": 103,
+   "division": "Suits",
+   "part": "PART IX.—SUITS RELATING TO MISCELLANEOUS MATTERS",
+   "description": "To make good out of the general estate of a deceased trustee the loss occasioned by a breach of trust.",
+   "period": "Three years.",
+   "starts": "The date of the trustee's death or if the loss has not then resulted, the date of the loss.",
+   "raw": "103.   To make good out of the general            Three years.     The date of the trustee's death or if the\n          estate of a deceased trustee the                             loss has not then resulted, the date of\n          loss occasioned by a breach of                               the loss.\n          trust."
+  },
+  {
+   "art": 104,
+   "division": "Suits",
+   "part": "PART IX.—SUITS RELATING TO MISCELLANEOUS MATTERS",
+   "description": "To establish a periodically recurring right.",
+   "period": "Three years.",
+   "starts": "When the plaintiff is first refused the enjoyment of the right.",
+   "raw": "104.   To     establish    a     periodically     Three years.     When the plaintiff is first refused the\n          recurring right.                                             enjoyment of the right."
+  },
+  {
+   "art": 105,
+   "division": "Suits",
+   "part": "PART IX.—SUITS RELATING TO MISCELLANEOUS MATTERS",
+   "description": "By a Hindu for arrears of maintenance.",
+   "period": "Three years.",
+   "starts": "When the arrears are payable.",
+   "raw": "105.   By a Hindu for arrears of                  Three years.     When the arrears are payable.\n          maintenance."
+  },
+  {
+   "art": 106,
+   "division": "Suits",
+   "part": "PART IX.—SUITS RELATING TO MISCELLANEOUS MATTERS",
+   "description": "For a legacy or for a share of a residur bequeathed by a testator or for a distributive share of the property of an intestate against an executor or an administrator or some other person legally charged with the duty of distributing the estate.",
+   "period": "Twelve years.",
+   "starts": "When the legacy or share becomes payable or deliverable.",
+   "raw": "106.   For a legacy or for a share of a          Twelve years. When the legacy or share becomes\n          residur bequeathed by a testator                             payable or deliverable.\n          or for a distributive share of the\n          property of an intestate against\n          an executor or an administrator\n          or some other person legally\n          charged with the duty of\n          distributing the estate.\n  1. Subs. by Act 52 of 1964, s. 3 and the Second Schedule, for “an order under rule 63 or rule 103,” (w.e.f. 29-12-1964)."
+  },
+  {
+   "art": 107,
+   "division": "Suits",
+   "part": "PART IX.—SUITS RELATING TO MISCELLANEOUS MATTERS",
+   "description": "For possession of a hereditary office. Explanation.—A hereditary office is possessed when the properties thereof are usually received, or (if there are no properties) when the duties thereof are usually performed.",
+   "period": "Twelve years.",
+   "starts": "When the defendant takes possession of the office adversely to the plaintiff.",
+   "raw": "107. For possession of a hereditary              Twelve years.        When the defendant takes possession of\n        office.                                                         the office adversely to the plaintiff.\n     Explanation.—A hereditary office\n        is possessed when the properties\n        thereof are usually received, or\n        (if there are no properties) when\n        the duties thereof are usually\n        performed."
+  },
+  {
+   "art": 108,
+   "division": "Suits",
+   "part": "PART IX.—SUITS RELATING TO MISCELLANEOUS MATTERS",
+   "description": "Suit during the life of a Hindu or Muslim female by a Hindu or Muslim who, if the female died at the date of instituting the suit, would be entitled to the possession of land, to have an alienation of such land made by the female declared to be void except for her life or until her re- marriage.",
+   "period": "Twelve years.",
+   "starts": "The date of the alienation.",
+   "raw": "108. Suit during the life of a Hindu or          Twelve years.        The date of the alienation.\n        Muslim female by a Hindu or\n        Muslim who, if the female died\n        at the date of instituting the suit,\n        would be entitled to the\n        possession of land, to have an\n        alienation of such land made by\n        the female declared to be void\n        except for her life or until her re-\n        marriage."
+  },
+  {
+   "art": 109,
+   "division": "Suits",
+   "part": "PART IX.—SUITS RELATING TO MISCELLANEOUS MATTERS",
+   "description": "By a Hindu governed by Mitakshara law to set aside his father’s alienation of ancestral property.",
+   "period": "Twelve years.",
+   "starts": "When the alienee takes possession of the property.",
+   "raw": "109. By      a Hindu governed by                 Twelve years.        When the alienee takes possession of the\n          Mitakshara law to set aside his                               property.\n          father’s alienation of ancestral\n          property."
+  },
+  {
+   "art": 110,
+   "division": "Suits",
+   "part": "PART IX.—SUITS RELATING TO MISCELLANEOUS MATTERS",
+   "description": "By a person excluded from a joint family property to enforce a right to share therein.",
+   "period": "Twelve years.",
+   "starts": "When the exclusion becomes known to the plaintiff.",
+   "raw": "110. By a person excluded from a joint           Twelve years.        When the exclusion becomes known to\n       family property to enforce a                                     the plaintiff.\n       right to share therein."
+  },
+  {
+   "art": 111,
+   "division": "Suits",
+   "part": "PART IX.—SUITS RELATING TO MISCELLANEOUS MATTERS",
+   "description": "By or on behalf of any local authority for possession of any public street or road or any part thereof from which it has been dispossessed or of which it has discontinued the possession.",
+   "period": "Thirty years.",
+   "starts": "The date of the dispossession or discontinuance.",
+   "raw": "111. By or on behalf of any local            Thirty years. The date of the dispossession or\n       authority for possession of any                       discontinuance.\n       public street or road or any part\n       thereof from which it has been\n       dispossessed or of which it has\n       discontinued the possession."
+  },
+  {
+   "art": 112,
+   "division": "Suits",
+   "part": "PART IX.—SUITS RELATING TO MISCELLANEOUS MATTERS",
+   "description": "Any suit (except a suit before the Supreme Court in the exercise of its original jurisdiction) by or on behalf of the Central Government or any State Government, including the Government of the State of Jammu and Kashmir.",
+   "period": "Thirty years.",
+   "starts": "When the period of limitation would begin to run under this Act against a like suit by a private person.",
+   "raw": "112. Any suit (except a suit before the      Thirty years. When the period of limitation would\n       Supreme Court in the exercise of                      begin to run under this Act against a\n       its original jurisdiction) by or on                   like suit by a private person.\n       behalf      of      the     Central\n       Government or any State\n       Government, including the\n       Government of the State of\n       Jammu and Kashmir."
+  },
+  {
+   "art": 113,
+   "division": "Suits",
+   "part": "PART X.—SUITS FOR WHICH THERE IS NO PRESCRIBED PERIOD",
+   "description": "Any suit for which no period of limitation is provided elsewhere in this Schedule.",
+   "period": "Three years.",
+   "starts": "When the right to sue accrues.",
+   "raw": "113. Any suit for which no period of         Three years.  When the right to sue accrues.\n       limitation is provided elsewhere\n       in this Schedule."
+  },
+  {
+   "art": 114,
+   "division": "Appeals",
+   "part": "PART X.—SUITS FOR WHICH THERE IS NO PRESCRIBED PERIOD",
+   "description": "Appeal from an order of acquittal,— (a)under sub-section (1) or sub- Ninety days. The date of the order appealed from. section (2) of section 417 of the Code of Criminal Procedure, 1898 (5 of 1898); (b)under sub-section (3) of Thirty days. The date of the grant of special leave. section 417 of that Code.",
+   "period": "Ninety days.; Thirty days.",
+   "starts": "",
+   "raw": "114. Appeal from an order of\n       acquittal,—\n       (a)under sub-section (1) or sub-      Ninety days.   The date of the order appealed from.\n          section (2) of section 417 of\n          the    Code       of   Criminal\n          Procedure, 1898 (5 of 1898);\n       (b)under sub-section (3) of            Thirty days.  The date of the grant of special leave.\n          section 417 of that Code.",
+   "complex": true
+  },
+  {
+   "art": 115,
+   "division": "Appeals",
+   "part": "PART X.—SUITS FOR WHICH THERE IS NO PRESCRIBED PERIOD",
+   "description": "Under the Code of Criminal Procedure, 1898 (5 of 1898)— (a) from a sentence of death Thirty days. The date of the sentence. passed by a court of session or by a High Court in the exercise of its original criminal jurisdiction; (b) from any other sentence or any order not being an order of acquittal— (i) to the High Court Sixty days. The date of the sentence or order. (ii) to any other court Thirty days. The date of the sentence or order.",
+   "period": "Thirty days.; Sixty days.; Thirty days.",
+   "starts": "",
+   "raw": "115. Under the Code of Criminal\n       Procedure, 1898 (5 of 1898)—\n         (a) from a sentence of death           Thirty days.         The date of the sentence.\n           passed by a court of session or\n           by a High Court in the\n           exercise of its original\n           criminal jurisdiction;\n         (b) from any other sentence or\n           any order not being an order\n           of acquittal—\n            (i) to the High Court                Sixty days.         The date of the sentence or order.\n            (ii) to any other court             Thirty days.         The date of the sentence or order.",
+   "complex": true
+  },
+  {
+   "art": 116,
+   "division": "Appeals",
+   "part": "PART X.—SUITS FOR WHICH THERE IS NO PRESCRIBED PERIOD",
+   "description": "Under the Code of Civil Procedure, 1908 (5 of 1908)— (a) to a High Court from any Ninety days. The date of the decree or order. decree or order. (b) to any other court from any Thirty days. The date of the decree or order. decree or order.",
+   "period": "Ninety days.; Thirty days.",
+   "starts": "",
+   "raw": "116. Under the Code of Civil Procedure,\n       1908 (5 of 1908)—\n         (a) to a High Court from any           Ninety days.         The date of the decree or order.\n           decree or order.\n         (b) to any other court from any        Thirty days.         The date of the decree or order.\n           decree or order.",
+   "complex": true
+  },
+  {
+   "art": 117,
+   "division": "Appeals",
+   "part": "PART X.—SUITS FOR WHICH THERE IS NO PRESCRIBED PERIOD",
+   "description": "From a decree or order of any High Court to the same Court.",
+   "period": "Thirty days.",
+   "starts": "The date of the decree or order.",
+   "raw": "117. From a decree or order of any High         Thirty days.         The date of the decree or order.\n        Court to the same Court."
+  },
+  {
+   "art": 118,
+   "division": "Applications",
+   "part": "PART I.—APPLICATIONS IN SPECIFIED CASES",
+   "description": "For leave to appear and defend a suit under summary procedure.",
+   "period": "Ten days.",
+   "starts": "When the summons is served.",
+   "raw": "118. For leave to appear and defend a           Ten days.           When the summons is served.\n        suit      under     summary\n        procedure."
+  },
+  {
+   "art": 119,
+   "division": "Applications",
+   "part": "PART I.—APPLICATIONS IN SPECIFIED CASES",
+   "description": "Under the Arbitration Act, 1940 (10 of 1940),— (a) for the filing in court of an Thirty days. The date of service of the notice of the award; making of the award; (b) for setting aside an award Thirty days. The date of service of the notice of the or getting an award remitted filing of the award. for reconsideration.",
+   "period": "Thirty days.; Thirty days.",
+   "starts": "",
+   "raw": "119. Under the Arbitration Act, 1940\n       (10 of 1940),—\n         (a) for the filing in court of an     Thirty days.         The date of service of the notice of the\n           award;                                                     making of the award;\n         (b) for setting aside an award        Thirty days.         The date of service of the notice of the\n           or getting an award remitted                               filing of the award.\n           for reconsideration.",
+   "complex": true
+  },
+  {
+   "art": 120,
+   "division": "Applications",
+   "part": "PART I.—APPLICATIONS IN SPECIFIED CASES",
+   "description": "Under the Code of Civil Procedure, 1908 (5 of 1908), to have the legalrepresentative of a deceased plaintiff or appellant or of a deceased defendant or respondent, made a party.",
+   "period": "Ninety days.",
+   "starts": "The date of death of the plaintiff, appellant, defendant or respondent, as the case may be.",
+   "raw": "120. Under the Code of Civil                  Ninety days.          The date of death of the plaintiff,\n       Procedure, 1908 (5 of 1908),                                   appellant, defendant or respondent, as\n       to have the legalrepresentative                                the case may be.\n       of a deceased plaintiff or\n       appellant or of a deceased\n       defendant or respondent, made\n       a party."
+  },
+  {
+   "art": 121,
+   "division": "Applications",
+   "part": "PART I.—APPLICATIONS IN SPECIFIED CASES",
+   "description": "Under the same Code for an order to set aside an abatement.",
+   "period": "Sixty days.",
+   "starts": "The date of abatement.",
+   "raw": "121. Under the same Code for an order          Sixty days.          The date of abatement.\n       to set aside an abatement."
+  },
+  {
+   "art": 122,
+   "division": "Applications",
+   "part": "PART I.—APPLICATIONS IN SPECIFIED CASES",
+   "description": "To restore a suit or appeal or application for review or revision dismissed for default of appearance or for want of prosecution or for failure to pay costs of service of process or to furnish security for costs.",
+   "period": "Thirty days.",
+   "starts": "The date of dismissal.",
+   "raw": "122. To restore a suit or appeal or            Thirty days.         The date of dismissal.\n       application for review or\n       revision dismissed for default\n       of appearance or for want of\n       prosecution or for failure to\n       pay costs of service of process\n       or to furnish security for costs."
+  },
+  {
+   "art": 123,
+   "division": "Applications",
+   "part": "PART I.—APPLICATIONS IN SPECIFIED CASES",
+   "description": "To set aside a decree passed ex parte or to rehear an appeal decreed or heard ex parte. Explanation.—For the purpose of this article, substituted service under rule 20 of Order V of the Code of Civil Procedure, 1908 (5 of 1908) shall not be deemed to be due service.",
+   "period": "Thirty days.",
+   "starts": "The date of the decree or where the summons or notice was not duly served, when the applicant had knowledge of the decree.",
+   "raw": "123. To set aside a decree passed ex                  Thirty days.           The date of the decree or where the\n       parte or to rehear an appeal                                            summons or notice was not duly\n       decreed or heard ex parte.                                              served, when the applicant had\n     Explanation.—For the purpose of                                           knowledge of the decree.\n       this article, substituted service\n       under rule 20 of Order V of\n       the Code of Civil Procedure,\n       1908 (5 of 1908) shall not be\n       deemed to be due service."
+  },
+  {
+   "art": 124,
+   "division": "Applications",
+   "part": "PART I.—APPLICATIONS IN SPECIFIED CASES",
+   "description": "For a review of judgment by a court other than the Supreme Court.",
+   "period": "Thirty days.",
+   "starts": "The date of the decree or order.",
+   "raw": "124. For a review of judgment by a                    Thirty days.           The date of the decree or order.\n        court other than the Supreme\n        Court."
+  },
+  {
+   "art": 125,
+   "division": "Applications",
+   "part": "PART I.—APPLICATIONS IN SPECIFIED CASES",
+   "description": "To record an adjustment or satisfaction of a decree.",
+   "period": "Thirty days.",
+   "starts": "When the payment or adjustment is made.",
+   "raw": "125. To record an adjustment or                       Thirty days.           When the payment or adjustment is made.\n       satisfaction of a decree."
+  },
+  {
+   "art": 126,
+   "division": "Applications",
+   "part": "PART I.—APPLICATIONS IN SPECIFIED CASES",
+   "description": "For the payment of the amount of a decree by instalments.",
+   "period": "Thirty days.",
+   "starts": "The date of the decree.",
+   "raw": "126. For the payment of the amount of                 Thirty days.           The date of the decree.\n        a decree by instalments."
+  },
+  {
+   "art": 127,
+   "division": "Applications",
+   "part": "PART I.—APPLICATIONS IN SPECIFIED CASES",
+   "description": "To set aside a sale in execution of a decree, including any such application by a judgment- debtor.",
+   "period": "[Sixty days].",
+   "starts": "The date of the sale.",
+   "raw": "127. To set aside a sale in execution of              [Sixty days].          The date of the sale.\n        a decree, including any such\n        application by a judgment-\n        debtor."
+  },
+  {
+   "art": 128,
+   "division": "Applications",
+   "part": "PART I.—APPLICATIONS IN SPECIFIED CASES",
+   "description": "For possession by one dispossessed of immovable property and disputing the right of the decree-holder or purchaser at a sale in execution of a decree.",
+   "period": "Thirty days.",
+   "starts": "The date of the dispossession.",
+   "raw": "128. For     possession     by    one                 Thirty days.           The date of the dispossession.\n        dispossessed of immovable\n        property and disputing the\n        right of the decree-holder or\n        purchaser at a sale in\n        execution of a decree."
+  },
+  {
+   "art": 129,
+   "division": "Applications",
+   "part": "PART I.—APPLICATIONS IN SPECIFIED CASES",
+   "description": "For possession after removing resistance or obstruction to delivery of possession of immovable property decreed or sold in execution of a decree.",
+   "period": "Thirty days.",
+   "starts": "The date of resistance or obstruction.",
+   "raw": "129. For possession after removing                    Thirty days.           The date of resistance or obstruction.\n        resistance or obstruction to\n        delivery of possession of\n        immovable property decreed\n        or sold in execution of a\n        decree."
+  },
+  {
+   "art": 130,
+   "division": "Applications",
+   "part": "PART I.—APPLICATIONS IN SPECIFIED CASES",
+   "description": "For leave to appeal as a pauper— (a) to the High Court; Sixty days. The date of decree appealed from. (b) to any other court. Thirty days. The date of decree appealed from.",
+   "period": "Sixty days.; Thirty days.",
+   "starts": "",
+   "raw": "130. For leave to appeal as a pauper—\n          (a) to the High Court;                         Sixty days.         The date of decree appealed from.\n          (b) to any other court.                     Thirty days.            The date of decree appealed from.",
+   "complex": true
+  },
+  {
+   "art": 131,
+   "division": "Applications",
+   "part": "PART I.—APPLICATIONS IN SPECIFIED CASES",
+   "description": "To any court for the exercise of its powers of revision under the Code of Civil Procedure, 1908 (5 of 1908), or the Code of Criminal Procedure, 1898 (5 of 1898).",
+   "period": "Ninety days.",
+   "starts": "The date of the decree or order or sentence sought to be revised.",
+   "raw": "131. To any court for the exercise of                 Ninety days.           The date of the decree or order or\n       its powers of revision under                                            sentence sought to be revised.\n       the Code of Civil Procedure,\n       1908 (5 of 1908), or the Code\n       of Criminal Procedure, 1898\n       (5 of 1898)."
+  },
+  {
+   "art": 132,
+   "division": "Applications",
+   "part": "PART I.—APPLICATIONS IN SPECIFIED CASES",
+   "description": "To the High Court for a certificate of fitness to appeal to the Supreme Court under clause (1) of article 132, article 133 or sub-clause (c) of clause (1) of article 134 of the Constitution or under any other law for the time being in force.",
+   "period": "Sixty days.",
+   "starts": "The date of the decree, order or sentence.",
+   "raw": "132. To     the High Court for a                         Sixty days.         The date of the decree, order or sentence.\n          certificate of fitness to appeal\n          to the Supreme Court under\n          clause (1) of article 132,\n          article 133 or sub-clause (c) of\n          clause (1) of article 134 of the\n          Constitution or under any\n          other law for the time being in\n          force.\n  1. Subs. by Act 104 of 1976, s. 98, for “Thirty days” (w.e.f. 9-9-1976)."
+  },
+  {
+   "art": 133,
+   "division": "Applications",
+   "part": "PART I.—APPLICATIONS IN SPECIFIED CASES",
+   "description": "To the Supreme Court for special leave to appeal,— (a) in a case involving death Sixty days. The date of the judgment final order or sentence; sentence. (b) in a case where leave to Sixty days. The date of the order of refusal. appeal was refused by the High Court; (c) in any other case. Ninety days. The date of the judgment or order.",
+   "period": "Sixty days.; Sixty days.; Ninety days.",
+   "starts": "",
+   "raw": "133. To the Supreme Court for special\n        leave to appeal,—\n         (a) in a case involving death          Sixty days.        The date of the judgment final order or\n           sentence;                                                 sentence.\n         (b) in a case where leave to           Sixty days.        The date of the order of refusal.\n           appeal was refused by the\n           High Court;\n         (c) in any other case.                Ninety days.        The date of the judgment or order.",
+   "complex": true
+  },
+  {
+   "art": 134,
+   "division": "Applications",
+   "part": "PART I.—APPLICATIONS IN SPECIFIED CASES",
+   "description": "For delivery of possession by a purchaser of immovable property at a sale in execution of a decree.",
+   "period": "One year.",
+   "starts": "When the sale becomes absolute.",
+   "raw": "134. For delivery of possession by a             One year.         When the sale becomes absolute.\n        purchaser     of    immovable\n        property at a sale in execution\n        of a decree."
+  },
+  {
+   "art": 135,
+   "division": "Applications",
+   "part": "PART I.—APPLICATIONS IN SPECIFIED CASES",
+   "description": "For the enforcement of a decree granting a mandatory injunction.",
+   "period": "Three years.",
+   "starts": "The date of the decree or where a date is fixed for performance, such date.",
+   "raw": "135. For the enforcement of a decree            Three years.       The date of the decree or where a date is\n        granting    a     mandatory                                  fixed for performance, such date.\n        injunction."
+  },
+  {
+   "art": 136,
+   "division": "Applications",
+   "part": "PART I.—APPLICATIONS IN SPECIFIED CASES",
+   "description": "For the execution of any decree (other than a decree granting a mandatory injunction) or order of any civil court.",
+   "period": "Twelve years.",
+   "starts": "[When] the decree or order becomes enforceable or where the decree or any subsequent order directs any payment of money or the delivery of any property to be made at a certain date or at recurring periods, when default in making the payment or delivery in respect of which execution is sought, takes place: Provided that an application for the enforcement or execution of a decree granting a perpetual injunction shall not be subject to any period of limitation.",
+   "raw": "136. For the execution of any decree           Twelve years.        [When] the decree or order becomes\n        (other than a decree granting a                               enforceable or where the decree or any\n        mandatory injunction) or                                      subsequent order directs any payment\n        order of any civil court.                                     of money or the delivery of any\n                                                                      property to be made at a certain date or\n                                                                      at recurring periods, when default in\n                                                                      making the payment or delivery in\n                                                                      respect of which execution is sought,\n                                                                      takes place:\n                                                                   Provided that an application for the\n                                                                      enforcement or execution of a decree\n                                                                      granting a perpetual injunction shall\n                                                                      not be subject to any period of\n                                                                      limitation."
+  },
+  {
+   "art": 137,
+   "division": "Applications",
+   "part": "PART II—OTHER APPLICATION",
+   "description": "Any other application for which no period of limitation is provided elsewhere in this Division.",
+   "period": "Three years.",
+   "starts": "When the right to apply accrues.",
+   "raw": "137. Any other application for which            Three years.       When the right to apply accrues.\n       no period of limitation is\n       provided elsewhere in this\n       Division.\n  1. Subs. by Act 53 of 1964, s. 3 and the Second Schedule, for “Where” (w.e.f. 12-12-1964.)"
+  }
+ ]
+}
