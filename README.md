@@ -113,6 +113,10 @@ Checks after deploying:
 - `/api/translate?check=hi` — tests translation end to end.
 - `/api/voice` — returns `{"ok":true}` when voice is available.
 
+**Models (measured live, Oct 2026):** translation and voice use `gemini-flash-lite-latest` first (≈1 s per translation batch, ≈1–1.5 s per voice clip), with `gemini-3.5-flash-lite` as an automatic backup if the first is slow or busy. The larger 3.x flash models took 20–47 s and are only a last resort. Voice was tested end to end with synthetic speech in Odia, Tamil, Hindi, Bengali, Telugu, Malayalam, Kannada, Nepali, Urdu and English, with the app set to English: the spoken language was identified and the meaning was correct every time. The app stops recording by itself about 1.2 s after the person stops speaking.
+
+`/api/diag` is a private, token-locked endpoint for re-running these live checks.
+
 **Quota:** each voice search and each non-English typed search is one Gemini call. On the free tier, heavy use can hit the daily limit; the app then asks people to type. Add billing or Bhashini ASR if usage grows.
 
 ## Pre-translated text
