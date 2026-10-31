@@ -58,7 +58,7 @@
   const fmtDate = (d) => { if (!d) return ''; const t = new Date(d + 'T00:00:00'); return isNaN(t) ? d : t.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }); };
   const KEYS = 'ABCDEFGHI'; const OPTKEYS = '123456789';
   function announce(m) { live.textContent = ''; setTimeout(() => { live.textContent = m; }, 30); }
-  let tt; function toast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 2400); announce(m); }
+  let tt; function toast(m, ms) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), ms || 2400); announce(m); }
   const optLabel = (q, id) => (q.options.find((o) => o.id === id) || {}).label || id;
   const answerText = (q, a) => (Array.isArray(a) ? a.map((x) => optLabel(q, x)).join('; ') : optLabel(q, a));
   const chapOf = (q) => q.chapter || 'The basics';
@@ -107,9 +107,13 @@
   /* Right-to-left only once the words on screen are actually in Urdu, Sindhi or Kashmiri — English text in an RTL layout
      looks broken (punctuation jumps to the wrong end). */
   const hasText = (l) => l === 'en' || uiReady(l) || Object.keys(RT.tr).some((k) => k.startsWith(l + '|')) || (XLANG === l && Object.keys(XMAP).length > 20);
+  /* Direction (right-to-left for Urdu, Sindhi, Kashmiri) changes only when a page is first shown — on a language
+     switch, on opening a page, or when the "Translating…" cover lifts. A translation that arrives later while
+     someone is reading updates the words but never flips the whole page under them. */
+  let bgRender = false;
   function applyLangDom() {
     const m = LMETA[LANG]; const root = document.documentElement;
-    root.lang = hasText(LANG) ? LANG : 'en'; root.dir = m.rtl && hasText(LANG) ? 'rtl' : 'ltr';
+    if (!bgRender || document.body.classList.contains('trwait')) { root.lang = hasText(LANG) ? LANG : 'en'; root.dir = m.rtl && hasText(LANG) ? 'rtl' : 'ltr'; }
     if (m.font) {
       const id = 'font-' + m.font.replace(/\W/g, '');
       if (!document.getElementById(id)) { const l = document.createElement('link'); l.id = id; l.rel = 'stylesheet'; l.href = 'https://fonts.googleapis.com/css2?family=' + encodeURIComponent(m.font) + ':wght@400;600;700&display=swap'; document.head.appendChild(l); }
@@ -225,7 +229,7 @@ ${JSON.stringify(map)}`;
     if (document.querySelector('.overlay')) { srT = setTimeout(safeRender, 1200); return; }
     const now = Date.now(); if (now - (safeRender.last || 0) < 250) { srT = setTimeout(safeRender, 260); return; }
     safeRender.last = now;
-    const y = window.scrollY; render(); window.scrollTo(0, y);
+    const y = window.scrollY; bgRender = true; try { render(); } finally { bgRender = false; } window.scrollTo(0, y);
   }
   /* Start whatever translations the current screen needs, without blocking it. */
   function autoTranslate(view, arg) {
@@ -292,7 +296,11 @@ ${JSON.stringify(map)}`;
     const tick = () => {
       quiet = busyNow() ? 0 : quiet + 1;
       // Draw the final page while still dimmed, then reveal it: nothing changes after it appears.
-      if (quiet >= 3 || Date.now() - t0 > 10000) { applyLangDom(); clearTimeout(srT); const y = window.scrollY; render(); window.scrollTo(0, y); body.classList.remove('trwait'); return; }
+      if (quiet >= 3 || Date.now() - t0 > 10000) {
+        applyLangDom(); clearTimeout(srT); const y = window.scrollY; render(); window.scrollTo(0, y); body.classList.remove('trwait');
+        if (trFailed[LANG] && !hasText(LANG)) toast(LMETA[LANG].native + ': translation is busy right now, so this page is in English. Please try again in a few minutes.', 7000);
+        return;
+      }
       trWaitT = setTimeout(tick, 200);
     };
     trWaitT = setTimeout(tick, 200);
@@ -1287,7 +1295,7 @@ ${JSON.stringify(map)}`;
     // group sentences into chunks: short first chunk (fast start), then up to ~650 characters each
     function chunks(lines) {
       const out = []; let cur = '';
-      lines.forEach((l) => { const lim = out.length ? 650 : 260; if (cur && (cur + ' ' + l).length > lim) { out.push(cur); cur = l; } else cur = cur ? cur + ' ' + l : l; });
+      lines.forEach((l) => { const lim = out.length ? 650 : 140; if (cur && (cur + ' ' + l).length > lim) { out.push(cur); cur = l; } else cur = cur ? cur + ' ' + l : l; });
       if (cur) out.push(cur); return out;
     }
     const bestVoice = async (lang) => {

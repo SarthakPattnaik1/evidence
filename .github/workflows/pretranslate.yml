@@ -1,6 +1,8 @@
 name: Pre-translate app text
 # Translates every app string into all 22 languages with Gemini and commits src/tr/*.json.
 # Needs repo secret GEMINI_API_KEY (Settings → Secrets and variables → Actions).
+# Better: add GEMINI_API_KEY_BULK — a key from a SECOND Google project (its own free daily allowance), so this
+# bulk job never uses up the allowance the live site needs for visitors. If set, it is used instead.
 # Runs daily until everything is translated (free-tier quota is daily), and on demand.
 on:
   workflow_dispatch:
@@ -27,7 +29,7 @@ jobs:
         with: { node-version: '22' }
       - name: Translate missing strings
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY_BULK || secrets.GEMINI_API_KEY }}
           MAX_MINUTES: '320'
         run: |
           if [ -z "$GEMINI_API_KEY" ]; then echo "Add the GEMINI_API_KEY repository secret first."; exit 0; fi

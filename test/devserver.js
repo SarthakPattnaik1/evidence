@@ -44,6 +44,9 @@ if (process.env.FAKE_TRANSLATE) {
       const out = audio ? { text: okWav ? 'कुत्ते ने मेरे बेटे को काट लिया' : '', en: okWav ? 'stray dog bit my son' : '' } : { en: /फोन|फ़ोन|ফোন/.test(vt) ? 'mobile phone stolen' : /कुत्त|ନୁକୁର|କୁକୁର/.test(vt) ? 'dog bite' : /जमीन|ज़मीन|ଜମି/.test(vt) ? 'land encroachment by neighbour' : 'legal problem' };
       return { ok: true, status: 200, json: async () => ({ candidates: [{ content: { parts: [{ text: JSON.stringify(out) }] } }] }), text: async () => '' };
     }
+    // FAKE_FAIL=N: the first N translation calls fail like Gemini's free-tier daily limit (429), then it works again.
+    global.FAILN = (global.FAILN || 0) + 1;
+    if (global.FAILN <= +(process.env.FAKE_FAIL || 0)) return { ok: false, status: 429, json: async () => ({ error: { code: 429, message: 'You exceeded your current quota (per day)' } }), text: async () => '{"error":{"code":429,"message":"You exceeded your current quota, PerDay"}}' };
     const p = b.contents[0].parts[0].text; const obj = JSON.parse(p.slice(p.lastIndexOf('\n\n') + 2)); const r = {};
     global.GEMCALLS = (global.GEMCALLS || 0) + 1; for (const k in obj) r[k] = '«' + obj[k] + '»';
     await new Promise((res) => setTimeout(res, +process.env.FAKE_TRANSLATE || 300));
