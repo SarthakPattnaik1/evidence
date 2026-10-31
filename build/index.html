@@ -7349,9 +7349,23 @@ ${JSON.stringify(map)}`;
   }
 
   /* ============ DISCLAIMER (Bar Council of India rules) ============ */
-  // Shown on the first visit and whenever the wording changes (bump CONSENT_V). Emergency numbers work before agreeing.
+  /* Bar Council of India Rule 36: shown on EVERY visit, to everyone — a new visit, a new tab, or a refresh.
+     "I agree" is not saved on the phone. The only time it is not asked again is a click from one Saboot page to
+     another in the same tab within 30 minutes of agreeing (e.g. from a /guide page into the app), so nobody is
+     asked twice in a few seconds. The /guide pages show the same disclaimer (tools/site.py). Emergency numbers
+     work before agreeing. */
   const CONSENT_V = 1;
-  const consented = () => { const c = lsGet('saboot_consent'); return !!(c && c.v === CONSENT_V); };
+  let agreedNow = false;
+  const handedOver = (() => {
+    try {
+      const s = JSON.parse(sessionStorage.getItem('saboot_ok') || 'null');
+      const nav = (performance.getEntriesByType && performance.getEntriesByType('navigation')[0]) || {};
+      const inSite = !!document.referrer && new URL(document.referrer).origin === location.origin;
+      return !!(s && s.v === CONSENT_V && Date.now() - s.t < 30 * 60000 && nav.type !== 'reload' && (inSite || nav.type === 'back_forward'));
+    } catch (e) { return false; }
+  })();
+  try { localStorage.removeItem('saboot_consent'); } catch (e) { /* the old "remember forever" flag */ }
+  const consented = () => agreedNow || handedOver;
   let consentMode = 'ask';
   function consentHTML() {
     const tel = (n, t) => `<a class="sosnum" href="tel:${n}">${ic('phone', 16)}<b>${n}</b><span>${esc(X(t))}</span></a>`;
@@ -7398,7 +7412,7 @@ ${JSON.stringify(map)}`;
       ov.addEventListener('click', (e) => {
         const b = e.target.closest('[data-cs]'); if (!b) return;
         const a = b.dataset.cs;
-        if (a === 'agree') { lsSet('saboot_consent', { v: CONSENT_V, t: new Date().toISOString().slice(0, 10) }); TRACK.once('consent', { x: 'agree' }); ov.remove(); document.body.classList.remove('consenting'); const h = app.querySelector('h1'); if (h) h.focus({ preventScroll: true }); return; }
+        if (a === 'agree') { agreedNow = true; try { sessionStorage.setItem('saboot_ok', JSON.stringify({ v: CONSENT_V, t: Date.now() })); } catch (e2) { /* private mode */ } TRACK.once('consent', { x: 'agree' }); ov.remove(); document.body.classList.remove('consenting'); const h = app.querySelector('h1'); if (h) h.focus({ preventScroll: true }); return; }
         if (a === 'disagree') { TRACK.once('consent', { x: 'disagree' }); consentMode = 'no'; }
         if (a === 'back') consentMode = 'ask';
         refreshConsent(true);

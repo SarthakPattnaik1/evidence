@@ -43,14 +43,56 @@ footer{max-width:960px;margin:0 auto;padding:20px;color:#566476;font-size:14px}
 """
 
 
-def page(title, desc, body, path, icon):
+def _disclaimer_points():
+    """The disclaimer points, read from src/app.js so the app and the guide pages always say the same thing."""
+    src = (ROOT / 'src' / 'app.js').read_text(encoding='utf-8')
+    block = re.search(r"const pts = \[(.*?)\];", src, re.S).group(1)
+    pts = [json.loads('"' + m.replace('"', '\\"') + '"') for m in re.findall(r"'((?:[^'\\]|\\.)*)'", block)]
+    assert len(pts) >= 6, 'disclaimer points not found in src/app.js'
+    return pts
+
+
+# Bar Council of India Rule 36: the same disclaimer as the app, on every visit to a guide page.
+# Not on /privacy and /terms (the disclaimer links to them). Without JavaScript the page stays readable.
+GATE_CSS = """#dg{position:fixed;inset:0;z-index:50;background:rgba(11,31,54,.62);display:flex;align-items:center;justify-content:center;padding:14px}
+#dg .d{background:#fff;border-radius:18px;max-width:560px;width:100%;max-height:92vh;overflow:auto;padding:22px 22px 18px;box-shadow:0 20px 50px -20px rgba(0,0,0,.5)}
+#dg h2{margin:0 0 4px}#dg ol{padding-left:20px;font-size:15.5px;line-height:1.5}#dg li{margin:7px 0}
+#dg .b{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}#dg button,#dg .l{font:700 16px/1 'Noto Sans',system-ui,sans-serif;border-radius:12px;padding:14px 20px;cursor:pointer;border:1.5px solid #1B3A5C;text-decoration:none}
+#dg .y{background:#1B3A5C;color:#fff;flex:1}#dg .n{background:#fff;color:#1B3A5C}#dg .l{background:#fff;color:#1B3A5C;display:inline-block}
+#dg .s{background:#FDF3F1;border-radius:12px;padding:10px 12px;font-size:14.5px;color:#7A2418;margin-top:10px}#dg .s a{color:#B3261E;font-weight:700}
+body.dgon{overflow:hidden}"""
+
+
+def gate_html():
+    pts = ''.join(f'<li>{e(t)}</li>' for t in _disclaimer_points())
+    sos = '<div class="s">In danger right now? Call <a href="tel:112">112</a> · Free legal aid <a href="tel:15100">15100</a> · Cyber fraud <a href="tel:1930">1930</a></div>'
+    ask = (f'<h2 id="dgh">Disclaimer</h2><p class="muted" style="margin:0">Please read and agree to continue.</p><ol>{pts}</ol>'
+           '<p class="muted">By clicking “I agree”, you confirm that you have read and accept the above, and our <a href="/terms">Terms</a> and <a href="/privacy">Privacy</a> policy.</p>'
+           f'{sos}<div class="b"><button class="y" data-dg="agree">I agree</button><button class="n" data-dg="no">I disagree</button></div>')
+    no = ('<h2 id="dgh">That is okay. You can still get free help</h2><ul><li><a href="tel:15100"><b>15100</b></a> NALSA free legal aid — a free lawyer if you are eligible</li>'
+          '<li><a href="tel:112"><b>112</b></a> Emergency — police, ambulance, fire</li><li><a href="tel:181"><b>181</b></a> Women helpline</li>'
+          '<li><a href="tel:1930"><b>1930</b></a> Cyber fraud — call fast if money was taken</li><li><a href="tel:1098"><b>1098</b></a> Child helpline</li></ul>'
+          '<div class="b"><button class="y" data-dg="back">Go back and read again</button><a class="l" href="https://nalsa.gov.in" rel="noopener">Leave Saboot</a></div>')
+    js = """(function(){var V=1;function handed(){try{var s=JSON.parse(sessionStorage.getItem('saboot_ok')||'null');var n=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{};
+var inSite=!!document.referrer&&new URL(document.referrer).origin===location.origin;return !!(s&&s.v===V&&Date.now()-s.t<1800000&&n.type!=='reload'&&(inSite||n.type==='back_forward'));}catch(e){return false;}}
+if(handed())return;var ASK=%s,NO=%s;var o=document.createElement('div');o.id='dg';o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-labelledby','dgh');
+var d=document.createElement('div');d.className='d';d.tabIndex=-1;o.appendChild(d);function show(h){d.innerHTML=h;d.scrollTop=0;d.focus();}
+var main=document.querySelector('main');document.body.appendChild(o);document.body.classList.add('dgon');if(main)main.setAttribute('aria-hidden','true');show(ASK);
+o.addEventListener('click',function(ev){var b=ev.target.closest('[data-dg]');if(!b)return;var a=b.getAttribute('data-dg');
+if(a==='agree'){try{sessionStorage.setItem('saboot_ok',JSON.stringify({v:V,t:Date.now()}));}catch(e){}o.remove();document.body.classList.remove('dgon');if(main)main.removeAttribute('aria-hidden');var h=document.querySelector('h1');if(h){h.tabIndex=-1;h.focus();}}
+else if(a==='no')show(NO);else if(a==='back')show(ASK);});
+o.addEventListener('keydown',function(ev){if(ev.key!=='Tab')return;var f=o.querySelectorAll('a[href],button');if(!f.length)return;if(ev.shiftKey&&document.activeElement===f[0]){ev.preventDefault();f[f.length-1].focus();}else if(!ev.shiftKey&&document.activeElement===f[f.length-1]){ev.preventDefault();f[0].focus();}});})();""" % (json.dumps(ask), json.dumps(no))
+    return f'<script>{js.replace("</", "<\\/")}</script>'
+
+
+def page(title, desc, body, path, icon, gate=True):
     return f"""<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(title)}</title><meta name="description" content="{e(desc)}"><link rel="canonical" href="{BASE}{path}">
 <meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:type" content="article"><meta property="og:url" content="{BASE}{path}"><meta property="og:site_name" content="Saboot"><meta property="og:locale" content="en_IN"><meta property="og:image" content="{BASE}/og.jpg?v=5"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Saboot: Walk into your lawyer’s office ready."><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="{BASE}/og.jpg?v=5"><link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2">
 <meta name="theme-color" content="#1B3A5C"><meta name="author" content="Sarthak Pattnaik, Subhankar Das"><link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml"><link rel="icon" href="/icon-64.png?v=2" type="image/png"><link rel="manifest" href="/manifest.webmanifest">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
-<style>{CSS}</style></head><body><header><a href="/" style="display:flex;align-items:center;gap:8px;text-decoration:none"><img src="/mark.png?v=2" alt="" style="height:28px;width:auto"><img src="/wordmark.png?v=2" alt="Saboot" style="height:26px;width:auto"></a><a class="back" href="/">Open Saboot</a></header>
-<main>{body}</main><footer>Saboot is a free preparation tool, not a law firm, and does not give legal advice. Made by <a href="https://www.linkedin.com/in/sarthakad" rel="noopener">Sarthak Pattnaik</a> and <a href="https://www.linkedin.com/in/subhankar-das-311030b1/" rel="noopener">Subhankar Das</a>. Emergency: 112 · Free legal aid: 15100 · Cyber fraud: 1930.<br><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="/">Open Saboot</a></footer></body></html>"""
+<style>{CSS}{GATE_CSS if gate else ''}</style></head><body><header><a href="/" style="display:flex;align-items:center;gap:8px;text-decoration:none"><img src="/mark.png?v=2" alt="" style="height:28px;width:auto"><img src="/wordmark.png?v=2" alt="Saboot" style="height:26px;width:auto"></a><a class="back" href="/">Open Saboot</a></header>
+<main>{body}</main><footer>Saboot is a free preparation tool, not a law firm, and does not give legal advice. Made by <a href="https://www.linkedin.com/in/sarthakad" rel="noopener">Sarthak Pattnaik</a> and <a href="https://www.linkedin.com/in/subhankar-das-311030b1/" rel="noopener">Subhankar Das</a>. Emergency: 112 · Free legal aid: 15100 · Cyber fraud: 1930.<br><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="/">Open Saboot</a></footer>{gate_html() if gate else ''}</body></html>"""
 
 
 def legal(kicker, title, intro, short, sections, extra=''):
@@ -111,7 +153,7 @@ def run():
         ('reports', 'Mistakes you report', '<p>If you use <b>Report a mistake</b>, we receive the guide, the type of problem and what you wrote, with numbers removed. Please don’t include personal details.</p>'),
         ('choices', 'Your choices', '<ul><li>Use Saboot without saving anything — nothing is kept after you close the page.</li><li>Tap <b>Delete all</b> to remove a saved list.</li><li>If your browser sends “Do Not Track”, nothing is counted.</li></ul>'),
         ('changes', 'Changes to this page', '<p>If we change how Saboot handles information, we will update this page and the date at the top.</p>')])
-    (OUT / 'privacy.html').write_text(page('Privacy | Saboot', 'Your answers stay on your device. How Saboot handles information, in plain words.', privacy, '/privacy', icon))
+    (OUT / 'privacy.html').write_text(page('Privacy | Saboot', 'Your answers stay on your device. How Saboot handles information, in plain words.', privacy, '/privacy', icon, gate=False))
     terms = legal('Terms of use', 'Simple terms for a free tool', upd + '. Please read these before you rely on Saboot.', [
         ('🧭', 'Saboot helps you <b>prepare</b> — it lists the papers and facts to take to an advocate.'),
         ('⚖️', 'It is <b>not legal advice</b> and does not replace an advocate.'),
@@ -128,7 +170,7 @@ def run():
         ('law', 'Governing law', '<p>These terms are governed by the laws of India.</p>'),
         ('changes', 'Changes to these terms', '<p>We may update these terms. The date at the top shows the latest version.</p>')],
         extra='<div class="sos"><b>In an emergency, don’t wait.</b><a href="tel:112">📞 112 Emergency</a><a href="tel:1930">📞 1930 Cyber fraud</a><a href="tel:15100">📞 15100 Free legal aid</a></div>')
-    (OUT / 'terms.html').write_text(page('Terms | Saboot', 'Simple terms of use for Saboot, a free legal preparation tool.', terms, '/terms', icon))
+    (OUT / 'terms.html').write_text(page('Terms | Saboot', 'Simple terms of use for Saboot, a free legal preparation tool.', terms, '/terms', icon, gate=False))
     urls += [('/privacy', '0.3'), ('/terms', '0.3')]
 
     (OUT / 'guides.json').write_text(json.dumps({'checked': data.get('checked'), 'version': data.get('version'), 'langs': data['langs'], 'cats': data['cats'],
