@@ -10,6 +10,7 @@ on:
         required: false
   schedule:
     - cron: '17 21 * * *'   # 02:47 India time
+    - cron: '17 9 * * *'    # 14:47 India time (stops by itself at the daily quota; resumes next run)
   push:
     branches: [main]
     paths: ['src/**.js']
@@ -19,7 +20,7 @@ concurrency: { group: pretranslate, cancel-in-progress: false }
 jobs:
   translate:
     runs-on: ubuntu-latest
-    timeout-minutes: 55
+    timeout-minutes: 340
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -27,13 +28,17 @@ jobs:
       - name: Translate missing strings
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          MAX_MINUTES: '45'
+          MAX_MINUTES: '320'
         run: |
           if [ -z "$GEMINI_API_KEY" ]; then echo "Add the GEMINI_API_KEY repository secret first."; exit 0; fi
-          node tools/pretranslate.js "${{ github.event.inputs.langs }}"
+          node tools/pretranslate.js "${{ github.event.inputs.langs }}" &
+          PID=$!
+          # save progress to the repo every 30 minutes so a long run is never lost
+          while kill -0 $PID 2>/dev/null; do sleep 1800; if kill -0 $PID 2>/dev/null; then git config user.name "saboot-translate-bot"; git config user.email "actions@users.noreply.github.com"; git add src/tr; git diff --cached --quiet || (git commit -qm "Pre-translated text (progress) [skip translate]" && git pull -q --rebase && git push -q) || true; fi; done
+          wait $PID
       - name: Commit translations
         run: |
           git config user.name "saboot-translate-bot"
           git config user.email "actions@users.noreply.github.com"
           git add src/tr
-          git diff --cached --quiet && echo "No changes" || (git commit -m "Update pre-translated text [skip translate]" && git push)
+          git diff --cached --quiet && echo "No changes" || (git commit -m "Update pre-translated text [skip translate]" && git pull -q --rebase && git push)

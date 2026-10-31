@@ -5,11 +5,12 @@ const fs = require('fs'); const path = require('path');
 const STRINGS = require('./strings.js');
 const DIR = path.join(__dirname, '..', 'src', 'tr'); fs.mkdirSync(DIR, { recursive: true });
 const KEY = process.env.GEMINI_API_KEY; if (!KEY) { console.error('Set GEMINI_API_KEY'); process.exit(1); }
-const ORDER = 'hi bn mr te ta gu ur kn or ml pa as mai sat ks ne sd doi kok mni brx sa'.split(' ');
+const ORDER = 'hi bn or ur sd mr te ta gu kn ml pa as ks ne mai kok doi sat mni brx sa'.split(' ');
 const NAMES = { hi: ['Hindi', 'हिन्दी'], bn: ['Bengali', 'বাংলা'], te: ['Telugu', 'తెలుగు'], mr: ['Marathi', 'मराठी'], ta: ['Tamil', 'தமிழ்'], ur: ['Urdu', 'اردو', 'Urdu (Nastaliq/Naskh) script'], gu: ['Gujarati', 'ગુજરાતી'], kn: ['Kannada', 'ಕನ್ನಡ'], or: ['Odia', 'ଓଡ଼ିଆ'], ml: ['Malayalam', 'മലയാളം'], pa: ['Punjabi', 'ਪੰਜਾਬੀ'], as: ['Assamese', 'অসমীয়া'], mai: ['Maithili', 'मैथिली'], sat: ['Santali', 'ᱥᱟᱱᱛᱟᱲᱤ', 'Ol Chiki script'], ks: ['Kashmiri', 'کٲشُر', 'Perso-Arabic script'], ne: ['Nepali', 'नेपाली'], sd: ['Sindhi', 'سنڌي', 'Perso-Arabic script'], doi: ['Dogri', 'डोगरी'], kok: ['Konkani', 'कोंकणी', 'Devanagari script'], mni: ['Manipuri', 'ꯃꯤꯇꯩꯂꯣꯟ', 'Meitei Mayek script'], brx: ['Bodo', 'बड़ो', 'Devanagari script'], sa: ['Sanskrit', 'संस्कृतम्', 'Devanagari script'] };
 const langs = (process.argv[2] ? process.argv[2].split(',') : ORDER).filter((l) => NAMES[l]);
 const deadline = Date.now() + (Number(process.env.MAX_MINUTES) || 40) * 60000;
-const MODELS = [process.env.GEMINI_MODEL, 'gemini-flash-latest', 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-flash-lite-latest', 'gemini-3.5-flash-lite'].filter(Boolean);
+// fast models first: the 'thinking' flash models took ~18 s a batch, which is why a 45-minute run finished only 2 languages
+const MODELS = [process.env.GEMINI_MODEL, 'gemini-flash-lite-latest', 'gemini-3.5-flash-lite', 'gemini-flash-latest', 'gemini-3.5-flash'].filter(Boolean);
 let okModel = null; const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const ph = (v) => (String(v).match(/\{[^}]*\}/g) || []).sort().join('|');
 

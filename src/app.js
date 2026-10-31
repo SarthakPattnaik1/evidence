@@ -103,9 +103,12 @@
   const uiReady = (l) => l === 'en' || !!I18N.STRINGS[l] || !!RT.ui[l] || (DICTLANG === l && Object.keys(DICT).length > 300);
   function trGet(chunk, key, en) { if (LANG === 'en') return en; const m = RT.tr[LANG + '|' + chunk]; return (m && m[key]) || D(en) || en; }
   const G = (iss, key, en) => trGet('g:' + iss.id + ':' + (/^[a-z]+_e_|^lq|^info|^st\d/.test(key) || /_u_/.test(key) ? 'b' : 'a'), key, en);
+  /* Right-to-left only once the words on screen are actually in Urdu, Sindhi or Kashmiri — English text in an RTL layout
+     looks broken (punctuation jumps to the wrong end). */
+  const hasText = (l) => l === 'en' || uiReady(l) || Object.keys(RT.tr).some((k) => k.startsWith(l + '|')) || (XLANG === l && Object.keys(XMAP).length > 20);
   function applyLangDom() {
     const m = LMETA[LANG]; const root = document.documentElement;
-    root.lang = LANG; root.dir = m.rtl ? 'rtl' : 'ltr';
+    root.lang = hasText(LANG) ? LANG : 'en'; root.dir = m.rtl && hasText(LANG) ? 'rtl' : 'ltr';
     if (m.font) {
       const id = 'font-' + m.font.replace(/\W/g, '');
       if (!document.getElementById(id)) { const l = document.createElement('link'); l.id = id; l.rel = 'stylesheet'; l.href = 'https://fonts.googleapis.com/css2?family=' + encodeURIComponent(m.font) + ':wght@400;600;700&display=swap'; document.head.appendChild(l); }
@@ -272,7 +275,22 @@ ${JSON.stringify(map)}`;
   }
   function setLang(code) {
     LANG = code; lsSet('er_lang', code); applyLangDom(); TRACK.ev('lang', { x: code }); dictLoad();
-    render();
+    render(); trWait();
+  }
+  /* Switching to a language that is not pre-translated: instead of the page changing in waves as each batch of
+     translation arrives, keep it dimmed behind "Translating…" and show it once, already translated (max 9 s). */
+  let trWaitT = null;
+  function trWait() {
+    clearTimeout(trWaitT); const body = document.body;
+    if (LANG === 'en' || uiReady(LANG)) { body.classList.remove('trwait'); return; }
+    body.classList.add('trwait'); const t0 = Date.now(); let quiet = 0;
+    const tick = () => {
+      const busy = Object.keys(pending).length + xFly.size + XQ.size;
+      quiet = busy ? 0 : quiet + 1;
+      if (quiet >= 3 || Date.now() - t0 > 9000) { body.classList.remove('trwait'); applyLangDom(); safeRender(); return; }
+      trWaitT = setTimeout(tick, 200);
+    };
+    trWaitT = setTimeout(tick, 250);
   }
   function trNote() { return translated() ? `<p class="trnote">${ic('globe', 16)} ${esc(trFailed[LANG] && !Object.keys(pending).length ? T('enonly') : T('auto'))} <button class="btn text" data-act="toen">${esc(T('en'))}</button></p>` : ''; }
 
@@ -318,6 +336,7 @@ ${JSON.stringify(map)}`;
   }
 
   function render() {
+    applyLangDom();
     const raw = (location.hash || '').slice(1);
     if (raw.startsWith('a-')) { applyAdvLink(raw); return; }
     const [view, ...rest] = raw.split('-'); const arg = rest.join('-');
@@ -1513,7 +1532,7 @@ ${JSON.stringify(map)}`;
     searchT = setTimeout(() => { let n = 0; try { n = searchAll(v).length; } catch (e) { /* ignore */ } TRACK.ev('search', { n, x: v }); }, 1500);
   }
   try { const fi = document.createElement('link'); fi.rel = 'icon'; fi.href = window.ER_BRAND.icon; document.head.appendChild(fi); } catch (e) { /* none */ }
-  applyLangDom(); dictLoad();
+  applyLangDom(); dictLoad(); setTimeout(trWait, 0);
   render();
   showConsent();
 })();

@@ -1005,3 +1005,10 @@ body.consenting{overflow:hidden}
 .lim .lexact input{margin-left:6px;padding:6px 8px;border:1px solid var(--line);border-radius:10px;font:inherit;background:#fff}
 .lim details{margin-top:6px}.lim details summary{cursor:pointer;font-size:14px;font-weight:600;color:var(--go-d)}
 @media print{.lim{box-shadow:none;break-inside:avoid}}
+
+/* v33 language switch: dim until translated, show once */
+body.trwait main,body.trwait header.top .wrap>*:not(.lang){opacity:.18;transition:opacity .2s;pointer-events:none}
+
+.trpill{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);z-index:60;background:#13294A;color:#fff;border-radius:999px;padding:8px 14px;font-weight:600;font-size:15px;max-width:90vw;text-align:center}
+.trpill[hidden]{display:none}
+body.trwait .trpill{position:fixed;left:50%;top:42%;transform:translate(-50%,-50%);z-index:60;font-size:17px;padding:12px 18px;box-shadow:0 10px 30px -10px rgba(11,31,54,.45)}
