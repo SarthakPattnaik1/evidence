@@ -1,0 +1,17 @@
+name: Find exact source pages
+on:
+  push:
+    branches: [law-sources]
+    paths: ['sources/find.py', 'sources/cases.json', 'sources/acts.json']
+permissions:
+  contents: write
+jobs:
+  find:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 sources/find.py
+      - run: |
+          git config user.name saboot-law-bot; git config user.email actions@users.noreply.github.com
+          git pull -q --rebase origin law-sources || true
+          git add sources/found.json; git commit -m "Candidate source pages" || true; git push
