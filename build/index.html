@@ -1008,6 +1008,27 @@ body.consenting{overflow:hidden}
 .carryhead .fh b{color:#6B4700}
 .dialog .btn.wa,.btn.wa{background:#0E7A3D;color:#fff;border-color:#0E7A3D}
 .dialog .btn.wa:hover,.btn.wa:hover{background:#0B6633}
+/* v32 time limit card */
+.lim{margin:14px 0 18px;padding:16px 16px 12px;border-radius:18px;background:#fff;border:1px solid var(--line);box-shadow:var(--sh1);border-left:6px solid var(--go)}
+.lim.soon{border-left-color:var(--amber)}.lim.edge,.lim.past{border-left-color:var(--tape)}.lim.unknown{border-left-color:#8A97A8}
+.lim .limtop{display:flex;gap:10px;align-items:flex-start}.lim .limtop svg{flex:none;margin-top:3px;color:var(--go)}
+.lim.soon .limtop svg{color:#9A6410}.lim.edge .limtop svg,.lim.past .limtop svg{color:var(--tape)}
+.lim .kick{margin:0;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lim h2{font-size:21px;margin:2px 0 0;line-height:1.2}
+.lim .lline{margin:8px 0 6px;font-weight:600}
+.lim .lrule{margin:10px 0 4px;color:var(--ink2);font-size:15px}
+.lim .ltips{margin:8px 0;padding-left:20px;font-size:15px}.lim .ltips li{margin:5px 0}
+.lim .lgood{display:flex;gap:6px;align-items:flex-start;background:var(--go-l);color:var(--go-d);border-radius:10px;padding:8px 10px;margin:8px 0;font-size:15px}.lim .lgood svg{flex:none;margin-top:3px}
+.ltl{margin:12px 0 2px}.ltl .track{position:relative;height:12px;border-radius:99px;background:linear-gradient(90deg,#E4F0E8 0 60%,#FBF0D9 60% 85%,#F7E4DE 85% 100%);overflow:visible}
+.ltl .lband{display:block;position:absolute;top:0;height:12px;border-radius:99px;background:repeating-linear-gradient(135deg,rgba(19,41,74,.75) 0 4px,rgba(19,41,74,.45) 4px 8px);max-width:100%}
+.ltl .now{display:block;position:absolute;top:-6px;width:4px;height:24px;margin-left:-2px;border-radius:2px;background:var(--ink);box-shadow:0 0 0 2px #fff}
+.ltl .end{display:block;position:absolute;right:0;top:-6px;width:3px;height:24px;background:var(--tape);border-radius:2px}
+.ltl .lbls{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-top:6px}
+.ltl .here{margin:2px 0 0;font-size:13px;color:var(--ink2)}
+.lim .lexact{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:10px 0 4px;font-size:15px}
+.lim .lexact input{margin-left:6px;padding:6px 8px;border:1px solid var(--line);border-radius:10px;font:inherit;background:#fff}
+.lim details{margin-top:6px}.lim details summary{cursor:pointer;font-size:14px;font-weight:600;color:var(--go-d)}
+@media print{.lim{box-shadow:none;break-inside:avoid}}
 </style>
 <script defer src="/_vercel/insights/script.js"></script>
 </head>
@@ -1308,6 +1329,8 @@ body.consenting{overflow:hidden}
         options: o([['bank', 'Bank transfer or UPI'], ['cheque', 'Cheque'], ['cash', 'Cash'], ['mixed', 'Mixed']]) },
       { id: 'rd_vacated', text: 'Has the house been vacated and the keys handed back?', why: 'The deposit usually becomes due after handover.',
         options: o([['yes', 'Yes'], ['notice', 'Notice given, still living there'], ['no', 'No']]) },
+      { id: 'rd_moved', text: 'When did you move out and hand back the keys?', when: ALL(W('rd_vacated', 'yes'), W('rd_role', 'tenant')), why: 'There is a time limit for a case to get the deposit back — usually 3 years. We use this to show how much time you have.',
+        options: o([['m6', 'In the last 6 months'], ['y1', '6 months to 1 year ago'], ['y2', '1 to 2 years ago'], ['y3', '2 to 3 years ago'], ['older', 'More than 3 years ago']]) },
       { id: 'rd_reason', text: 'What reason has been given for keeping the deposit?', type: 'multi', why: 'Each reason needs different evidence.',
         options: o([['damage', 'Damage to the property'], ['dues', 'Unpaid rent, electricity or maintenance'], ['painting', 'Painting or cleaning charges'], ['none', 'No reason'], ['other', 'Something else']]) },
       { id: 'rd_photos', text: 'Are there photos or videos of the home\'s condition?', deep: true, chapter: 'Condition',
@@ -1425,8 +1448,8 @@ body.consenting{overflow:hidden}
         options: o([['bank', 'Bank transfer or UPI'], ['cash', 'Cash'], ['cheque', 'By cheque'], ['mixed', 'Mixed']]) },
       { id: 'ml_written', text: 'Is there anything in writing showing it was a loan?', why: 'A transfer shows money moved. It does not, by itself, show that it had to be repaid.',
         options: o([['agreement', 'A signed agreement or promissory note'], ['messages', 'Messages where they accept they owe me'], ['none', 'Nothing in writing'], NS]) },
-      { id: 'ml_when', text: 'When was the money given?', why: 'Older debts may face time limits.',
-        options: o([['y1', 'Within the last year'], ['y3', '1 to 3 years ago'], ['older', 'More than 3 years ago'], ['several', 'Several times over a period']]) },
+      { id: 'ml_when', text: 'When was the money given?', why: 'Courts accept a case to recover a loan for 3 years from the day the money was given. We use this to show how much time you have.',
+        options: o([['y1', 'Within the last year'], ['y2', '1 to 2 years ago'], ['y3', '2 to 3 years ago'], ['older', 'More than 3 years ago'], ['several', 'Several times over a period']]) },
       { id: 'ml_since', text: 'Since then, has the person paid anything back or admitted the debt?', why: 'A part-payment or written admission can be important for time limits.',
         options: o([['paid', 'Paid part of it'], ['admitted', 'Admitted it in a message'], ['nothing', 'Neither'], NS]) },
       { id: 'ml_cheque', text: 'Did they give you a cheque for repayment?', why: 'A bounced cheque has its own strict deadlines.',
@@ -2999,7 +3022,7 @@ body.consenting{overflow:hidden}
       { id: 'bu_contract', text: 'What do you have in writing?', type: 'multi', chapter: 'Paper trail', why: 'Written terms, purchase orders and acceptance prove the debt.', options: o([['contract', 'Signed contract'], ['po', 'Purchase order / work order'], ['invoice', 'Invoices'], ['emails', 'Emails / messages agreeing terms'], ['none', 'Little in writing']]) },
       { id: 'bu_dispute', text: 'Has the client raised any complaint about your work?', chapter: 'Paper trail', why: 'A genuine dispute before your demand can block insolvency and weaken summary routes.', options: o([['no', 'No, they just haven\'t paid'], ['after', 'Only after I demanded payment'], ['before', 'Yes, they complained earlier'], NS]) },
       { id: 'bu_arb', text: 'Does the contract have an arbitration clause?', chapter: 'Paper trail', when: W('bu_contract', 'contract', 'po'), why: 'An arbitration clause usually sends the dispute to arbitration, not court.', options: o([['yes', 'Yes'], ['no', 'No'], NS]) },
-      { id: 'bu_since', text: 'When was payment due?', chapter: 'Timing', why: 'Money claims generally have a 3-year limit; acknowledgements extend it.', options: o([['recent', 'Within the last year'], ['y3', '1–3 years ago'], ['older', 'More than 3 years ago']]) },
+      { id: 'bu_since', text: 'When was payment due?', chapter: 'Timing', why: 'Money claims generally have a 3-year limit from when payment fell due. We use this to show how much time you have.', options: o([['recent', 'Within the last year'], ['y2', '1–2 years ago'], ['y3', '2–3 years ago'], ['older', 'More than 3 years ago']]) },
       { id: 'bu_ack', text: 'Has the client admitted the dues (ledger confirmation, part-payment, email)?', deep: true, chapter: 'Timing', why: 'Admissions strengthen your case and can extend limitation.', options: o([['yes', 'Yes'], ['no', 'No']]) },
       { id: 'bu_gst', text: 'Have you paid GST on these invoices?', deep: true, chapter: 'Tax', why: 'Affects the amount and your records.', options: o([['yes', 'Yes'], ['no', 'No / not applicable']]) }
     ],
@@ -3093,6 +3116,7 @@ body.consenting{overflow:hidden}
       { id: 'cbx_kind', text: 'What kind of deal?', chapter: 'The deal', why: 'Different industries keep different records.', options: o([['supply', 'Supply of goods'], ['services', 'Services / software / consulting'], ['franchise', 'Franchise / distribution'], ['lease', 'Commercial lease'], ['jv', 'Joint venture / investment'], ['other', 'Other']]) },
       { id: 'cbx_value', text: 'Value of the dispute?', chapter: 'The deal', why: '₹3 lakh is the threshold for commercial courts.', options: o([['u3', 'Under ₹3 lakh'], ['3to1cr', '₹3 lakh to ₹1 crore'], ['over1cr', 'More than ₹1 crore']]) },
       { id: 'cbx_breach', text: 'What went wrong?', type: 'multi', chapter: 'The breach', why: 'Each breach needs specific proof.', options: o([['nondelivery', 'Not delivered / not performed'], ['quality', 'Poor quality'], ['delay', 'Delay'], ['nonpayment', 'Payment not made'], ['termination', 'Contract wrongly terminated'], ['guarantee', 'Bank guarantee being invoked'], ['confidential', 'Confidential information misused']]) },
+      { id: 'cbx_when', text: 'When did the other side break the deal?', when: W('cbx_role', 'claim'), chapter: 'The breach', why: 'A case for breach of contract must usually be filed within 3 years of the breach. We use this to show how much time you have.', options: o([['m6', 'In the last 6 months'], ['y1', '6 months to 1 year ago'], ['y2', '1 to 2 years ago'], ['y3', '2 to 3 years ago'], ['older', 'More than 3 years ago']]) },
       { id: 'cbx_arb', text: 'Does the contract have an arbitration clause?', chapter: 'The contract', why: 'Decides forum.', options: o([['yes', 'Yes'], ['no', 'No'], ['nowritten', 'No written contract']]) },
       { id: 'cbx_notice', text: 'Has a notice of breach been sent or received?', deep: true, chapter: 'Steps so far', why: 'Notices fix dates and cure periods.', options: o([['sent', 'Sent'], ['received', 'Received'], ['no', 'No']]) },
       { id: 'cbx_loss', text: 'Can you show your loss in numbers?', deep: true, chapter: 'Loss', when: W('cbx_role', 'claim'), why: 'Damages must be proved, not assumed.', options: o([['yes', 'Yes'], ['partly', 'Partly'], ['no', 'Not yet']]) }
@@ -3858,7 +3882,8 @@ body.consenting{overflow:hidden}
       { id: 'ic_type', text: 'What is it about?', why: 'Interns, freelancers and new hires have different routes.', options: o([['intern', 'Internship stipend or certificate'], ['freelance', 'Freelance / client work'], ['creator', 'Brand deal / creator payment'], ['offer', 'Job offer revoked or joining delayed'], ['fee', 'I paid a fee for an internship or job']]) },
       { id: 'ic_written', text: 'What do you have in writing?', why: 'Written terms are the key proof.', options: o([['letter', 'Offer letter / contract'], ['emails', 'Emails or DMs agreeing the work and pay'], ['nothing', 'Almost nothing']]) },
       { id: 'ic_done', text: 'Did you complete the work or period?', when: NOT(W('ic_type', 'offer', 'fee')), why: 'Completed work is harder to deny.', options: o([['all', 'Yes, fully'], ['part', 'Partly'], ['no', 'No']]) },
-      { id: 'ic_amount', text: 'How much is owed?', why: 'Helps choose between a notice, consumer forum or suit.', options: o([['u50k', 'Under ₹50,000'], ['50to5', '₹50,000–₹5 lakh'], ['over5', 'Over ₹5 lakh']]) }
+      { id: 'ic_amount', text: 'How much is owed?', why: 'Helps choose between a notice, consumer forum or suit.', options: o([['u50k', 'Under ₹50,000'], ['50to5', '₹50,000–₹5 lakh'], ['over5', 'Over ₹5 lakh']]) },
+      { id: 'ic_when', text: 'When was the payment due?', when: W('ic_type', 'intern', 'freelance', 'creator'), why: 'A case to recover unpaid work must usually be filed within 3 years. We use this to show how much time you have.', options: o([['m6', 'In the last 6 months'], ['y1', '6 months to 1 year ago'], ['y2', '1 to 2 years ago'], ['y3', '2 to 3 years ago'], ['older', 'More than 3 years ago']]) }
     ],
     evidence: [
       { id: 'ic_e_terms', name: 'Offer letter, contract, or the emails/DMs where pay was agreed', fact: 'What was promised', why: 'The core of your claim.', where: 'Email, LinkedIn, Instagram DMs.', preserve: 'Screenshot with dates and usernames; export the chat.' },
@@ -4412,7 +4437,7 @@ body.consenting{overflow:hidden}
     questions: [
       { id: 'df_side', text: 'Which side are you on?', why: 'Accusing and defending are very different.', options: o([['victim', 'Someone defamed me'], ['accused', 'I received a notice or case for defamation']]) },
       { id: 'df_where', text: 'Where was it said or published?', why: 'Online posts can be removed quickly; evidence differs.', type: 'multi', options: o([['social', 'Social media or WhatsApp'], ['news', 'News or website'], ['review', 'Review site'], ['spoken', 'Spoken to others'], ['letter', 'Letter, notice or complaint to an office']]) },
-      { id: 'df_when', text: 'When was it first published?', why: 'Civil cases should usually be filed within a year.', options: o([['recent', 'Within the last 3 months'], ['year', '3 to 12 months ago'], ['old', 'More than a year ago']]) },
+      { id: 'df_when', text: 'When was it first published?', why: 'A civil case for compensation must usually be filed within one year. We use this to show how much time you have.', options: o([['recent', 'Within the last 3 months'], ['m9', '3 to 9 months ago'], ['year', '9 to 12 months ago'], ['old', 'More than a year ago']]) },
       { id: 'df_harm', text: 'What harm has it caused?', deep: true, when: W('df_side', 'victim'), why: 'Damages depend on harm.', type: 'multi', options: o([['job', 'Job or business loss'], ['family', 'Family or marriage trouble'], ['social', 'Social humiliation'], ['none', 'Not sure yet']]) }
     ],
     evidence: [
@@ -5323,6 +5348,129 @@ body.consenting{overflow:hidden}
   Object.entries(fill).forEach(([id, arr]) => { const x = by(id); if (x) x.stand = (x.stand || []).concat(arr); });
 })(typeof window !== 'undefined' ? window : globalThis);
 </script>
+<script>/* Saboot time limits. Pure data + arithmetic; no DOM.
+   Every rule quotes the Schedule of the Limitation Act, 1963 as printed in the official text kept in law/limitation-act-1963.txt.
+   Rules are a guide for the person, never a calculation their case depends on: we always show a range or an "about" date,
+   prefer the EARLIER start when the law could be read two ways, and never tell anyone they are "within time". */
+(function (root) {
+  const LA = 'Limitation Act, 1963';
+  const ART = {
+    15: { n: '15', d: 'For the price of goods sold and delivered to be paid for after the expiry of a fixed period of credit.', p: 'Three years.', s: 'When the period of credit expires.' },
+    18: { n: '18', d: 'For the price of work done by the plaintiff for the defendant at his request, where no time has been fixed for payment.', p: 'Three years.', s: 'When the work is done.' },
+    19: { n: '19', d: 'For money payable for money lent.', p: 'Three years.', s: 'When the loan is made.' },
+    55: { n: '55', d: 'For compensation for the breach of any contract, express or implied not herein specially provided for.', p: 'Three years.', s: 'When the contract is broken or (where there are successive breaches) when the breach in respect of which the suit is instituted occurs or (where the breach is continuing) when it ceases.' },
+    59: { n: '59', d: 'To cancel or set aside an instrument or decree or for the rescission of a contract.', p: 'Three years.', s: 'When the facts entitling the plaintiff to have the instrument or decree cancelled or set aside or the contract rescinded first become known to him.' },
+    64: { n: '64', d: 'For possession of immovable property based on previous possession and not on title, when the plaintiff while in possession of the property has been dispossessed.', p: 'Twelve years.', s: 'The date of dispossession.' },
+    65: { n: '65', d: 'For possession of immovable property or any interest therein based on title.', p: 'Twelve years.', s: 'When the possession of the defendant becomes adverse to the plaintiff.' },
+    75: { n: '75', d: 'For compensation for libel.', p: 'One year.', s: 'When the libel is published.' },
+    76: { n: '76', d: 'For compensation for slander.', p: 'One year.', s: 'When the words are spoken, or, if the words are not actionable in themselves, when the special damage complained of results.' },
+    113: { n: '113', d: 'Any suit for which no period of limitation is provided elsewhere in this Schedule.', p: 'Three years.', s: 'When the right to sue accrues.' }
+  };
+  // Ways the clock can start again or count later. Plain words first, the section after.
+  const TIP = {
+    ack: { t: 'Did they admit the debt in writing and sign it? That can start the time again.', s: 'Section 18' },
+    part: { t: 'Did they pay any part back? That can start the time again.', s: 'Section 19' },
+    fraud: { t: 'Were you cheated and found out only later? The time may count from when you found out.', s: 'Section 17' },
+    continuing: { t: 'Is the breach still going on? The time may count from when it stops.', s: 'Article 55' },
+    adverse: { t: 'The 12 years usually count from when they openly claimed it as theirs — not from when they arrived.', s: 'Article 65' },
+    knowledge: { t: 'The 3 years count from when you found out — not from the date on the paper.', s: 'Article 59' },
+    criminal: { t: 'This is for a civil case for money. A police complaint has its own time limit.', s: '' }
+  };
+  const Y = (a, b) => [a * 12, b == null ? null : b * 12];
+  const STD5 = { m6: [0, 6], y1: [6, 12], y2: [12, 24], y3: [24, 36], older: [36, null] };
+  const RULES = [
+    { id: 'loan', guide: 'money-lent-not-returned', q: 'ml_when', months: 36, arts: [19], what: 'a case to get your money back',
+      start: 'the day the money was given', startShort: 'Money given', unknown: { several: 'If you gave money several times, the time usually runs separately from each payment. List every date.' },
+      b: { y1: [0, 12], y2: [12, 24], y3: [24, 36], older: [36, null] },
+      restart: { q: 'ml_since', in: ['paid', 'admitted'], t: 'They paid something back or admitted the debt — the time can start again from that date. Note exactly when.' },
+      tips: ['ack', 'part', 'fraud'], replaces: ['ml_u_old'] },
+    { id: 'biz', guide: 'business-unpaid', q: 'bu_since', months: 36, arts: [15, 18, 113], what: 'a case to recover what you are owed',
+      start: 'the day payment fell due', startShort: 'Payment due',
+      b: { recent: [0, 12], y2: [12, 24], y3: [24, 36], older: [36, null] },
+      restart: { q: 'bu_ack', in: ['yes'], t: 'The client admitted the dues or paid part — the time can start again from that date. Note exactly when.' },
+      tips: ['ack', 'part'], replaces: ['bu_u_limit'] },
+    { id: 'defame', guide: 'defamation', q: 'df_when', when: { q: 'df_side', in: ['victim'] }, months: 12, arts: [75, 76], what: 'a case claiming compensation',
+      start: 'the day it was first published or said', startShort: 'Published',
+      b: { recent: [0, 3], m9: [3, 9], year: [9, 12], old: [12, null] }, tips: ['criminal'] },
+    { id: 'land', guide: 'land-encroachment', q: 'le_since', months: 144, arts: [64, 65], what: 'a case to get the land back',
+      when: { all: [{ q: 'le_possession', in: ['them', 'partly'] }, { q: 'le_problem', in: ['building', 'occupied', 'boundary', 'access'] }] },
+      start: 'the day you were pushed out, or their possession became openly against you', startShort: 'Pushed out',
+      b: { weeks: [0, 1], year: [1, 12], years: [12, 120], long: [120, null] }, tips: ['adverse'], replaces: ['le_u_long'] },
+    { id: 'landdocs', guide: 'land-encroachment', q: 'le_since', months: 36, arts: [59], what: 'a case to cancel the fake or wrong papers',
+      when: { q: 'le_problem', in: ['fakedocs', 'records'] },
+      start: 'the day you first found out', startShort: 'Found out',
+      b: { weeks: [0, 1], year: [1, 12], years: [12, 120], long: [120, null] }, tips: ['knowledge', 'fraud'] },
+    { id: 'nriland', guide: 'nri-property', q: 'np_since', months: 144, arts: [64, 65], what: 'a case to get the property back',
+      when: { q: 'np_problem', in: ['relative', 'stranger', 'caretaker'] },
+      start: 'the day they took it over, or their possession became openly against you', startShort: 'Taken over',
+      b: { recent: [0, 12], years: [12, 120], long: [120, null] }, tips: ['adverse'], replaces: ['np_u_long'] },
+    { id: 'nridocs', guide: 'nri-property', q: 'np_since', months: 36, arts: [59], what: 'a case to cancel the fake or wrong papers',
+      when: { q: 'np_problem', in: ['sold', 'records'] },
+      start: 'the day you first found out', startShort: 'Found out',
+      b: { recent: [0, 12], years: [12, 120], long: [120, null] }, tips: ['knowledge', 'fraud'] },
+    { id: 'deposit', guide: 'rental-security-deposit', q: 'rd_moved', months: 36, arts: [113], what: 'a case to get the deposit back',
+      start: 'the day you moved out and handed back the keys', startShort: 'Moved out', b: STD5, tips: [] },
+    { id: 'contract', guide: 'contract-breach', q: 'cbx_when', months: 36, arts: [55], what: 'a case for compensation',
+      start: 'the day the deal was broken', startShort: 'Deal broken', b: STD5, tips: ['continuing'] },
+    { id: 'gig', guide: 'internship-creator-pay', q: 'ic_when', months: 36, arts: [18, 113], what: 'a case to recover the payment',
+      start: 'the day payment fell due, or the work was finished', startShort: 'Payment due', b: STD5, tips: ['ack', 'part'] }
+  ];
+  function evalWhen(c, a) {
+    if (!c) return true;
+    if (c.all) return c.all.every((x) => evalWhen(x, a));
+    if (c.any) return c.any.some((x) => evalWhen(x, a));
+    if (c.not) return !evalWhen(c.not, a);
+    const v = a[c.q]; if (v == null) return false; return [].concat(v).some((x) => c.in.includes(x));
+  }
+  const rulesFor = (gid) => RULES.filter((r) => r.guide === gid);
+  function rule(gid, answers) { return rulesFor(gid).find((r) => evalWhen(r.when, answers) && answers[r.q] != null) || null; }
+
+  // months → "about 2 years" style parts (returned as [n, unit] so the app can translate)
+  function span(m) {
+    if (m < 1) return [Math.max(1, Math.round(m * 30)), 'days'];
+    if (m < 11.5) return [Math.round(m), m < 1.5 ? 'month' : 'months'];
+    const y = Math.floor(m / 12 + 0.25), r = m / 12 - Math.floor(m / 12);
+    if (r >= 0.25 && r < 0.75) return [Math.floor(m / 12) + 0.5, 'years'];
+    return [y, y === 1 ? 'year' : 'years'];
+  }
+  const addMonths = (d, m) => { const x = new Date(d.getTime()); const day = x.getDate(); x.setMonth(x.getMonth() + m); if (x.getDate() !== day) x.setDate(0); return x; };
+  const monthsBetween = (a, b) => (b - a) / (1000 * 60 * 60 * 24 * 30.4375);
+
+  /* status: ok | soon | edge | past | unknown
+     exact: optional ISO date (yyyy-mm-dd) the person typed for the start event */
+  function card(gid, answers, exact, today) {
+    const r = rule(gid, answers); if (!r) return null;
+    today = today || new Date();
+    const P = r.months; const ans = [].concat(answers[r.q])[0];
+    const restarted = !!(r.restart && evalWhen({ q: r.restart.q, in: r.restart.in }, answers));
+    const out = { rule: r, arts: r.arts.map((n) => ART[n]), law: LA, months: P, restarted, tips: r.tips.map((k) => TIP[k]) };
+    const soonAt = Math.max(Math.min(P * 0.25, 12), 2);
+    if (exact && /^\d{4}-\d{2}-\d{2}$/.test(exact)) {
+      const [y, mo, d] = exact.split('-').map(Number); const st = new Date(y, mo - 1, d);
+      if (st <= today) {
+        const end = addMonths(st, P); const left = monthsBetween(today, end);
+        out.exact = { start: st, end, leftDays: Math.round((end - today) / 864e5) };
+        out.elapsed = [monthsBetween(st, today), monthsBetween(st, today)];
+        out.status = left < 0 ? 'past' : left <= Math.min(1, soonAt) ? 'edge' : left <= soonAt ? 'soon' : 'ok';
+        out.left = left > 0 ? [left, left] : null;
+        return out;
+      }
+    }
+    const b = r.b[ans];
+    if (!b) { out.status = 'unknown'; out.note = (r.unknown || {})[ans] || null; return out; }
+    const [mn, mx] = b; out.elapsed = [mn, mx == null ? Math.max(P * 1.25, mn + 12) : mx];
+    const remMax = P - mn, remMin = mx == null ? -Infinity : P - mx;
+    out.status = remMax <= 0 ? 'past' : remMin <= 0 ? 'edge' : remMin <= soonAt ? 'soon' : 'ok';
+    out.left = remMax > 0 ? [Math.max(remMin, 0), remMax] : null;
+    return out;
+  }
+  const replaced = (gid, answers) => { const r = rule(gid, answers); return r ? r.replaces || [] : []; };
+  // unit phrases the app translates (listed so the translation allowlist sees them): '{n} days' '{n} month' '{n} months' '{n} year' '{n} years'
+  const api = { RULES, ART, TIP, LA, rule, rulesFor, card, span, replaced, addMonths };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  root.ER_LIM = api;
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
 <script>/* Advocate reviews, per guide. When an advocate checks a guide, add an entry here and redeploy:
      'cheque-bounce': { by: 'Adv. Full Name', enrol: 'OD/1234/2015', date: '2026-11-15', note: 'Optional short note' },
    The guide then shows "Reviewed by …" instead of "Draft". Only add a review the advocate has actually done. */
@@ -5801,6 +5949,7 @@ body.consenting{overflow:hidden}
   /* ---------- icons ---------- */
   const P = {
     bell: '<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15Z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
+    hourglass: '<path d="M6 3h12M6 21h12M7 3c0 5 10 5 10 9s-10 4-10 9M17 3c0 5-10 5-10 9"/>',
     speaker: '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/>',
     pin: '<path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.3"/>',
     scale: '<path d="M12 4v16M7 20h10M5 7h14"/><path d="m5 7-2.5 6a3 3 0 0 0 5 0Zm14 0-2.5 6a3 3 0 0 0 5 0Z"/>',
@@ -5852,7 +6001,7 @@ body.consenting{overflow:hidden}
 
   /* ---------- state ---------- */
   const blank = () => ({ issueId: null, topic: null, answers: {}, skipped: {}, stage: 'quick', history: [], quickDone: false, deepDone: false,
-    status: {}, records: {}, chrono: [], ackUrgent: {}, adv: null, excludeSensitive: true, notes: '', prefill: {}, chapterFound: [], breaks: 0 });
+    status: {}, records: {}, chrono: [], ackUrgent: {}, adv: null, excludeSensitive: true, notes: '', prefill: {}, chapterFound: [], breaks: 0, limDate: {} });
   let S = blank();
   const UI = { club: 'money', qcat: 'all', qsearch: '', mf: { i: 0, score: 0, ans: null, order: null } };
   let saveOn = false;
@@ -6407,7 +6556,7 @@ ${JSON.stringify(map)}`;
     const pr = E.progress(iss, S.answers, S.stage, S.skipped);
     const pct = Math.round((pr.done / Math.max(pr.total, 1)) * 100);
     const cur = S.answers[q.id] != null ? [].concat(S.answers[q.id])[0] : [].concat((S.prefill || {})[q.id] || [])[0];
-    const urg = E.urgent(iss, S.answers).filter((u) => u.level !== 'info');
+    const repl = LIM ? LIM.replaced(iss.id, S.answers) : []; const urg = E.urgent(iss, S.answers).filter((u) => u.level !== 'info' && !repl.includes(u.id));
     const first = S.stage === 'quick' && pr.done === 0;
     return shell(`<div class="wrap narrow qwrap">
       <div class="qtop"><button class="btn text" data-act="${S.history.length ? 'qback' : 'quit'}">${ic('back', 20)} ${esc(T('back'))}</button><span class="ptitle">${esc(S.topic ? S.topic.title : G(iss, 's', iss.short))}</span></div>
@@ -6476,7 +6625,7 @@ ${JSON.stringify(map)}`;
     const papers = items.filter((e) => !e.action).sort(order);
     const steps = items.filter((e) => e.action).sort(order);
     const have = papers.filter((e) => S.status[e.id] === 'have').length;
-    const urg = E.urgent(iss, S.answers); const infos = E.info(iss, S.answers);
+    const repl = LIM ? LIM.replaced(iss.id, S.answers) : []; const urg = E.urgent(iss, S.answers).filter((u) => !repl.includes(u.id)); const infos = E.info(iss, S.answers);
     const quickLeft = E.nextQuestion(iss, S.answers, 'quick', S.skipped);
     if (quickLeft) return viewQuiz();
     const deepLeft = E.nextQuestion(iss, S.answers, 'deep', S.skipped);
@@ -6489,6 +6638,7 @@ ${JSON.stringify(map)}`;
         <p class="fh">${esc(T('tickhave'))} <b>${have}/${papers.length}</b></p></div>
       ${trNote()}
       ${urg.map((u) => urgentBanner(u, iss)).join('')}
+      ${timeCard(iss)}
       ${steps.length ? `<h2 class="lh">${esc(T('dofirst'))}</h2><div class="checks">${steps.map((e) => checkRow(e, iss, must.has(e.id))).join('')}</div>` : ''}
       <h2 class="lh">${esc(T('papers'))} <span class="muted small">(${papers.length})</span></h2>
       <div class="checks" id="evlist">${papers.map((e) => checkRow(e, iss, must.has(e.id))).join('')}</div>
@@ -6595,6 +6745,7 @@ ${JSON.stringify(map)}`;
       ${S.notes ? `<p><b>In my own words:</b> ${esc(S.notes)}</p>` : ''}
       <h2>B. Chronology</h2>
       ${d.chrono.length ? `<table><thead><tr><th style="width:30%">Date</th><th>Event</th></tr></thead><tbody>${d.chrono.map((t) => `<tr><td>${t.date ? esc(fmtDate(t.date)) + (t.approx ? ' (approx.)' : '') : 'Unknown'}</td><td>${esc(t.text)}</td></tr>`).join('')}</tbody></table>` : '<p class="muted">No timeline entries yet.</p>'}
+      ${limReportHTML(iss)}
       <h2>C. Records I have</h2>${li(d.have, (e) => `<b>${esc(e.name)}</b>${(S.records[e.id] || []).length ? ': ' + S.records[e.id].map((r) => esc(r.label)).join('; ') : ' <span class="muted">(not named yet)</span>'}`)}
       <h2>D. Records still to find or check</h2>${li(d.missing, (e) => `${esc(e.name)} <span class="muted">(${esc(e.where || '')})</span>${e.time ? ' <b>Time-sensitive.</b>' : ''}`)}
       ${d.todo.length ? `<p><b>Steps not yet done:</b></p>${li(d.todo, (e) => esc(e.name))}` : ''}
@@ -6772,6 +6923,60 @@ ${JSON.stringify(map)}`;
 
   /* ============ NEXT STEPS: where to go, free lawyer, reminders, read aloud, follow-up ============ */
   // Where to go with the papers — official offices only, never an advocate (Bar Council rules).
+  /* ---------- time limit card (src/limits.js; law/limitation-act-1963.txt) ---------- */
+  const LIM = window.ER_LIM;
+  function spanText(m) { const [n, u] = LIM.span(m); return X('{n} ' + u).replace('{n}', String(n).replace('.5', '½')); }
+  function rangeText(a, b) {
+    if (b - a < 1 || spanText(a) === spanText(b)) return spanText(b);
+    if (a < 0.5) return X('up to {b}').replace('{b}', spanText(b));
+    const [na, ua] = LIM.span(a), [nb, ub] = LIM.span(b); const h = (n) => String(n).replace('.5', '½');
+    if (/^year/.test(ua) && /^year/.test(ub)) return X('{a} to {b} years').replace('{a}', h(na)).replace('{b}', h(nb));
+    if (/^month/.test(ua) && /^month/.test(ub)) return X('{a} to {b} months').replace('{a}', h(na)).replace('{b}', h(nb));
+    return X('{a} to {b}').replace('{a}', spanText(a)).replace('{b}', spanText(b));
+  }
+  const limFmt = (d) => d.toLocaleDateString(LBCP[LANG] || 'en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+  function limData(iss) { return LIM ? LIM.card(iss.id, S.answers, (S.limDate || {})[iss.id]) : null; }
+  function timeCard(iss) {
+    const c = limData(iss); if (!c) return '';
+    const r = c.rule; const per = spanText(c.months);
+    const HEAD = { ok: 'You have time', soon: 'Time is getting short', edge: 'You may be very close to the time limit', past: 'This may be past the usual time limit', unknown: 'Find the exact date' };
+    let line = ''; let head = HEAD[c.status];
+    if (c.restarted && (c.status === 'past' || c.status === 'edge')) { head = 'The time may have started again'; }
+    if (c.exact) {
+      line = c.status === 'past' ? X('The time ended around {d}.').replace('{d}', limFmt(c.exact.end))
+        : X('The time ends around {d} — {n} days from today.').replace('{d}', limFmt(c.exact.end)).replace('{n}', c.exact.leftDays);
+    } else if (c.status === 'ok') line = X('About {r} left.').replace('{r}', rangeText(c.left[0], c.left[1]));
+    else if (c.status === 'soon') line = X('About {r} left. See an advocate in the next few weeks.').replace('{r}', rangeText(c.left[0], c.left[1]));
+    else if (c.status === 'edge') line = X('You may have up to {r} left — or none. Find the exact date today.').replace('{r}', spanText(c.left[1]));
+    else if (c.status === 'past' && c.restarted) line = X('More than {p} have passed — but their payment or admission may have started the time again.').replace('{p}', per);
+    else if (c.status === 'past') line = X('Do not give up yet. Ask an advocate about these:');
+    else line = c.note ? X(c.note) : X('Look for anything that shows the date: a bank record, a message, a receipt.');
+    if (c.exact && c.status !== 'past' && c.status !== 'ok') line += ' ' + X('See an advocate well before then.');
+    const rule = X('The law gives {p} from {s} to file {w}.').replace('{p}', per).replace('{s}', X(r.start)).replace('{w}', X(r.what));
+    // timeline: band = elapsed range as a share of the period
+    const P = c.months, pc = (m) => Math.max(0, Math.min(100, (m / P) * 100));
+    const band = c.elapsed ? (c.exact ? `<i class="now" style="left:${pc(c.elapsed[0])}%"></i>` : (() => { const l = Math.min(pc(c.elapsed[0]), 96); return `<i class="lband" style="left:${l}%;width:${Math.max(4, pc(c.elapsed[1]) - l)}%"></i>`; })()) : '';
+    const bar = c.status === 'unknown' ? '' : `<div class="ltl" aria-hidden="true"><div class="track">${band}<b class="end"></b></div><div class="lbls"><span>${esc(X(r.startShort))}</span><span>${esc(X('{p} limit').replace('{p}', per))}</span></div><p class="here">${esc(c.exact ? X('Today') : c.status === 'past' ? X('You are past the end of this line') : X('You are somewhere in the shaded part'))}</p></div>`;
+    const tips = (c.status === 'past' || c.status === 'edge' || c.restarted) ? c.tips.filter((t) => !(c.restarted && /Section 1[89]/.test(t.s))) : c.tips.filter((t) => !t.s);
+    const max = (() => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); })();
+    const law = c.arts.map((a) => `<p class="small"><b>${esc(c.law)}, Schedule, Article ${a.n}</b><br><span lang="en">“${esc(a.d)}” — ${esc(a.p)} ${esc(X('Starts:'))} “${esc(a.s)}”</span></p>`).join('');
+    return `<section class="lim ${c.status}" aria-labelledby="limh">
+      <div class="limtop">${ic('hourglass', 22)}<div><p class="kick">${esc(X('Time limit'))}</p><h2 id="limh">${esc(X(head))}</h2></div></div>
+      <p class="lline">${esc(line)}</p>
+      ${bar}
+      <p class="lrule">${esc(rule)}</p>
+      ${c.restarted ? `<p class="lgood">${ic('check', 16)} ${esc(X(r.restart.t))}</p>` : ''}
+      ${tips.length ? `<ul class="ltips">${tips.map((t) => `<li>${esc(X(t.t))}${t.s ? ` <span class="muted">(${esc(t.s)})</span>` : ''}</li>`).join('')}</ul>` : ''}
+      <div class="lexact noprint"><label>${esc(X(c.exact ? 'Exact date' : 'Know the exact date?'))} <input type="date" id="limdate" max="${max}" value="${esc((S.limDate || {})[iss.id] || '')}" aria-describedby="limh"></label>
+        ${c.status !== 'past' ? `<button class="btn text sm" data-act="limremind">${ic('bell', 16)} ${esc(X('Remind me'))}</button>` : ''}</div>
+      <details class="noprint"><summary>${esc(X('The law behind this'))}</summary>${law}<p class="small muted">${esc(X('Courts count the exact days, and some cases allow more time. Where the law can be read two ways, we show the earlier date so you do not wait too long. Your advocate will confirm.'))}</p></details>
+    </section>`;
+  }
+  function limReportHTML(iss) {
+    const c = limData(iss); if (!c) return '';
+    const q = iss.questions.find((x) => x.id === c.rule.q);
+    return `<h2>Time limit (guide only)</h2><p>${esc(c.law)}, Schedule, Article ${c.arts.map((a) => a.n).join(' / ')}: ${esc(spanText(c.months))} from ${esc(c.rule.start)}. Client's answer: <b>${esc(q ? answerText(q, S.answers[q.id]) : '')}</b>${c.exact ? `; exact date given: <b>${esc(limFmt(c.exact.start))}</b> (period ends around ${esc(limFmt(c.exact.end))})` : ''}.${c.restarted ? ' Client reports a part-payment or acknowledgement (ss. 18–19 may apply).' : ''} Please verify.</p>`;
+  }
   function whereBox(iss) {
     const w = iss.where || []; if (!w.length) return '';
     const row = (x) => `<li>${x.u ? `<a href="${esc(x.u)}" target="_blank" rel="noopener">${esc(X(x.t))}</a>` : esc(X(x.t))}</li>`;
@@ -6818,11 +7023,11 @@ ${JSON.stringify(map)}`;
 
   const LBCP = { en: 'en-IN', hi: 'hi-IN', bn: 'bn-IN', te: 'te-IN', mr: 'mr-IN', ta: 'ta-IN', ur: 'ur-IN', gu: 'gu-IN', kn: 'kn-IN', or: 'or-IN', ml: 'ml-IN', pa: 'pa-IN', as: 'as-IN', ne: 'ne-NP', mai: 'hi-IN', doi: 'hi-IN', kok: 'mr-IN', sa: 'hi-IN', brx: 'hi-IN', ks: 'ur-IN', sd: 'ur-IN', sat: 'hi-IN', mni: 'bn-IN' };
   // Deadline reminder: add to the phone's calendar (.ics) or send to their own WhatsApp.
-  function showRemind(u, iss) {
+  function showRemind(u, iss, pre) {
     const title = G(iss, u.id + '.t', u.title), text = G(iss, u.id + '.x', u.text);
     const pad = (n) => String(n).padStart(2, '0');
     const at = (days) => { const d = new Date(); d.setDate(d.getDate() + days); d.setHours(10, 0, 0, 0); return d; };
-    let when = at(1);
+    let when = pre instanceof Date && !isNaN(pre) ? new Date(pre.getFullYear(), pre.getMonth(), pre.getDate(), 10, 0, 0) : at(1);
     const ov = document.createElement('div'); ov.className = 'overlay'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-labelledby', 'remh');
     const today = new Date(); const min = today.getFullYear() + '-' + pad(today.getMonth() + 1) + '-' + pad(today.getDate());
     const fmt = (d) => d.toLocaleDateString(LBCP[LANG] || 'en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
@@ -7018,6 +7223,7 @@ ${JSON.stringify(map)}`;
   function afterRender(view) {
     const m = document.getElementById('matter'); if (m) m.addEventListener('input', () => { renderResults(m.value); trackSearch(m.value); });
     const qs = document.getElementById('qsearch'); if (qs) qs.addEventListener('input', () => { UI.qsearch = qs.value; const pos = qs.selectionStart; render(); const n = document.getElementById('qsearch'); n.focus(); n.setSelectionRange(pos, pos); });
+    const ld = document.getElementById('limdate'); if (ld) ld.addEventListener('change', () => { const iss = issue(); S.limDate = S.limDate || {}; if (ld.value) S.limDate[iss.id] = ld.value; else delete S.limDate[iss.id]; persist(); const y = scrollY; render(); scrollTo(0, y); const n = document.getElementById('limh'); if (n) announce(n.textContent); });
     const form = document.getElementById('qform');
     if (form) {
       const qq = issue().questions.find((x) => x.id === form.dataset.q);
@@ -7106,6 +7312,8 @@ ${JSON.stringify(map)}`;
       case 'exit': S = blank(); saveOn = false; clearSaved(); app.innerHTML = ''; history.replaceState(null, '', '#home'); render(); break;
       case 'excl': S.excludeSensitive = t.checked; persist(); render(); break;
       case 'mic': TRACK.once('voice', { l: LANG }); VOICE.toggle(); break;
+      case 'limremind': { const iss = issue(); const c = limData(iss); if (!c) break; let pre = null; if (c.exact) { pre = new Date(c.exact.end.getTime()); pre.setDate(pre.getDate() - 30); if (pre <= new Date()) pre = null; }
+        showRemind({ id: 'lim', title: X('See an advocate about the time limit'), text: c.exact ? X('The time ends around {d}.').replace('{d}', limFmt(c.exact.end)) : X('Find the exact date and take your list to an advocate.') }, iss, pre); break; }
       case 'remind': { const iss = issue(); const u = iss && (iss.urgent || []).find((x) => x.id === t.dataset.u); if (u) showRemind(u, iss); break; }
       case 'aidcheck': showAid(); break;
       case 'readaloud': READ.toggle(t); break;
