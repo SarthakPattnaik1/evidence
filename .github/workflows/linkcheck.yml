@@ -1,0 +1,26 @@
+name: Check source links
+on:
+  push:
+    branches: [law-sources]
+    paths: ['sources/urls.txt', '.github/workflows/linkcheck.yml']
+permissions:
+  contents: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check every link (status, final URL, page title)
+        run: |
+          out=sources/linkcheck.tsv; printf "url\tstatus\tfinal\ttitle\n" > $out
+          while read -r u; do
+            [ -z "$u" ] && continue
+            r=$(curl -sSL -A 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124 Safari/537.36' --max-time 25 --retry 1 -o /tmp/b -w '%{http_code}\t%{url_effective}' "$u" 2>/dev/null || echo "000\t-")
+            t=$(tr -d '\r\n' < /tmp/b 2>/dev/null | grep -oiE '<title[^>]*>[^<]{0,120}' | head -1 | sed 's/<title[^>]*>//I' | tr '\t' ' ')
+            printf "%s\t%s\t%s\n" "$u" "$r" "$t" >> $out
+          done < sources/urls.txt
+          cat $out
+      - name: Commit
+        run: |
+          git config user.name saboot-law-bot; git config user.email actions@users.noreply.github.com
+          git add sources; git commit -m "Link check" || true; git push
