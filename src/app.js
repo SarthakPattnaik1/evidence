@@ -344,7 +344,7 @@ ${JSON.stringify(map)}`;
       <div class="fmark"><img class="fm" src="${window.ER_BRAND.icon}" alt="" width="53" height="44"><div><img class="fw" src="${window.ER_BRAND.word}" alt="Saboot" width="97" height="32"><b>Saboot</b><span>${esc(X('Know what to bring. Meet your lawyer prepared.'))}</span></div></div>
       <p style="max-width:62em">${f('f_disc')}</p>
       <p class="small muted madeby">${esc(X('Made by'))} <a class="plink" href="https://www.linkedin.com/in/sarthakad" target="_blank" rel="noopener">Sarthak Pattnaik</a> ${esc(X('and'))} <a class="plink" href="https://www.linkedin.com/in/subhankar-das-311030b1/" target="_blank" rel="noopener">Subhankar Das</a>.</p>
-      <div class="row"><button data-go="about">${f('f_about')}</button><button data-act="disclaimer">${esc(X('Disclaimer'))}</button><button data-go="advocates">${f('f_adv')}</button><button data-go="myths">${f('f_myth')}</button><button data-go="help">${f('f_help')}</button><button data-act="reportissue">${esc(X('Report a problem'))}</button>${S.issueId ? `<button data-act="clear">${f('f_clear')}</button>` : ''}${/^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname) ? `<a class="flink" href="/guide">${esc(X('All guides'))}</a><a class="flink" href="/privacy">${esc(X('Privacy'))}</a><a class="flink" href="/terms">${esc(X('Terms'))}</a>` : ''}</div>
+      <div class="row"><button data-go="about">${f('f_about')}</button><button data-act="disclaimer">${esc(X('Disclaimer'))}</button><button data-go="advocates">${f('f_adv')}</button><button data-go="myths">${f('f_myth')}</button><button data-go="help">${f('f_help')}</button><button data-act="reportissue">${esc(X('Report a problem'))}</button>${S.issueId ? `<button data-act="clear">${f('f_clear')}</button>` : ''}${/^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname) ? `<a class="flink" href="/guide">${esc(X('All guides'))}</a><a class="flink" href="/s">${esc(X('Everyday situations'))}</a><a class="flink" href="/privacy">${esc(X('Privacy'))}</a><a class="flink" href="/terms">${esc(X('Terms'))}</a>` : ''}</div>
     </div></footer>`;
   }
 
@@ -356,7 +356,7 @@ ${JSON.stringify(map)}`;
     const need = (fn) => (S.issueId ? fn() : viewHome());
     const map = {
       cat: () => viewCat(arg),
-      start: () => viewIntro(arg), topic: () => { const d = KB.directory[Number(arg)]; return viewIntro((d && d.route) || 'general', d); },
+      start: () => viewIntro(arg), topic: () => { const d = KB.directory[Number(arg)]; return viewIntro((d && d.route) || 'general', d); }, sit: () => { const d = KB.directory.find((x) => x.slug === arg); return d ? viewIntro(d.route, d) : viewHome(); },
       quiz: () => need(() => { syncQuiz(arg); return viewQuiz(); }), brk: () => need(viewList), urgent: () => need(viewUrgent), list: () => need(viewList),
       answers: () => need(viewAnswers), timeline: () => need(viewTimeline), report: () => need(viewReport),
       questions: () => viewQuestions(), q: () => viewQuestions(arg), myths: () => viewMyths(), advocates: () => viewAdvocates(), help: () => viewHelp(), about: () => viewAbout()

@@ -3,10 +3,11 @@ global.window = global;
 ['kb', 'cites', 'j-money', 'j-family', 'j-consumer', 'j-other', 'j-nri', 'j-business', 'j-more', 'j-genz', 'j-gaps', 'j-rights', 'stand', 'law-2026', 'situations', 'reviews', 'qa'].forEach((f) => require('../src/' + f + '.js'));
 const K = global.ER_KB; const fails = [];
 const BY = Object.fromEntries(K.issues.map((i) => [i.id, i]));
-const seen = new Set(); const perGuide = {};
+const seen = new Set(); const perGuide = {}; const slugs = new Set();
 for (const s of K.situations) {
   const iss = BY[s.g]; if (!iss) { fails.push('no guide: ' + s.g + ' — ' + s.t); continue; }
   perGuide[s.g] = (perGuide[s.g] || 0) + 1;
+  if (!s.slug || slugs.has(s.slug)) fails.push('slug missing or repeated: ' + s.t); slugs.add(s.slug);
   const k = s.t.toLowerCase(); if (seen.has(k)) fails.push('duplicate: ' + s.t); seen.add(k);
   if (BY[s.g] && s.t.toLowerCase() === iss.short.toLowerCase()) fails.push('same as guide name: ' + s.t);
   for (const [q, v] of Object.entries(s.pre || {})) {

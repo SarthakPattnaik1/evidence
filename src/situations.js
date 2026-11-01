@@ -808,9 +808,11 @@
 
   /* Install as directory entries routed to their guide. */
   const BY = Object.fromEntries(KB.issues.map((i) => [i.id, i]));
+  // Stable web address for each situation: /s/<slug> (static page) and #sit-<slug> (app).
+  const slug = (t) => { let x = t.toLowerCase().replace(/[’']/g, '').replace(/₹/g, 'rs ').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); if (x.length > 72) x = x.slice(0, 72).replace(/-[^-]*$/, ''); return x; };
   out.forEach((x) => {
-    const iss = BY[x.g]; if (!iss) return;
-    KB.directory.push({ cat: iss.cat, title: x.t, synonyms: x.s, route: x.g, urgentNote: x.note, pre: x.pre, sit: true });
+    const iss = BY[x.g]; if (!iss) return; x.slug = slug(x.t);
+    KB.directory.push({ cat: iss.cat, title: x.t, synonyms: x.s, route: x.g, urgentNote: x.note, pre: x.pre, sit: true, slug: x.slug });
   });
   KB.situations = out;
 })(typeof window !== 'undefined' ? window : globalThis);

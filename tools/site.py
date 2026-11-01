@@ -118,6 +118,14 @@ def run():
     gdir = OUT / 'guide'; gdir.mkdir(exist_ok=True)
     urls = [('/', '1.0')]
     index_rows = []
+    sits = data.get('situations', [])
+    by_g = {}
+    for x in sits:
+        by_g.setdefault(x['g'], []).append(x)
+    def sit_links(gid):
+        xs = by_g.get(gid, [])
+        return ('<h2>Common situations</h2><ul>' + ''.join(f'<li><a href="/s/{e(x["slug"])}">{e(x["t"])}</a></li>' for x in xs) + '</ul>') if xs else ''
+    guides = {i['id']: i for i in data['issues']}
     for i in data['issues']:
         if i['id'] == 'general':
             continue
@@ -130,7 +138,7 @@ def run():
 <h2>Papers that usually help</h2><ul>{ev}</ul>
 <h2>Questions Saboot will ask you</h2><ul>{qs}</ul>
 <h2>Sources</h2><ul>{srcs}</ul>
-<a class="cta" href="/#start-{e(i['id'])}">Start — it's free, no sign-up</a>
+{sit_links(i['id'])}<a class="cta" href="/#start-{e(i['id'])}">Start — it's free, no sign-up</a>
 <p class="muted">Also searched as: {e(', '.join(i.get('synonyms', [])[:12]))}</p>"""
         desc = (i['short'] + ' — ' + i['intro'])[:155]
         (gdir / f"{i['id']}.html").write_text(page(f"{i['title']} — papers to take to your advocate | Saboot", desc, body, f"/guide/{i['id']}", icon))
@@ -138,6 +146,52 @@ def run():
         index_rows.append(f'<li><a href="/guide/{e(i["id"])}">{e(i["title"])}</a> <span class="muted">— {e(i["short"])}</span></li>')
     (gdir / 'index.html').write_text(page('All guides | Saboot', 'Every legal situation Saboot helps you prepare for, in plain language.', '<h1>All guides</h1><ul>' + ''.join(index_rows) + '</ul>', '/guide', icon))
     urls.append(('/guide', '0.9'))
+
+    # One page per everyday situation (/s/<slug>). The papers, points and warnings are computed by the app's own
+    # engine from the answers the situation pre-fills, so each page is specific. Pages whose content would be
+    # identical to an earlier situation of the same guide (and have no safety note) are kept for visitors but
+    # marked noindex, so search engines never see near-duplicates.
+    sdir = OUT / 's'; sdir.mkdir(exist_ok=True)
+    seen_sig = set(); n_index = 0; area_rows = {}
+    KIND = {'good': 'In your favour', 'risk': 'Be careful', 'next': 'Next step'}
+    for x in sits:
+        g = guides[x['g']]
+        sig = (x['g'], tuple(v['id'] for v in x['ev']), tuple(v['id'] for v in x.get('maybe', [])), tuple(v['t'] for v in x['stand']), tuple(v['t'] for v in x['urg']))
+        dup = sig in seen_sig and not x['note']
+        seen_sig.add(sig)
+        note = f'<div class="sos"><b>Before anything else</b>{e(x["note"])}</div>' if x['note'] else ''
+        urg = ''.join(f'<div class="sos"><b>{e(u["t"])}</b>{e(u["x"])}</div>' for u in x['urg'])
+        told = ''.join(f'<li>{e(t["q"])} <b>{e(t["a"])}</b></li>' for t in x['told'] if t.get('a'))
+        stand = ''.join(f'<li><span class="tag">{e(KIND.get(v["k"], "Note"))}</span> {e(v["t"])}</li>' for v in x['stand'])
+        acts = [v for v in x['ev'] if v['action']]; docs = [v for v in x['ev'] if not v['action']]
+        li = lambda v: f'<li><b>{e(v["name"])}</b><br><span class="muted">{e(v["why"])}{(" Where: " + e(v["where"])) if v["where"] else ""}</span></li>'
+        rel = [y for y in by_g.get(x['g'], []) if y['slug'] != x['slug']][:8]
+        srcs = ''.join((f'<li><a href="{e(v["u"])}" rel="noopener">{e(v["t"])}</a></li>' if v.get('u') else f'<li>{e(v["t"])}</li>') for v in (g.get('sources') or []))
+        cta = f'<a class="cta" href="/#sit-{e(x["slug"])}">Make my own list — free, 2 minutes</a>'
+        body = f'''<p class="muted"><a href="/guide/{e(x["g"])}">{e(cats.get(x["cat"], ""))} › {e(g["short"])}</a></p><h1>{e(x["t"])}</h1>
+<p>What usually matters in this situation, and the papers to keep ready before you meet an advocate or free legal aid (call 15100).</p>{note}{urg}{cta}
+{('<h2>Your situation</h2><ul>' + told + '</ul>') if told else ''}
+{('<h2>Where you stand</h2><ul>' + stand + '</ul>') if stand else ''}
+{('<h2>Do these now</h2><ul>' + ''.join(li(v) for v in acts) + '</ul>') if acts else ''}
+<h2>Papers to gather</h2><ul>{''.join(li(v) for v in docs)}</ul>
+{('<h2>You may also need, depending on your answers</h2><ul>' + ''.join(f'<li>{e(v["name"])} <span class="muted">— {e(v["why"])}</span></li>' for v in x["maybe"][:10]) + '</ul>') if x.get('maybe') else ''}
+<h2>What the law says</h2><div class="box"><p>{e(g["juris"])}</p><p class="muted">Draft — not yet reviewed by a named advocate. General information, not legal advice.</p></div>
+{('<h2>Saboot will also ask</h2><ul>' + ''.join(f"<li>{e(q)}</li>" for q in x["ask"]) + '</ul>') if x['ask'] else ''}
+{cta}
+{('<h2>Similar situations</h2><ul>' + ''.join(f'<li><a href="/s/{e(y["slug"])}">{e(y["t"])}</a></li>' for y in rel) + '</ul>') if rel else ''}
+<h2>Sources</h2><ul>{srcs}</ul><p class="muted"><a href="/guide/{e(x["g"])}">The full guide: {e(g["title"])}</a> · <a href="/s">All situations</a></p>'''
+        desc = (x['t'] + ' — ' + (x['note'] or g['intro']))[:155]
+        html = page(f'{x["t"]} — what to do and which papers to keep | Saboot', desc, body, f'/s/{x["slug"]}', icon)
+        if dup:
+            html = html.replace('<link rel="canonical"', '<meta name="robots" content="noindex,follow"><link rel="canonical"', 1)
+        else:
+            urls.append((f'/s/{x["slug"]}', '0.6')); n_index += 1
+        (sdir / f'{x["slug"]}.html').write_text(html, encoding='utf-8')
+        area_rows.setdefault(x['cat'], []).append(f'<li><a href="/s/{e(x["slug"])}">{e(x["t"])}</a></li>')
+    sidx = ''.join(f'<h2>{e(cats.get(c, c))}</h2><ul>' + ''.join(rows) + '</ul>' for c, rows in area_rows.items())
+    (sdir / 'index.html').write_text(page('Everyday legal situations — what to do and which papers to keep | Saboot', f'{len(sits)} everyday legal problems in plain words, each with the papers to gather and where to go.', f'<h1>Everyday situations</h1><p>{len(sits)} problems in plain words. Pick yours to see what to do and which papers to keep.</p>{sidx}', '/s', icon), encoding='utf-8')
+    urls.append(('/s', '0.9'))
+    print('situation pages', len(sits), 'indexed', n_index)
 
     upd = 'Last updated 31 October 2026'
     privacy = legal('Privacy', 'Your answers stay with you', upd + '. Saboot is built to help you without collecting your personal story.', [
