@@ -1064,3 +1064,16 @@ html.hc .opt:has(input:checked){background:#FFF6C2;box-shadow:inset 0 0 0 3px #0
    down the middle). Direction arrows point the way the page reads. */
 @media (min-width:820px){ html[dir=rtl] .hart img{transform:scaleX(-1)} }
 html[dir=rtl] .i-dir{transform:scaleX(-1)}
+
+/* v36: 600+ everyday situations — collapsed list under each area */
+.sitmore{grid-column:1/-1;margin-top:6px;border:1.5px solid var(--line);border-radius:14px;background:var(--sheet)}
+.sitmore summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:14px 16px;font-weight:700}
+.sitmore summary::-webkit-details-marker{display:none}
+.sitmore summary svg{margin-inline-start:auto;transition:transform .2s}
+.sitmore[open] summary svg{transform:rotate(180deg)}
+.sitmore .cnt{font-size:13px;font-weight:700;color:var(--muted);background:var(--paper);border-radius:999px;padding:1px 9px}
+.sitlist{list-style:none;margin:0;padding:0 8px 10px}
+.sitlist li+li{border-top:1px solid var(--line)}
+.sitlist button{display:block;width:100%;text-align:start;background:none;border:0;padding:12px 8px;font-size:15.5px;color:var(--ink);cursor:pointer;border-radius:8px;min-height:44px}
+.sitlist button:hover{background:var(--paper)}
+.sitg{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:14px 16px 2px}

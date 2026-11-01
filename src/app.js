@@ -356,7 +356,7 @@ ${JSON.stringify(map)}`;
     const need = (fn) => (S.issueId ? fn() : viewHome());
     const map = {
       cat: () => viewCat(arg),
-      start: () => viewIntro(arg), topic: () => viewIntro('general', KB.directory[Number(arg)]),
+      start: () => viewIntro(arg), topic: () => { const d = KB.directory[Number(arg)]; return viewIntro((d && d.route) || 'general', d); },
       quiz: () => need(() => { syncQuiz(arg); return viewQuiz(); }), brk: () => need(viewList), urgent: () => need(viewUrgent), list: () => need(viewList),
       answers: () => need(viewAnswers), timeline: () => need(viewTimeline), report: () => need(viewReport),
       questions: () => viewQuestions(), q: () => viewQuestions(arg), myths: () => viewMyths(), advocates: () => viewAdvocates(), help: () => viewHelp(), about: () => viewAbout()
@@ -379,9 +379,12 @@ ${JSON.stringify(map)}`;
   const catTitle = (c) => T('c_' + c.id) || c.title;
   function problemRows(cid) {
     const deep = BUILT.filter((i) => i.cat === cid).concat(BUILT.filter((i) => i.cat !== cid && (i.also || []).includes(cid)));
-    const gen = KB.directory.map((d, idx) => ({ ...d, idx })).filter((d) => d.cat === cid);
+    const gen = KB.directory.map((d, idx) => ({ ...d, idx })).filter((d) => d.cat === cid && !d.sit);
+    const ids = new Set(deep.map((i) => i.id));
+    const sits = KB.directory.map((d, idx) => ({ ...d, idx })).filter((d) => d.sit && ids.has(d.route));
     return deep.map((i) => `<button class="prob" data-play="${i.id}"><b>${esc(C(cid, i.id + '.s', i.short))}</b><span>${esc(C(cid, i.id + '.t', i.title))}</span>${ic('chev', 22)}</button>`).join('')
-      + gen.map((d) => `<button class="prob" data-play="general" data-topic="${d.idx}"><b>${esc(C(cid, 'd' + d.idx, d.title))}</b><span>${esc(T('basic'))}</span>${ic('chev', 22)}</button>`).join('');
+      + gen.map((d) => `<button class="prob" data-play="general" data-topic="${d.idx}"><b>${esc(C(cid, 'd' + d.idx, d.title))}</b><span>${esc(T('basic'))}</span>${ic('chev', 22)}</button>`).join('')
+      + (sits.length ? `<details class="sitmore"><summary>${esc(X('More situations'))} <span class="cnt">${sits.length}</span>${ic('down', 18)}</summary>${deep.filter((i) => sits.some((d) => d.route === i.id)).map((i) => `<h3 class="sitg">${esc(C(cid, i.id + '.s', i.short))}</h3><ul class="sitlist">${sits.filter((d) => d.route === i.id).map((d) => `<li><button data-play="${d.route}" data-topic="${d.idx}">${esc(X(d.title))}</button></li>`).join('')}</ul>`).join('')}</details>` : '');
   }
   const H = (k, en) => { if (LANG === 'en') return en; const m = RT.tr[LANG + '|home']; return (m && m[k]) || X(en); };
   const HERO = { nav_help: 'Help', hero_h: 'Walk into your lawyer’s office ready.', hero_s1: 'Answer a few simple questions.', hero_s2: 'Know exactly which papers to carry — free, in your language.', hero_go: 'Get Started', hero_f: 'Free • Simple • Multilingual', tagline: 'Know what to bring. Meet your lawyer prepared.', f1: 'Ask', f1s: 'In your language', f2: 'Prepare', f2s: 'Step by step', f3: 'Organize', f3s: 'Your evidence', f4: 'Be Ready', f4s: 'With confidence' };
@@ -580,9 +583,9 @@ ${JSON.stringify(map)}`;
     if (en) q = q + ' ' + en;
     const items = [];
     BUILT.forEach((i) => items.push({ text: i.title + ' ' + i.short, syn: i.synonyms, ref: { bonus: 1, play: i.id, title: i.short } }));
-    KB.directory.forEach((d, idx) => items.push({ text: d.title, syn: d.synonyms, ref: { bonus: 0, play: 'general', topic: idx, title: d.title } }));
+    KB.directory.forEach((d, idx) => items.push({ text: d.title, syn: d.synonyms, ref: { bonus: d.route ? 0.5 : 0, play: d.route || 'general', topic: idx, title: d.title, sub: d.route && BY_ID[d.route] ? BY_ID[d.route].short : '' } }));
     KB.questions.forEach((x) => items.push({ text: x.q, syn: x.kw, ref: { bonus: -1, min: 3, go: 'q-' + x.id, title: x.q, kind: 'Answer' } }));
-    return window.ER_ENGINE.search(items, q).filter((r) => !r.ref.min || r.s >= r.ref.min).map((r) => Object.assign({ s: r.s + r.ref.bonus }, r.ref)).sort((a, b) => b.s - a.s).filter((r, i, a) => i === 0 || r.s >= a[0].s * 0.4).slice(0, 5);
+    return window.ER_ENGINE.search(items, q).filter((r) => !r.ref.min || r.s >= r.ref.min).map((r) => Object.assign({ s: r.s + r.ref.bonus }, r.ref)).sort((a, b) => b.s - a.s).filter((r, i, a) => i === 0 || r.s >= a[0].s * 0.4).filter(((n) => (r) => (n[r.play || r.go] = (n[r.play || r.go] || 0) + 1) <= 2)({})).slice(0, 5);
   }
   // Text in a non-Latin script (Hindi, Odia, Tamil…) is turned into a short English meaning so it can be matched.
   const EN_OF = new Map(); let enTimer = null;
@@ -611,12 +614,12 @@ ${JSON.stringify(map)}`;
     const r = searchAll(q, en);
     const waiting = !r.length && nonLatin(q) && API_OK() && !EN_OF.get(LANG + '|' + q.trim().toLowerCase());
     if (waiting) { box.innerHTML = `<p class="muted small" style="margin:10px 4px">${esc(X('Looking for the right guide…'))}</p>`; return; }
-    box.innerHTML = r.length ? r.map((x) => `<button class="prob" ${x.play ? `data-play="${x.play}" ${x.topic != null ? `data-topic="${x.topic}"` : ''}` : `data-go="${x.go}"`}><b>${esc(X(x.title))}</b><span>${esc(x.play ? X('Start') : X('Read the answer'))}</span>${ic('chev', 22)}</button>`).join('')
+    box.innerHTML = r.length ? r.map((x) => `<button class="prob" ${x.play ? `data-play="${x.play}" ${x.topic != null ? `data-topic="${x.topic}"` : ''}` : `data-go="${x.go}"`}><b>${esc(X(x.title))}</b><span>${esc(x.sub ? X(x.sub) : x.play ? X('Start') : X('Read the answer'))}</span>${ic('chev', 22)}</button>`).join('')
       : `<button class="prob" data-play="general"><b>${esc(X('Not sure what this is?'))}</b><span>${esc(X('Answer a few simple questions'))}</span>${ic('chev', 22)}</button>`;
   }
 
   /* ============ INTRO ============ */
-  function startIssue(id, topic) { const keep = S.adv && S.adv.issueId === id ? S.adv : null; S = blank(); S.issueId = id; S.topic = topic || null; S.adv = keep; persist(); }
+  function startIssue(id, topic) { const keep = S.adv && S.adv.issueId === id ? S.adv : null; S = blank(); S.issueId = id; S.topic = topic || null; S.adv = keep; if (topic && topic.pre) S.prefill = Object.assign({}, topic.pre); persist(); }
   function viewIntro(id, topic) {
     const iss = BY_ID[id]; if (!iss) return viewHome();
     const qs = E.stageQuestions(iss, {}, 'quick');

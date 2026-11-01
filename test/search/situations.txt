@@ -1,0 +1,31 @@
+# Nov 2026: queries the 600 situations and 3 new guides should catch (written before checking results)
+broker did trades without my permission | securities-complaint
+mutual fund money not credited after redemption | securities-complaint
+sip still cutting after cancel | securities-complaint
+shares of my late father transfer | securities-complaint,death-claims
+telegram stock tips group lost money | securities-complaint,job-investment-scam
+denied job because i am blind | disability-rights
+no ramp in bank for wheelchair | disability-rights
+college not giving scribe for exam | disability-rights
+udid card delayed | disability-rights
+someone poisoned street dogs in my colony | animal-cruelty
+society banning pets | animal-cruelty
+stopped from feeding stray dogs | animal-cruelty
+neighbour beating his dog | animal-cruelty
+restaurant added service charge | refund-refused
+wedding hall not returning advance | refund-refused
+gym not refunding membership | refund-refused
+cashless denied by insurance | insurance-claim
+lost baggage airline | travel-refund
+sent money to wrong upi id | failed-payment-debited
+atm did not give cash but deducted | failed-payment-debited
+anydesk fraud money gone | upi-cyber-fraud
+sim swap fraud | upi-cyber-fraud
+relieving letter not given | wrongful-termination
+fired because pregnant | wrongful-termination
+training bond money demanded | wrongful-termination
+maid salary not paid | unpaid-salary
+landlord locked my house | eviction-tenancy
+rti no reply 30 days | govt-benefits
+name missing from voter list | govt-benefits
+tenant sublet my flat | eviction-tenancy
