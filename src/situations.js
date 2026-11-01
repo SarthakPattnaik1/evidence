@@ -806,6 +806,31 @@
     ['Website or app not usable with a screen reader', 'website not accessible|screen reader', { pd_what: 'access' }]
   ]);
 
+  /* ---------------- Gaps found by the coverage check (consumer helpline sectors, cybercrime categories, Tele-Law areas) ---------------- */
+  G('ecommerce-order', [['Food delivery order was wrong, spoilt or missing', 'food delivery complaint|swiggy zomato wrong order|spoilt food delivered', { ec_problem: 'wrong' }]]);
+  G('refund-refused', [
+    ['Bought adulterated or unsafe food from a shop or restaurant', 'food adulteration|unsafe food|food poisoning restaurant|fssai complaint', { rr_what: 'product', rr_where: 'shop', rr_problem: 'defective' }, 'Keep the bill, the packet and a sample of the food. Food-safety complaints go to the FSSAI.'],
+    ['Gas cylinder overcharged, underweight or delivery charge demanded', 'lpg overcharged|gas cylinder weight|lpg delivery charge|gas agency', { rr_what: 'product', rr_where: 'provider' }, 'For a gas leak, open windows, do not use switches, and call 1906 at once.'],
+    ['Shop gave less weight or quantity than I paid for', 'short weight|less quantity|weighing scale cheating|legal metrology', { rr_what: 'product', rr_where: 'shop' }, 'Short weight and missing MRP details are complaints for the Legal Metrology department of your state.'],
+    ['Courier company lost or damaged my parcel', 'courier lost parcel|courier damaged|courier complaint', { rr_what: 'service', rr_where: 'provider', rr_problem: 'notdelivered' }],
+    ['Speed post or registered post lost or delayed', 'speed post lost|registered post not delivered|india post complaint', { rr_what: 'service', rr_where: 'provider', rr_problem: 'notdelivered' }]
+  ]);
+  G('govt-benefits', [
+    ['No water supply or a wrong water bill from the municipality', 'water supply complaint|water bill wrong|no water municipality', { gvb_what: 'office', gvb_level: 'state' }],
+    ['Garbage, drains or streetlights not fixed despite complaints', 'garbage not collected|drain blocked|streetlight complaint|municipal complaint', { gvb_what: 'office', gvb_level: 'state' }]
+  ]);
+  G('upi-cyber-fraud', [['A fake email changed our supplier’s bank details and we paid', 'business email compromise|bec fraud|invoice fraud email|supplier email hacked', { uf_how: 'tricked' }, 'Call 1930 and your bank at once — ask them to hold the receiving account.']]);
+  G('account-hacked', [['Our office computers were locked by ransomware', 'ransomware|files encrypted|computer locked ransom', { ah_what: 'hacked' }, 'Disconnect the computers from the internet, do not pay, and report on cybercrime.gov.in.']]);
+  G('online-harassment', [['Hateful posts targeting my religion, caste or community', 'hate speech|communal post|provocative speech online', { oh_what: 'messages' }]]);
+  G('police-complaint', [
+    ['Men follow, tease or harass me on the street', 'eve teasing|street harassment|stalking on road|followed by men', { pc_what: 'women' }, 'If you are in danger, call 112 or the women’s helpline 181.'],
+    ['A child is about to be married', 'child marriage|underage marriage|stop child marriage', { pc_what: 'other' }, 'Call 1098 or 112 now — a child marriage can be stopped before it happens.']
+  ]);
+  G('unpaid-salary', [
+    ['Paid less than men for the same work', 'equal pay|gender pay gap|equal remuneration|women paid less', { us_type: 'employee', us_status: 'working' }],
+    ['Employer not paying my maternity leave', 'maternity benefit|maternity leave not paid|26 weeks maternity', { us_type: 'employee', us_status: 'working' }]
+  ]);
+
   /* Install as directory entries routed to their guide. */
   const BY = Object.fromEntries(KB.issues.map((i) => [i.id, i]));
   // Stable web address for each situation: /s/<slug> (static page) and #sit-<slug> (app).

@@ -166,6 +166,10 @@ select{border:1px solid var(--line);border-radius:8px;padding:5px 8px;background
         <div class="scroll" style="max-height:340px"><table id="urg"></table></div>
       </div>
       <div class="card">
+        <div class="sechead"><h2>Write next</h2><p>Searches that found no guide or were abandoned, grouped and ranked — the to-do list for new guides and answers</p></div>
+        <div class="scroll" style="max-height:340px"><table id="writenext"></table></div>
+      </div>
+      <div class="card">
         <div class="sechead"><h2>Searches</h2><p id="searchrate">What people typed, and what they chose</p></div>
         <div class="scroll" style="max-height:340px"><table id="miss"></table></div>
       </div>
@@ -395,6 +399,13 @@ select{border:1px solid var(--line);border-radius:8px;padding:5px 8px;background
       const pk = Object.entries(o.picks).sort((a, b) => b[1] - a[1]);
       const what = o.n === 0 ? '<span class="tag crit">✕ No guide found</span>' : pk.length ? pk.map(([g, n]) => `→ ${esc(pickName(g))}${n > 1 ? ' ×' + n : ''}`).join('<br>') : '<span class="tag warn">! Left without choosing</span>';
       return `<tr><td>${esc(o.q)} <span class="small">${esc(o.l !== 'en' ? (LN[o.l] || o.l) : '')}</span></td><td class="n">${o.times || '—'}</td><td>${what}</td><td class="n small">${new Date(o.t).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</td></tr>`; }).join('')}</tbody>` : '<tbody><tr><td class="empty">No searches in this period.</td></tr></tbody>';
+
+    // Write next: group unmet searches by their key words (order and filler words ignored), rank by demand.
+    const STOP = new Set('a an the my me i to of for in on is was and or not no with by from at it this that he she they we you our your his her their what how can do does did will be been get got has have had am are why when where which who india indian law legal help please sir madam kya hai'.split(' '));
+    const keyOf = (q) => [...new Set(String(q).toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, ' ').split(/\s+/).filter((w) => w.length > 2 && !STOP.has(w)).map((w) => w.replace(/(ing|ed|es|s)$/, '')))].sort().join(' ');
+    const W = {}; qs.filter((o) => rank(o) < 2).forEach((o) => { const k = keyOf(o.q) || o.q; const g = W[k] || (W[k] = { k, ex: [], times: 0, none: 0, t: 0 }); g.ex.push(o.q); g.times += o.times || 1; if (o.n === 0) g.none += o.times || 1; g.t = Math.max(g.t, o.t); });
+    const wn = Object.values(W).sort((a, b) => b.times - a.times || b.none - a.none || b.t - a.t);
+    $('#writenext').innerHTML = wn.length ? `<thead><tr><th>People asked about</th><th class="n">Times</th><th class="n">Found nothing</th></tr></thead><tbody>${wn.slice(0, 40).map((g) => `<tr><td>${esc(g.ex[0])}${g.ex.length > 1 ? `<br><span class="small">also: ${g.ex.slice(1, 4).map(esc).join(' · ')}</span>` : ''}</td><td class="n">${g.times}</td><td class="n">${g.none}</td></tr>`).join('')}</tbody>` : '<tbody><tr><td class="empty">Nothing unmet in this period — or the analytics store is not set up yet (run supabase/schema.sql).</td></tr></tbody>';
 
     const KN = { law: 'Law or deadline looks wrong', paper: 'Paper missing / not needed', confusing: 'Confusing', translation: 'Translation wrong', other: 'Other' };
     const rp = DATA.reports || [];

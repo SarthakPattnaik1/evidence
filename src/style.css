@@ -1077,3 +1077,8 @@ html[dir=rtl] .i-dir{transform:scaleX(-1)}
 .sitlist button{display:block;width:100%;text-align:start;background:none;border:0;padding:12px 8px;font-size:15.5px;color:var(--ink);cursor:pointer;border-radius:8px;min-height:44px}
 .sitlist button:hover{background:var(--paper)}
 .sitg{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:14px 16px 2px}
+/* v37: never a dead end */
+.nomatch{margin-top:10px;padding:12px 14px;border:1.5px dashed var(--line);border-radius:14px;background:var(--sheet)}
+.nomatch p{margin:0 0 8px}
+.nmacts{display:flex;flex-wrap:wrap;gap:8px}
+.btn.sm{min-height:44px;padding:8px 14px;font-size:14.5px}

@@ -616,6 +616,10 @@ ${JSON.stringify(map)}`;
     if (waiting) { box.innerHTML = `<p class="muted small" style="margin:10px 4px">${esc(X('Looking for the right guide…'))}</p>`; return; }
     box.innerHTML = r.length ? r.map((x) => `<button class="prob" ${x.play ? `data-play="${x.play}" ${x.topic != null ? `data-topic="${x.topic}"` : ''}` : `data-go="${x.go}"`}><b>${esc(X(x.title))}</b><span>${esc(x.sub ? X(x.sub) : x.play ? X('Start') : X('Read the answer'))}</span>${ic('chev', 22)}</button>`).join('')
       : `<button class="prob" data-play="general"><b>${esc(X('Not sure what this is?'))}</b><span>${esc(X('Answer a few simple questions'))}</span>${ic('chev', 22)}</button>`;
+    // Never a dead end: a free person to talk to is always one tap away, and misses tell us what to add next.
+    if (r.length < 2) box.insertAdjacentHTML('beforeend', `<div class="nomatch"><p class="small">${esc(r.length ? X('None of these? Talk to someone free:') : X('We may not have a guide for this yet. Talk to someone free:'))}</p>
+      <div class="nmacts"><a class="btn line sm" href="tel:15100">${ic('phone', 16)} ${esc(X('15100 — free legal aid'))}</a><a class="btn line sm" href="tel:14454">${ic('phone', 16)} ${esc(X('14454 — Tele-Law advice'))}</a></div>
+      ${r.length ? '' : `<p class="small muted" style="margin:6px 0 0">${esc(X('Searches like this help us decide which guide to write next.'))}</p>`}</div>`);
   }
 
   /* ============ INTRO ============ */
@@ -940,6 +944,7 @@ ${JSON.stringify(map)}`;
     return shell(`<div class="wrap narrow" style="padding:26px 0 40px">
       <h1 style="font-size:clamp(30px,5vw,46px)">Send a client a preparation link</h1>
       <p class="lead" style="margin-top:12px">Choose a guide, tick the records you want the client to bring, and add a note. The link carries only these choices — never client information.</p>
+      ${/^https?:$/.test(location.protocol) && !/claude|anthropic/.test(location.hostname) ? `<div class="banner info" style="margin:14px 0">${ic('file')}<div><h3>Help review the guides</h3><p>All guides are drafts until an advocate checks them. If you or your law clinic can review one, <a href="/review">print a review sheet</a> — guides that reach the most people come first.</p></div></div>` : ''}
       <form id="advform" class="panel">
         <label class="f">Guide<select class="t" name="issue" id="advissue">${KB.categories.map((c) => `<optgroup label="${esc(c.title)}">${BUILT.filter((i) => i.cat === c.id).map((i) => `<option value="${i.id}" ${i.id === sel ? 'selected' : ''}>${esc(i.short)}</option>`).join('')}</optgroup>`).join('')}</select></label>
         <fieldset style="margin-top:14px"><legend class="f">Records to flag as “Advocate asked”</legend><p class="small muted" style="margin:2px 0 6px">The client only sees items that apply to their answers.</p>

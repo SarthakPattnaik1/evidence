@@ -147,6 +147,42 @@ def run():
     (gdir / 'index.html').write_text(page('All guides | Saboot', 'Every legal situation Saboot helps you prepare for, in plain language.', '<h1>All guides</h1><ul>' + ''.join(index_rows) + '</ul>', '/guide', icon))
     urls.append(('/guide', '0.9'))
 
+    # Review sheets for advocates and law clinics (/review, noindex). Priority: guides that carry urgent
+    # warnings and the most everyday situations first — where a mistake would reach the most people.
+    rdir = OUT / 'review'; rdir.mkdir(exist_ok=True)
+    KINDK = {'good': 'In your favour', 'risk': 'Be careful', 'next': 'Next step'}
+    rv = [i for i in data['issues'] if i['id'] != 'general']
+    prio = lambda i: (0 if i.get('review') else 1, sum(1 for u in i['full']['urg'] if u['level'] == 'now') * 3 + len(i['full']['urg']) + i['full']['nsit'])
+    rv.sort(key=prio, reverse=True)
+    RCSS = '<style>.rs h2{margin-top:22px}.rs table{border-collapse:collapse;width:100%;font-size:15px}.rs td,.rs th{border:1px solid #ccc;padding:6px 8px;vertical-align:top;text-align:left}.chk li{list-style:"☐  "}.sign td{height:34px}.rs tr{break-inside:avoid}@media print{header,footer,.noprint{display:none}main{padding:0}.rs h2{break-after:avoid}}</style>'
+    rows = []
+    for n, i in enumerate(rv, 1):
+        f = i['full']
+        qs = ''.join(f'<tr><td>{e(q["t"])}{" <i>(asked only in some cases)</i>" if q["cond"] else ""}{" <i>(detailed round)</i>" if q["deep"] else ""}<br><span class="muted">Why: {e(q["why"])}</span></td><td>{"; ".join(e(o) for o in q["o"])}</td><td></td></tr>' for q in f['qs'])
+        evs = ''.join(f'<tr><td>{"<b>Step:</b> " if x["action"] else ""}{e(x["name"])}{" <i>(some cases)</i>" if x["cond"] else ""}</td><td>{e(x["why"])}{(" Where: " + e(x["where"])) if x["where"] else ""}{(" Time: " + e(x["time"])) if x["time"] else ""}</td><td></td></tr>' for x in f['ev'])
+        urg = ''.join(f'<tr><td>{e(u["level"])}</td><td><b>{e(u["t"])}</b> — {e(u["x"])}</td><td></td></tr>' for u in f['urg'])
+        st = ''.join(f'<tr><td>{e(KINDK.get(x["k"], x["k"]))}</td><td>{e(x["t"])}</td><td></td></tr>' for x in f['stand'])
+        srcs = ''.join((f'<li><a href="{e(x["u"])}" rel="noopener">{e(x["t"])}</a></li>' if x.get('u') else f'<li>{e(x["t"])}</li>') for x in (i.get('sources') or []))
+        status = ('Reviewed by ' + e(i['review']['by']) + ' on ' + e(i['review']['date'])) if i.get('review') else 'Draft — not yet reviewed'
+        sec4 = ('<h2>4. Urgent warnings</h2><table><tr><th>Level</th><th>Warning</th><th>Correction</th></tr>' + urg + '</table>') if urg else ''
+        sec5 = ('<h2>5. “Where you stand” points</h2><table><tr><th>Type</th><th>Text</th><th>Correction</th></tr>' + st + '</table>') if st else ''
+        body = (f'<div class="rs"><p class="muted noprint"><a href="/review">All review sheets</a> · <a href="/guide/{e(i["id"])}">Public page</a> · <button onclick="print()">Print or save as PDF</button></p>'
+                f'<p class="muted">Saboot review sheet · priority {n} of {len(rv)} · {status}</p><h1>{e(i["title"])}</h1>'
+                '<p>Please check every statement below against the current law and practice. Write corrections in the last column. Saboot is a free preparation tool: it lists papers and facts to take to an advocate and never recommends an advocate.</p>'
+                f'<h2>1. What the law says (shown to users)</h2><div class="box"><p>{e(i["juris"])}</p></div><ul>{srcs}</ul><p>Correct and complete? ☐ Yes ☐ No — corrections:</p><p style="border-bottom:1px solid #999;height:60px"></p>'
+                f'<h2>2. Questions asked</h2><table><tr><th>Question</th><th>Answers offered</th><th>Correction</th></tr>{qs}</table>'
+                f'<h2>3. Papers and steps listed</h2><table><tr><th>Paper / step</th><th>Why / where / time</th><th>Correction</th></tr>{evs}</table>{sec4}{sec5}'
+                '<h2>Checklist</h2><ul class="chk"><li>Every deadline and time limit is correct today</li><li>Every section number matches the current Act (BNS/BNSS/BSA where applicable)</li><li>No paper is listed that a person cannot lawfully obtain</li><li>Nothing is missing that an advocate would always ask for</li><li>Urgent warnings are not alarming where they should not be, and not missing where they should be</li><li>Language is plain enough for someone with little schooling</li></ul>'
+                '<h2>Sign-off</h2><table class="sign"><tr><td style="width:40%">Reviewer name</td><td></td></tr><tr><td>Enrolment number and State Bar Council (or institution and supervising faculty)</td><td></td></tr><tr><td>Date</td><td></td></tr><tr><td>Result</td><td>☐ Approved ☐ Approved with the corrections above ☐ Not approved</td></tr><tr><td>Signature</td><td></td></tr></table>'
+                '<p class="muted">Return the signed sheet to the Saboot team. Once the corrections are made, the guide will show “Reviewed by” with your name and date.</p></div>')
+        (rdir / f'{i["id"]}.html').write_text(page(f'Review sheet: {i["short"]} | Saboot', 'Advocate review sheet', RCSS + body, f'/review/{i["id"]}', icon).replace('<link rel="canonical"', '<meta name="robots" content="noindex,nofollow"><link rel="canonical"', 1), encoding='utf-8')
+        rows.append(f'<tr><td>{n}</td><td><a href="/review/{e(i["id"])}">{e(i["short"])}</a></td><td>{len(f["urg"])}</td><td>{f["nsit"]}</td><td>{"Reviewed" if i.get("review") else "Draft"}</td></tr>')
+    done = sum(1 for i in rv if i.get('review'))
+    ridx = (f'<div class="rs"><h1>Review sheets for advocates and law clinics</h1><p>{len(rv)} guides · {done} reviewed · {len(rv) - done} drafts. Ordered by priority: guides with urgent warnings and the most everyday situations first. Print a sheet, check it against current law, note corrections and sign it.</p>'
+            f'<table><tr><th>#</th><th>Guide</th><th>Urgent warnings</th><th>Situations</th><th>Status</th></tr>{"".join(rows)}</table></div>')
+    (rdir / 'index.html').write_text(page('Review sheets | Saboot', 'Advocate review sheets', RCSS + ridx, '/review', icon).replace('<link rel="canonical"', '<meta name="robots" content="noindex,nofollow"><link rel="canonical"', 1), encoding='utf-8')
+    print('review sheets', len(rv))
+
     # One page per everyday situation (/s/<slug>). The papers, points and warnings are computed by the app's own
     # engine from the answers the situation pre-fills, so each page is specific. Pages whose content would be
     # identical to an earlier situation of the same guide (and have no safety note) are kept for visitors but
@@ -233,7 +269,7 @@ def run():
     lastmod = data.get('checked') or ''
     (OUT / '404.html').write_text(page('Page not found | Saboot', 'This page does not exist. Start again from the Saboot home page.', '<h1>We could not find that page</h1><p class="muted">The link may be old or mistyped.</p><a class="cta" href="/">Go to Saboot home</a><p class="muted">Need help now? Call <a href="tel:112">112</a> for emergencies, <a href="tel:1930">1930</a> for cyber fraud, <a href="tel:15100">15100</a> for free legal aid.</p>', '/404', None).replace('<link rel="canonical" href="' + BASE + '/404">', '<meta name="robots" content="noindex">'), encoding='utf-8')
     (OUT / 'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + ''.join(f'<url><loc>{BASE}{u}</loc><lastmod>{lastmod}</lastmod><priority>{p}</priority></url>' for u, p in urls) + '</urlset>\n')
-    (OUT / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nDisallow: /admin\nSitemap: {BASE}/sitemap.xml\n')
+    (OUT / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /review\nSitemap: {BASE}/sitemap.xml\n')
     (OUT / 'manifest.webmanifest').write_text(json.dumps({
         'name': 'Saboot — papers for your advocate', 'short_name': 'Saboot', 'start_url': '/', 'display': 'standalone',
         'background_color': '#FBF8F3', 'theme_color': '#1B3A5C', 'lang': 'en',

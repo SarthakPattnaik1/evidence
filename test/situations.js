@@ -1,6 +1,6 @@
 /* Every situation must open a real guide, and every pre-filled answer must be a real question/option of that guide. */
 global.window = global;
-['kb', 'cites', 'j-money', 'j-family', 'j-consumer', 'j-other', 'j-nri', 'j-business', 'j-more', 'j-genz', 'j-gaps', 'j-rights', 'stand', 'law-2026', 'situations', 'reviews', 'qa'].forEach((f) => require('../src/' + f + '.js'));
+['kb', 'cites', 'j-money', 'j-family', 'j-consumer', 'j-other', 'j-nri', 'j-business', 'j-more', 'j-genz', 'j-gaps', 'j-rights', 'stand', 'law-2026', 'situations', 'reviews', 'qa', 'qa2'].forEach((f) => require('../src/' + f + '.js'));
 const K = global.ER_KB; const fails = [];
 const BY = Object.fromEntries(K.issues.map((i) => [i.id, i]));
 const seen = new Set(); const perGuide = {}; const slugs = new Set();

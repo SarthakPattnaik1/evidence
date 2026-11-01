@@ -55,6 +55,14 @@
     'Vodafone Idea v. Ajay Kumar Agarwal': { t: 'Vodafone Idea Cellular Ltd. v. Ajay Kumar Agarwal, Supreme Court, 16 Feb 2022 — (2022) 6 SCC 496 (Indian Kanoon lists it with the connected appeal M. Lakshman Bhakta v. Vodafone Idea)', u: IK(149138346) },
     'Sanjabij Tari v. Kishore S. Borcar': { t: 'Sanjabij Tari v. Kishore S. Borcar, Supreme Court, 25 Sep 2025 — 2025 INSC 1158', u: IK(198100584) },
     'ICICI Lombard v. Ayiti Navaneetha': { t: 'ICICI Lombard General Insurance Co. Ltd. v. Ayiti Navaneetha, Supreme Court interim order, 4 Nov 2025', u: IK(199850448) },
+    // named in short answers (src/qa2.js); exact page not yet confirmed — shown as text only
+    'Mohd. Abdul Samad v. State of Telangana': { t: 'Mohd. Abdul Samad v. State of Telangana, Supreme Court, 10 Jul 2024', u: '' },
+    'D. Velusamy v. D. Patchaiammal': { t: 'D. Velusamy v. D. Patchaiammal, Supreme Court, 21 Oct 2010 — (2010) 10 SCC 469', u: '' },
+    'Satish Chander Ahuja v. Sneha Ahuja': { t: 'Satish Chander Ahuja v. Sneha Ahuja, Supreme Court, 15 Oct 2020 — (2021) 1 SCC 414', u: '' },
+    'Sudesh Chhikara v. Ramti Devi': { t: 'Sudesh Chhikara v. Ramti Devi, Supreme Court, 2 Dec 2022', u: '' },
+    'Revanasiddappa v. Mallikarjun': { t: 'Revanasiddappa v. Mallikarjun, Supreme Court (three judges), 1 Sep 2023', u: '' },
+    'Suraj Lamp v. State of Haryana': { t: 'Suraj Lamp & Industries Pvt. Ltd. v. State of Haryana, Supreme Court, 11 Oct 2011 — (2012) 1 SCC 656', u: '' },
+    'Parmanand Katara v. Union of India': { t: 'Parmanand Katara v. Union of India, Supreme Court, 28 Aug 1989 — (1989) 4 SCC 286', u: '' },
     'Bachpan Bachao Andolan v. Union of India': { t: 'Bachpan Bachao Andolan v. Union of India, W.P.(C) 75 of 2012, Supreme Court orders of 17 Jan 2013 and 10 May 2013', u: '' }
   };
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
