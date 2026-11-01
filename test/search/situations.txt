@@ -29,3 +29,24 @@ landlord locked my house | eviction-tenancy
 rti no reply 30 days | govt-benefits
 name missing from voter list | govt-benefits
 tenant sublet my flat | eviction-tenancy
+# 1 Nov 2026: crucial-gap guides (written before checking results)
+my 15 year old daughter wedding next week | child-protection
+teacher slapped my son | child-protection
+found newborn baby near temple | child-protection
+my 16 year old brother arrested by police | child-protection,accused-arrest
+husband in jail 4 years no trial | prisoner-rights
+cant meet my son in jail | prisoner-rights
+brother died in police lockup | prisoner-rights
+fasal bima paisa nahi mila | farmer-problem
+seeds not germinated company | farmer-problem
+mandi trader not paid for wheat | farmer-problem
+husband stuck in saudi passport taken | overseas-worker
+salary not paid dubai | overseas-worker
+dead body from kuwait | overseas-worker
+municipality notice to break my house | demolition-eviction
+bulldozer on my house | demolition-eviction
+thela seized by nagar nigam | demolition-eviction
+family admitted me in mental hospital | mental-health-rights
+nasha mukti kendra not letting him leave | mental-health-rights
+doctor refused abortion unmarried | pregnancy-rights
+in laws forcing abortion of girl child | pregnancy-rights

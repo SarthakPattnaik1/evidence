@@ -2,7 +2,7 @@
    domain; a named Act or judgment links to a bare homepage; or a link is not on the list checked on 31 Oct 2026.
    To add a link: open it on a phone in India, confirm the page matches the label, then add it to CHECKED. */
 global.window = global;
-['kb', 'cites', 'j-money', 'j-family', 'j-consumer', 'j-other', 'j-nri', 'j-business', 'j-more', 'j-genz', 'j-gaps', 'j-rights', 'stand', 'law-2026', 'situations', 'reviews', 'qa', 'qa2'].forEach((f) => require('../src/' + f + '.js'));
+['kb', 'cites', 'j-money', 'j-family', 'j-consumer', 'j-other', 'j-nri', 'j-business', 'j-more', 'j-genz', 'j-gaps', 'j-rights', 'j-crucial', 'stand', 'law-2026', 'situations', 'reviews', 'qa', 'qa2'].forEach((f) => require('../src/' + f + '.js'));
 const K = global.ER_KB, C = global.ER_CITE; const fails = [];
 // Opened and matched on 31 Oct 2026 (Mumbai and US). "blocked" = refused automated checks from cloud servers; open on a phone to confirm.
 const CHECKED = new Set(require('fs').readFileSync(__dirname + '/sources-checked.txt', 'utf8').split('\n').map((l) => l.split(' ')[0]).filter((l) => /^https?:/.test(l)));

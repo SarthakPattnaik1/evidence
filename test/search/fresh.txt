@@ -33,7 +33,7 @@ lost my wallet with pan card and aadhaar | lost-phone
 old father with dementia left home and missing | missing-person
 my sister was raped by her boss | sexual-assault
 was called by caste names at work | caste-atrocity
-my brother taken to gulf and passport taken | trafficking,nri-case-abroad
+my brother taken to gulf and passport taken | overseas-worker,trafficking,nri-case-abroad
 bought used car from dealer it was flood damaged | vehicle-transfer
 neighbour's pitbull bit my son | dog-bite
 need to correct mother's name in my birth certificate | documents-correction

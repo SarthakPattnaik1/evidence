@@ -2,7 +2,7 @@
 const fs = require('fs'); const path = require('path');
 const SRC = path.join(__dirname, '..', 'src');
 global.window = global;
-['kb', 'cites', 'j-money', 'j-family', 'j-consumer', 'j-other', 'j-nri', 'j-business', 'j-more', 'j-genz', 'j-gaps', 'j-rights', 'stand', 'law-2026', 'situations', 'reviews', 'qa', 'qa2', 'i18n'].forEach((f) => require(path.join(SRC, f + '.js')));
+['kb', 'cites', 'j-money', 'j-family', 'j-consumer', 'j-other', 'j-nri', 'j-business', 'j-more', 'j-genz', 'j-gaps', 'j-rights', 'j-crucial', 'stand', 'law-2026', 'situations', 'reviews', 'qa', 'qa2', 'i18n'].forEach((f) => require(path.join(SRC, f + '.js')));
 const KB = global.ER_KB; const I18N = global.ER_I18N;
 const app = fs.readFileSync(path.join(SRC, 'app.js'), 'utf8');
 const out = new Set(); const add = (s) => { if (typeof s === 'string' && s.trim() && /[A-Za-z]/.test(s)) out.add(s); };

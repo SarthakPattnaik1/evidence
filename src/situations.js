@@ -823,12 +823,120 @@
   G('account-hacked', [['Our office computers were locked by ransomware', 'ransomware|files encrypted|computer locked ransom', { ah_what: 'hacked' }, 'Disconnect the computers from the internet, do not pay, and report on cybercrime.gov.in.']]);
   G('online-harassment', [['Hateful posts targeting my religion, caste or community', 'hate speech|communal post|provocative speech online', { oh_what: 'messages' }]]);
   G('police-complaint', [
-    ['Men follow, tease or harass me on the street', 'eve teasing|street harassment|stalking on road|followed by men', { pc_what: 'women' }, 'If you are in danger, call 112 or the women’s helpline 181.'],
-    ['A child is about to be married', 'child marriage|underage marriage|stop child marriage', { pc_what: 'other' }, 'Call 1098 or 112 now — a child marriage can be stopped before it happens.']
+    ['Men follow, tease or harass me on the street', 'eve teasing|street harassment|stalking on road|followed by men', { pc_what: 'women' }, 'If you are in danger, call 112 or the women’s helpline 181.']
   ]);
   G('unpaid-salary', [
     ['Paid less than men for the same work', 'equal pay|gender pay gap|equal remuneration|women paid less', { us_type: 'employee', us_status: 'working' }],
     ['Employer not paying my maternity leave', 'maternity benefit|maternity leave not paid|26 weeks maternity', { us_type: 'employee', us_status: 'working' }]
+  ]);
+
+  /* ---- Crucial gaps (1 Nov 2026): groups that had no guide at all ---- */
+  G('child-protection', [
+    ['A child is about to be married', 'child marriage|underage marriage|stop child marriage|bal vivah', { cp_what: 'marriage', cp_when: 'days' }, 'Call 1098 or 112 now — a child marriage can be stopped before it happens.'],
+    ['My daughter’s marriage is being fixed before she turns 18', 'marriage fixed underage|engagement minor girl|family forcing marriage minor', { cp_what: 'marriage', cp_when: 'later' }],
+    ['I was married as a child and want to get out of it', 'annul child marriage|married as minor|void child marriage|nullity child marriage', { cp_what: 'marriage', cp_when: 'done', cp_who: 'child' }],
+    ['I am under 18 and my family is forcing me to marry', 'forced marriage minor|parents forcing me to marry|i am 16 marriage', { cp_what: 'marriage', cp_who: 'child' }, 'Call 1098 — it is free, works day and night, and you are not in trouble for calling.'],
+    ['I found an abandoned baby or child', 'found baby|abandoned newborn|baby left|child found alone', { cp_what: 'abandoned' }, 'Keep the child safe and call 1098 or 112 — it must be reported within 24 hours.'],
+    ['A child has no one to look after them after the parents died', 'orphan|parents died child|no guardian child|child alone after death', { cp_what: 'abandoned' }],
+    ['A teacher beat or humiliated my child', 'teacher beat child|corporal punishment|teacher slapped|school punishment injury', { cp_what: 'school' }],
+    ['My child was beaten or harassed at a hostel or madrasa', 'hostel warden beat|residential school abuse|ashram school beating', { cp_what: 'school' }],
+    ['A child near me is being beaten or starved at home', 'child beaten at home|child starved|child neglected|child abuse neighbour', { cp_what: 'home', cp_who: 'relative' }],
+    ['Children are made to beg at a signal or station', 'child begging|kids begging|begging racket', { cp_what: 'begging' }],
+    ['My son (under 18) has been picked up by the police', 'minor arrested|juvenile arrested|son 17 arrested|child in police station', { cp_what: 'juvenile', cp_who: 'parent' }, 'A child must not be kept in a police lock-up. Show proof of age and ask for the Juvenile Justice Board.'],
+    ['Police are treating my underage son as an adult', 'age proof juvenile|claim juvenility|juvenile tried as adult', { cp_what: 'juvenile', cp_who: 'parent' }]
+  ]);
+  G('prisoner-rights', [
+    ['My son has been in jail for years and the trial has not started', 'undertrial for years|trial not started|long jail no trial', { pr_what: 'bail', pr_stage: 'ut', pr_time: 'o3y' }],
+    ['An undertrial has served half the maximum sentence', 'section 479|half sentence served|undertrial release', { pr_what: 'bail', pr_stage: 'ut' }],
+    ['My husband in jail has no lawyer', 'no lawyer in jail|free lawyer prisoner|jail legal aid', { pr_what: 'lawyer' }],
+    ['The jail is not letting us meet my family member', 'jail mulakat refused|cannot meet prisoner|jail visit denied', { pr_what: 'meet' }],
+    ['Need parole for a wedding or funeral in the family', 'parole|emergency parole|furlough', { pr_what: 'parole', pr_stage: 'conv' }],
+    ['My brother is sick in jail and not being treated', 'prisoner sick|no treatment jail|jail hospital', { pr_what: 'hurt' }],
+    ['My father was beaten in jail', 'beaten in jail|jail torture|prisoner assaulted', { pr_what: 'hurt' }],
+    ['My son died in police custody', 'custodial death|died in lockup|police custody death', { pr_what: 'death' }, 'A Judicial Magistrate must inquire into every death in custody — ask for it in writing today.'],
+    ['A prisoner died in jail and we were not told the reason', 'died in jail|jail death|death in judicial custody', { pr_what: 'death' }],
+    ['Bail granted but he cannot pay the surety or bond', 'cannot pay bail bond|surety not available|bail granted still in jail', { pr_what: 'bail', pr_stage: 'ut' }]
+  ]);
+  G('farmer-problem', [
+    ['Hailstorm or flood damaged my crop — insurance not paid', 'crop insurance not paid|fasal bima claim|hailstorm crop loss|flood crop loss', { fm_what: 'ins' }, 'Report the loss on 14447 within 72 hours and keep the ticket number.'],
+    ['Crop insurance claim rejected for late reporting', 'claim rejected 72 hours|late intimation pmfby', { fm_what: 'ins', fm_reported: 'late' }],
+    ['Premium cut from my KCC but I don’t know if I am insured', 'premium deducted kcc|pmfby enrolled bank|crop insurance policy not received', { fm_what: 'ins', fm_enrolled: 'bank' }],
+    ['Drought destroyed the crop in our whole area', 'drought crop loss|yield loss|whole village crop failed', { fm_what: 'ins', fm_reported: 'wide' }],
+    ['Seeds did not germinate or the crop failed', 'fake seeds|seeds not germinated|spurious seeds|seed company fraud', { fm_what: 'seed' }, 'Keep the packet and some seed, and complain before harvesting.'],
+    ['Pesticide or fertiliser was fake and damaged my crop', 'fake pesticide|spurious fertiliser|fake urea|pesticide burnt crop', { fm_what: 'seed' }],
+    ['Dealer is selling urea or DAP above the printed price', 'urea overpriced|dap black marketing|fertiliser above mrp', { fm_what: 'seed' }],
+    ['Bank refuses my crop loan or Kisan Credit Card', 'kcc refused|crop loan rejected|kisan credit card not given', { fm_what: 'loan' }],
+    ['Bank is recovering a crop loan after crop failure', 'crop loan recovery|kcc notice|farm loan recovery', { fm_what: 'loan' }],
+    ['Trader or commission agent did not pay for my crop', 'mandi payment|arhtiya did not pay|trader cheated farmer|crop payment pending', { fm_what: 'mandi' }],
+    ['My crop was not bought at MSP at the procurement centre', 'msp not given|procurement centre refused|paddy not purchased', { fm_what: 'mandi' }]
+  ]);
+  G('overseas-worker', [
+    ['My husband’s employer in the Gulf took his passport', 'passport taken employer|sponsor holding passport|kafeel passport', { ow_what: 'passport', ow_where: 'gulf', ow_who: 'family' }],
+    ['Not paid salary for months in Saudi Arabia, UAE or Qatar', 'salary not paid gulf|unpaid wages saudi|dubai salary pending', { ow_what: 'salary', ow_where: 'gulf' }],
+    ['Stuck abroad — visa expired, no work, no money for the ticket', 'stuck abroad|visa expired abroad|stranded in gulf|no ticket to india', { ow_what: 'stuck' }, 'Call 1800-11-3090 or the Indian embassy and file on MADAD.'],
+    ['The job abroad is not what the agent promised', 'different job abroad|agent lied job|contract substitution', { ow_what: 'agent' }],
+    ['A woman domestic worker is locked in or abused abroad', 'housemaid abused gulf|domestic worker locked|maid not allowed to leave', { ow_what: 'abuse', ow_where: 'gulf' }, 'Contact the Indian embassy now — it can arrange shelter and a ticket home.'],
+    ['A family member died working abroad — bringing the body home', 'body repatriation|died in gulf|death abroad worker|bring body home', { ow_what: 'death' }],
+    ['Claiming insurance and dues after a worker’s death abroad', 'pravasi bima claim|death compensation abroad|end of service benefits death', { ow_what: 'death', ow_who: 'family' }],
+    ['Went abroad on a visit visa for a job and now stuck', 'visit visa job|tourist visa work abroad|illegal emigration', { ow_what: 'stuck', ow_emigrate: 'visit' }],
+    ['Lured to Myanmar, Cambodia or Laos for a job and forced into scam work', 'cyber slavery|scam compound|myanmar job trap|cambodia job scam', { ow_what: 'abuse', ow_where: 'asia' }, 'Contact the Indian embassy now and call 1930 to report the racket.']
+  ]);
+  G('demolition-eviction', [
+    ['Got a municipal notice to demolish my house', 'demolition notice house|municipality notice demolish|illegal construction notice', { dm_what: 'house', dm_notice: 'yes' }],
+    ['House demolished without any notice', 'demolished without notice|bulldozer no notice|house razed', { dm_what: 'done', dm_notice: 'no' }],
+    ['Bulldozer action on our house after a criminal case', 'bulldozer justice|house demolished accused|demolition after fir', { dm_what: 'house' }, 'Demolition as punishment is not allowed — see an advocate today about a stay.'],
+    ['My shop or building was sealed by the municipality', 'shop sealed|property sealed|sealing drive', { dm_what: 'house', dm_notice: 'yes' }],
+    ['Our basti is being cleared and we have nowhere to go', 'slum demolition|jhuggi eviction|basti cleared|slum rehabilitation', { dm_what: 'slum' }],
+    ['Asked to leave railway or forest land we have lived on for years', 'railway land eviction|forest land eviction|eviction notice government land', { dm_what: 'slum', dm_place: 'public' }],
+    ['Municipality removed my street stall or cart', 'stall removed|thela removed|hawker evicted|vendor removed', { dm_what: 'vendor' }],
+    ['Municipality seized my goods and won’t return them', 'goods seized municipality|cart seized|vendor goods confiscated', { dm_what: 'vendor' }, 'Ask for a signed list of the goods — perishable goods must be returned the same day you claim them.'],
+    ['Police or municipality demand money to let me sell on the street', 'hafta vendor|bribe street vendor|police extortion hawker', { dm_what: 'vendor' }],
+    ['Not given a vending certificate after the survey', 'vending certificate|town vending committee|vendor survey left out', { dm_what: 'vendor' }]
+  ]);
+  G('mental-health-rights', [
+    ['My family put me in a mental hospital against my will', 'admitted against my will|forced psychiatric admission|family admitted me', { mh_what: 'admit', mh_who: 'self' }],
+    ['Locked in a rehab or de-addiction centre and not allowed to leave', 'forced rehab|de-addiction centre locked|nasha mukti kendra forced', { mh_what: 'admit', mh_where: 'rehab' }],
+    ['A relative is chained or beaten at a faith healer or centre', 'chained mental illness|dargah chained|faith healer beating', { mh_what: 'abuse' }, 'Chaining is illegal — call 112 if the person is in danger.'],
+    ['Hospital gave shock treatment without consent', 'ect without consent|electric shock treatment|forced ect', { mh_what: 'abuse' }],
+    ['Insurance rejected my claim for depression or psychiatric treatment', 'mental illness insurance rejected|psychiatric claim rejected|depression claim', { mh_what: 'ins' }],
+    ['Government hospital refused mental health treatment', 'psychiatrist not available|mental health treatment refused', { mh_what: 'denied' }],
+    ['Fired or forced out of college because of a mental illness', 'fired depression|mental illness discrimination|college expelled mental health', { mh_what: 'work' }],
+    ['Kept in a mental hospital for months with no review', 'long psychiatric stay|mental health review board|kept for months hospital', { mh_what: 'admit', mh_days: 'o30' }]
+  ]);
+  G('pregnancy-rights', [
+    ['Doctor refused an abortion because I am unmarried', 'unmarried abortion|abortion refused unmarried|single woman mtp', { rp_what: 'refused', rp_age: 'adult' }],
+    ['Hospital demands my husband’s consent for an abortion', 'husband consent abortion|family consent mtp', { rp_what: 'consent', rp_age: 'adult' }],
+    ['Pregnant after rape — need an abortion urgently', 'pregnant after rape|rape pregnancy termination', { rp_what: 'refused', rp_cat: 'rape' }, 'Go to a government hospital now; the police must not delay medical care. Free legal aid: 15100.'],
+    ['Pregnancy is past 24 weeks and the baby has a serious problem', 'abortion after 24 weeks|medical board abortion|foetal abnormality termination', { rp_what: 'late', rp_weeks: 'o24', rp_cat: 'foetal' }],
+    ['In-laws are forcing me to abort because it is a girl', 'forced abortion girl|female foeticide pressure|in laws want boy', { rp_what: 'forced' }, 'No one can force you to end a pregnancy. If you are unsafe, call 112 or 181.'],
+    ['A clinic offered to tell the baby’s sex', 'sex determination|gender test pregnancy|ultrasound boy or girl', { rp_what: 'sexdet' }]
+  ]);
+
+  /* ---- Gaps inside existing guides ---- */
+  G('assault-threat', [
+    ['Being branded a witch and threatened by villagers', 'witch hunting|branded witch|dayan|witchcraft accusation', { at_what: 'threat', at_who: 'group' }, 'If you are in danger, call 112 now. Several states have special witch-hunting laws.'],
+    ['Need victim compensation after an attack', 'victim compensation|compensation scheme victim|dlsa compensation', { at_what: 'hit', at_injury: 'serious' }],
+    ['Witness in a case and being threatened to turn hostile', 'witness threatened|witness protection|pressure to withdraw case', { at_what: 'threat', at_who: 'known' }]
+  ]);
+  G('divorce-separation', [
+    ['Husband gave talaq and refuses to pay mehr', 'mehr not paid|talaq mehr|dower not paid|triple talaq', { dv_marriage: 'nikah' }]
+  ]);
+  G('govt-benefits', [
+    ['Hospital refused treatment on my Ayushman Bharat card', 'ayushman card refused|pmjay not accepted|ayushman hospital refused', { gvb_what: 'benefit', gvb_level: 'central' }, 'Call the PM-JAY helpline 14555 from the hospital and ask for the Ayushman Mitra.'],
+    ['MGNREGA work or wages not given', 'mgnrega wages|nrega job card|100 days work not given', { gvb_what: 'benefit', gvb_level: 'state' }],
+    ['Anganwadi or mid-day meal not given to my child', 'anganwadi|mid day meal|ration for child icds', { gvb_what: 'benefit', gvb_level: 'state' }]
+  ]);
+  G('education-dispute', [
+    ['Private school refused my child a free seat under RTE', 'rte 25 percent|rte admission refused|free seat ews school', { ed_inst: 'school' }]
+  ]);
+  G('loan-recovery', [
+    ['Private moneylender charging huge interest and threatening me', 'moneylender|sahukar|private lender interest|byaj harassment', { lr_lender: 'private', lr_problem: 'calls' }, 'Threats and violence are crimes — call 112 if you are in danger.']
+  ]);
+  G('insurance-claim', [
+    ['Tractor or farm equipment insurance claim rejected', 'tractor insurance claim|farm equipment insurance', { in_type: 'motor', in_status: 'rejected' }]
+  ]);
+  G('trafficking', [
+    ['A girl from our village was taken for a job and has not come back', 'girl missing job city|placement agency girl|daughter taken for work', { tf_what: 'trafficked', tf_who: 'family' }, 'Call 112 and report it as a missing person at once.']
   ]);
 
   /* Install as directory entries routed to their guide. */

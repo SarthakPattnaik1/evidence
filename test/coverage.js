@@ -4,7 +4,7 @@
    National Cybercrime Reporting Portal categories/sub-categories (MHA citizen manual, Annexure A);
    Tele-Law advice areas (tele-law.in FAQ; Department of Justice). Run: node test/coverage.js  (writes COVERAGE.md) */
 global.window = global;
-['kb', 'cites', 'j-money', 'j-family', 'j-consumer', 'j-other', 'j-nri', 'j-business', 'j-more', 'j-genz', 'j-gaps', 'j-rights', 'stand', 'law-2026', 'situations', 'reviews', 'qa', 'qa2'].forEach((f) => require('../src/' + f + '.js'));
+['kb', 'cites', 'j-money', 'j-family', 'j-consumer', 'j-other', 'j-nri', 'j-business', 'j-more', 'j-genz', 'j-gaps', 'j-rights', 'j-crucial', 'stand', 'law-2026', 'situations', 'reviews', 'qa', 'qa2'].forEach((f) => require('../src/' + f + '.js'));
 const K = global.ER_KB; const fs = require('fs'); const path = require('path');
 const G = new Set(K.issues.map((i) => i.id)); const S = new Map(K.situations.map((x) => [x.t, x.g]));
 

@@ -1,5 +1,5 @@
 global.window = global;
-['kb','cites','j-money','j-family','j-consumer','j-other','j-nri','j-business','j-more','j-genz', 'j-gaps', 'j-rights', 'stand','law-2026','situations','reviews','qa', 'qa2'].forEach((f) => require('../src/' + f + '.js'));
+['kb','cites','j-money','j-family','j-consumer','j-other','j-nri','j-business','j-more','j-genz', 'j-gaps', 'j-rights', 'j-crucial', 'stand','law-2026','situations','reviews','qa', 'qa2'].forEach((f) => require('../src/' + f + '.js'));
 const KB = global.ER_KB; require('../src/engine.js'); const E = global.ER_ENGINE;
 // Could this condition still come true once the remaining questions are answered? An unanswered question counts
 // as "maybe" only if it could still be asked (its own condition can come true); otherwise it never will be answered.

@@ -41,7 +41,7 @@ const URL = process.env.URL || 'http://localhost:8790/';
   await q.goto(URL + '#home'); await q.evaluate(() => localStorage.setItem('er_lang', '"ta"')); await q.reload(); await q.waitForTimeout(600);
   await q.evaluate(() => { navigator.mediaDevices.getUserMedia = () => Promise.reject(Object.assign(new Error('denied'), { name: 'NotAllowedError' })); });
   await q.click('[data-act=mic]'); await q.waitForTimeout(500);
-  const h = await q.textContent('#voicehint'); if (!/permission|Microphone|माइक/i.test(h || '')) fails.push('no permission message: ' + h);
+  const h = await q.textContent('#voicehint'); if (!/permission|Microphone|माइक|மைக்ரோஃபோன்/i.test(h || '')) fails.push('no permission message: ' + h);
   console.log(errs.length || fails.length ? 'VOICE FAIL\n' + errs.concat(fails).join('\n') : 'VOICE OK (Hindi voice, English UI + other language, typed Hindi, typed Odia, 320px, permission denied)');
   console.log('typed Hindi →', t2.join(' | '), '\ntyped Odia →', t3.join(' | '));
   await b.close(); process.exit(errs.length || fails.length ? 1 : 0);
