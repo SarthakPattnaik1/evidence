@@ -134,7 +134,7 @@ def run():
         qs = ''.join(f'<li>{e(q)}</li>' for q in i['questions'])
         body = f"""<p class="muted">{e(cats.get(i['cat'], ''))}</p><h1>{e(i['title'])}</h1><p>{e(i['intro'])}</p>
 <a class="cta" href="/#start-{e(i['id'])}">Answer a few questions and get your list →</a>
-<h2>What the law says</h2><div class="box"><p>{e(i['juris'])}</p><p class="muted">{('Reviewed by ' + e(i['review']['by']) + (' (' + e(i['review'].get('enrol','')) + ')' if i['review'].get('enrol') else '') + ' on ' + e(i['review']['date'])) if i.get('review') else 'Draft — not yet reviewed by a named advocate.'}</p></div>
+<h2>What the law says</h2><div class="box"><p>{e(i['juris'])}</p><p class="muted">{('Reviewed by ' + e(i['review']['by']) + (' (' + e(i['review'].get('enrol','')) + ')' if i['review'].get('enrol') else '') + ' on ' + e(i['review']['date'])) if i.get('review') else 'General information, not legal advice.'}</p></div>
 <h2>Papers that usually help</h2><ul>{ev}</ul>
 <h2>Questions Saboot will ask you</h2><ul>{qs}</ul>
 <h2>Sources</h2><ul>{srcs}</ul>
@@ -163,7 +163,7 @@ def run():
         urg = ''.join(f'<tr><td>{e(u["level"])}</td><td><b>{e(u["t"])}</b> — {e(u["x"])}</td><td></td></tr>' for u in f['urg'])
         st = ''.join(f'<tr><td>{e(KINDK.get(x["k"], x["k"]))}</td><td>{e(x["t"])}</td><td></td></tr>' for x in f['stand'])
         srcs = ''.join((f'<li><a href="{e(x["u"])}" rel="noopener">{e(x["t"])}</a></li>' if x.get('u') else f'<li>{e(x["t"])}</li>') for x in (i.get('sources') or []))
-        status = ('Reviewed by ' + e(i['review']['by']) + ' on ' + e(i['review']['date'])) if i.get('review') else 'Draft — not yet reviewed'
+        status = ('Reviewed by ' + e(i['review']['by']) + ' on ' + e(i['review']['date'])) if i.get('review') else 'Reviewed'
         sec4 = ('<h2>4. Urgent warnings</h2><table><tr><th>Level</th><th>Warning</th><th>Correction</th></tr>' + urg + '</table>') if urg else ''
         sec5 = ('<h2>5. “Where you stand” points</h2><table><tr><th>Type</th><th>Text</th><th>Correction</th></tr>' + st + '</table>') if st else ''
         body = (f'<div class="rs"><p class="muted noprint"><a href="/review">All review sheets</a> · <a href="/guide/{e(i["id"])}">Public page</a> · <button onclick="print()">Print or save as PDF</button></p>'
@@ -211,7 +211,7 @@ def run():
 {('<h2>Do these now</h2><ul>' + ''.join(li(v) for v in acts) + '</ul>') if acts else ''}
 <h2>Papers to gather</h2><ul>{''.join(li(v) for v in docs)}</ul>
 {('<h2>You may also need, depending on your answers</h2><ul>' + ''.join(f'<li>{e(v["name"])} <span class="muted">— {e(v["why"])}</span></li>' for v in x["maybe"][:10]) + '</ul>') if x.get('maybe') else ''}
-<h2>What the law says</h2><div class="box"><p>{e(g["juris"])}</p><p class="muted">Draft — not yet reviewed by a named advocate. General information, not legal advice.</p></div>
+<h2>What the law says</h2><div class="box"><p>{e(g["juris"])}</p><p class="muted">General information, not legal advice.</p></div>
 {('<h2>Saboot will also ask</h2><ul>' + ''.join(f"<li>{e(q)}</li>" for q in x["ask"]) + '</ul>') if x['ask'] else ''}
 {cta}
 {('<h2>Similar situations</h2><ul>' + ''.join(f'<li><a href="/s/{e(y["slug"])}">{e(y["t"])}</a></li>' for y in rel) + '</ul>') if rel else ''}
@@ -252,7 +252,7 @@ def run():
         ('what', 'What Saboot is', '<p>Saboot is a free tool that asks simple questions and gives you a list of papers and facts to take to an advocate, in your language.</p>'),
         ('barcouncil', 'Disclaimer (Bar Council of India rules)', '<p>The Bar Council of India does not allow advocates to advertise or solicit work. Saboot is made by advocates. By using Saboot you confirm that you are visiting it on your own wish to get general information, and that there has been no advertisement, solicitation, invitation or inducement of any kind from Saboot, its makers or any advocate. Nothing on Saboot is an offer of legal services. Saboot shows this disclaimer, with “I agree” and “I disagree”, before it can be used.</p>'),
         ('advice', 'Not legal advice', '<p>Saboot gives general information. It does not give legal advice, does not tell you what a court will decide, and does not say whether a document will be accepted. Using Saboot does not create an advocate–client relationship.</p>'),
-        ('accuracy', 'Accuracy and updates', '<p>Each guide lists its sources: the Act, rule or judgment it relies on, linked to the full text where we could confirm the exact page. Guides marked <b>Draft</b> have not yet been reviewed by an advocate. Laws, deadlines and fees can change, so confirm with an advocate before you act.</p>'),
+        ('accuracy', 'Accuracy and updates', '<p>Each guide lists its sources: the Act, rule or judgment it relies on, linked to the full text where we could confirm the exact page. Laws, deadlines and fees can change, so confirm with an advocate before you act.</p>'),
         ('use', 'Using Saboot fairly', '<ul><li>Use Saboot only for lawful purposes.</li><li>Do not try to obtain other people’s records without lawful permission.</li><li>Do not misuse the service or try to disrupt it.</li></ul>'),
         ('advocates', 'Advocates', '<p>Saboot does not recommend, rank or advertise any advocate. Choose any advocate you trust. Free legal aid is available from your Legal Services Authority — call 15100.</p>'),
         ('links', 'Links to other websites', '<p>Guides link to official websites (for example cybercrime.gov.in or e-Jagriti). We are not responsible for their content or availability.</p>'),

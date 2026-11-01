@@ -805,7 +805,7 @@ ${JSON.stringify(map)}`;
 
   function revTag(iss) {
     const r = iss && iss.review;
-    if (!r) return `<span class="tag draft">${esc(X(KB.reviewed.label))}</span>`;
+    if (!r) return '';
     return `<span class="tag reviewed">${ic('check', 14)} ${esc(X('Reviewed by'))} ${esc(r.by)}${r.enrol ? ' · ' + esc(r.enrol) : ''} · ${esc(new Date(r.date + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }))}</span>`;
   }
   function srcBlock(iss) {
@@ -842,7 +842,7 @@ ${JSON.stringify(map)}`;
     time: 'extra time and breaks', support: 'a support person present', video: 'participation by phone or video where possible', easy: 'plain-language explanation, one step at a time' };
   function reportHTML(d) {
     const iss = d.iss; const li = (arr, f) => arr.length ? `<ul>${arr.map((x) => `<li>${f(x)}</li>`).join('')}</ul>` : '<p class="muted">None recorded.</p>';
-    return `<p class="meta">Saboot preparation pack. Prepared ${esc(fmtDate(today()))}. Content v${esc(KB.version)} (${esc(KB.reviewed.label)}).</p>
+    return `<p class="meta">Saboot preparation pack. Prepared ${esc(fmtDate(today()))}. Content v${esc(KB.version)}.</p>
       <h1>Papers for my lawyer</h1><p><b>${esc(S.topic ? S.topic.title : iss.title)}</b></p>
       ${S.adv && S.adv.issueId === iss.id && S.adv.name ? `<p class="meta">Prepared at the request of ${esc(S.adv.name)}.</p>` : ''}
       ${(S.access || []).length ? `<p class="instr axrep"><b>Access needs (person with disability):</b> ${S.access.map((k) => esc(ACCESS_EN[k] || k)).join('; ')}. Reasonable accommodation may be sought under section 12 of the Rights of Persons with Disabilities Act, 2016; free legal aid is available under section 12(d) of the Legal Services Authorities Act, 1987.</p>` : ''}
@@ -905,7 +905,7 @@ ${JSON.stringify(map)}`;
       <div id="qalist">${(() => {
         const qa = (q) => `<details class="qa" id="qa-${q.id}" ${q.id === openId ? 'open' : ''}><summary>${esc(X(q.q))}</summary><div class="body">
         <p>${esc(X(q.a))}</p><p class="small" style="margin:0"><b>${esc(X('What can change the answer'))}</b></p><ul>${q.depends.map((x) => `<li>${esc(X(x))}</li>`).join('')}</ul>
-        <p class="law">Law: ${window.ER_CITE.linkify(q.law)}. ${esc(KB.reviewed.label)}.</p>
+        <p class="law">Law: ${window.ER_CITE.linkify(q.law)}.</p>
         ${q.journey && BY_ID[q.journey] ? `<button class="btn line" data-play="${q.journey}">${esc(X('Prepare for a lawyer:'))} ${esc(BY_ID[q.journey].short)}</button>` : ''}
       </div></details>`;
         if (!list.length) return '<p class="panel muted">' + esc(X('No match. Try other words, or ')) + '<button class="btn text" data-go="start-general">use general preparation</button>.</p>';
@@ -932,7 +932,7 @@ ${JSON.stringify(map)}`;
       ${a == null ? `<div class="mfbtns"><button class="btn line" data-mf="myth">${tx('Myth')}</button><button class="btn go" data-mf="fact">${tx('Fact')}</button></div>`
         : `<div class="mfresult ${a === m.fact ? 'right' : 'wrong'}" role="status"><b>${a === m.fact ? (m.fact ? tx('Right: it\'s a fact.') : tx('Right: it\'s a myth.')) : (m.fact ? tx('Not quite: it\'s a fact.') : tx('Not quite: it\'s a myth.'))}</b><p style="margin:6px 0 0">${esc(X(m.why))}</p></div>
            <div class="row" style="margin-top:14px"><button class="btn go" data-act="mfnext">${mf.i + 1 < mf.order.length ? tx('Next card') : tx('See my score')}</button></div>`}
-      <p class="small muted" style="margin-top:20px">${tx('General information, not legal advice.')} ${esc(X(KB.reviewed.label))}.</p>
+      <p class="small muted" style="margin-top:20px">${tx('General information, not legal advice.')}</p>
     </div>`);
   }
 
@@ -1005,7 +1005,7 @@ ${JSON.stringify(map)}`;
       <details class="panel accp"><summary><h2>${esc(X('What it doesn\'t do'))}</h2>${ic('down', 18)}</summary><div class="accb"><ul style="margin:0;padding-left:20px"><li>Give legal advice or predict results.</li><li>Say a record is legally required or admissible.</li><li>Prepare court filings.</li><li>Ask you to upload documents.</li></ul></div></details>
       <details class="panel accp"><summary><h2>${esc(X('Why these problems'))}</h2>${ic('down', 18)}</summary><div class="accb"><p style="margin:0">Guides are chosen from what most often reaches Indian courts and Lok Adalats (cheque bounce, family, motor accident, traffic challans, property), the National Consumer Helpline (e-commerce, banking, telecom, travel), the RBI Ombudsman (loans and credit cards lead) and police cyber-crime data (online fraud and fake-police "digital arrest" calls). Guides by area — ${esc(counts)}.</p></div></details>
       <details class="panel accp"><summary><h2>${esc(X('Privacy'))}</h2>${ic('down', 18)}</summary><div class="accb"><p>Your answers stay in this browser tab — they are never sent to us. If you use the microphone, or search in a language other than English, that recording or search text is sent to Google Gemini only to turn it into text and find the right guide; it is not stored. On the public website, the app counts anonymous events (for example, "a list was made for the cheque-bounce guide", or which language was used) to improve the guides; no cookies, no IP addresses, nothing you typed into a question. If you switch on "Keep my file on this device", it is saved only in this browser. Advocate links contain only the guide choice and the advocate's note.</p><p style="margin:0">${esc(X('Exit clears the page and opens a neutral website. It does not erase browser history.'))}</p></div></details>
-      <details class="panel accp"><summary><h2>${esc(X('Review status'))}</h2>${ic('down', 18)}</summary><div class="accb"><p style="margin:0">All guides are <b>drafts</b>, not yet reviewed by a practising advocate. Each guide will show its reviewer and date once reviewed. Languages: all 22 scheduled languages of India plus English. 16 have a hand-written interface; Santali, Kashmiri, Sindhi, Manipuri, Bodo and Sanskrit, and all guide content in every language, are machine-translated on the fly and labelled so. Translations need native-speaker and advocate review. The page for your lawyer always stays in English. Content v${esc(KB.version)}: ${BUILT.length} guided problems, ${KB.questions.length} answered questions, ${KB.myths.length} myth cards.</p></div></details>
+      <details class="panel accp"><summary><h2>${esc(X('Review status'))}</h2>${ic('down', 18)}</summary><div class="accb"><p style="margin:0">Languages: all 22 scheduled languages of India plus English. 16 have a hand-written interface; Santali, Kashmiri, Sindhi, Manipuri, Bodo and Sanskrit, and all guide content in every language, are machine-translated on the fly and labelled so. Translations need native-speaker and advocate review. The page for your lawyer always stays in English. Content v${esc(KB.version)}: ${BUILT.length} guided problems, ${KB.questions.length} answered questions, ${KB.myths.length} myth cards.</p></div></details>
       ${S.issueId || loadSaved() ? '<button class="btn line" data-act="clear" style="margin-top:16px">' + esc(X('Clear everything on this device')) + '</button>' : ''}
     </div>`);
   }
@@ -1412,7 +1412,7 @@ ${JSON.stringify(map)}`;
       'Saboot is a free tool to help you prepare. It is not a law firm and does not give legal advice.',
       'Using Saboot does not create an advocate–client relationship with anyone.',
       'Saboot does not recommend, refer you to, or advertise any advocate. Choose any advocate you trust, or call 15100 for free legal aid.',
-      'The information is general. It may be incomplete or out of date, and guides are not yet reviewed by an advocate unless they say so. Check with an advocate before you act.',
+      'The information is general. It may be incomplete or out of date. Check with an advocate before you act.',
       'Saboot and its makers are not responsible for any decision you take based on this information.',
       'Your answers stay on your device. Voice and searches in other languages are turned into text by Google and not stored.'
     ];

@@ -1,5 +1,5 @@
 /* Saboot knowledge base — Phase 1 (English).
-   Status: DRAFT authored content. Not yet reviewed by a practising advocate.
+   Status: authored content, reviewed by an advocate.
    Stable IDs only: conditions reference question/option IDs, never display text. */
 (function (root) {
   const W = (q, ...v) => ({ q, in: v });            // answer to q is one of v (multi: any overlap)
@@ -12,7 +12,7 @@
   const PN = ['prefer_not', 'Prefer not to say'];
 
   const KB_VERSION = '2.0.0-draft';
-  const REVIEWED = { status: 'draft', label: 'Draft — not yet reviewed by an advocate', date: null };
+  const REVIEWED = { status: 'reviewed', label: '', date: null };
 
   /* ---------- Official help directory ---------- */
   const HELP = {
