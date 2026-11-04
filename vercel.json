@@ -120,17 +120,6 @@
   },
   "redirects": [
     {
-      "source": "/admin(.html)?",
-      "has": [
-        {
-          "type": "host",
-          "value": "saboot.org"
-        }
-      ],
-      "destination": "https://admin.saboot.org/",
-      "permanent": false
-    },
-    {
       "source": "/",
       "has": [
         {
