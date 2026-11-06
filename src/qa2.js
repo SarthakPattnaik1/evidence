@@ -195,6 +195,12 @@
     ['Your state’s rent law', 'Terms of your agreement'], 'State rent laws; Specific Relief Act s.6', 'eviction-tenancy', ['eviction without court', 'landlord threw out']);
 
   /* ---------- Work ---------- */
+  Q('work', 'govt-charge-sheet-time', 'How much time do I get to reply to a charge sheet as a central government employee?',
+    "15 days from receiving the articles of charge to file your written statement of defence. The disciplinary authority can extend it by 15 days at a time, but never beyond 45 days in all (Rule 14(4), as amended in 2017). Ask for an extension in writing, and for copies of the documents relied on, before the 15 days run out.",
+    ['Whether it is a major (Rule 14) or minor (Rule 16) proceeding', 'State or PSU rules, which can differ'], 'CCS (CCA) Rules, 1965 — Rule 14(4)', 'govt-service', ['charge sheet reply time', 'written statement of defence days', '15 days charge sheet']);
+  Q('work', 'govt-penalty-appeal', 'How long do I have to appeal a penalty order in a government job?',
+    "45 days from the date you receive a copy of the order (Rule 25 of the CCS (CCA) Rules). The appellate authority can accept a late appeal if you show sufficient cause. After the appeal is decided, a case before the Central Administrative Tribunal must generally be filed within one year.",
+    ['Central, state or PSU employer'], 'CCS (CCA) Rules, 1965 — Rule 25; Administrative Tribunals Act, 1985 s.21', 'govt-service', ['penalty appeal time', 'appeal 45 days', 'appeal against punishment government']);
   Q('work', 'govt-show-cause-steps', 'I am a government employee and fear disciplinary proceedings. What should I do?',
     "Four steps: (1) collect copies of every document about the matter — orders, letters, emails, file notings and records; (2) collect the rules that apply, such as the CCS (CCA) Rules 1965, the CCS (Conduct) Rules 1964 or your state's service rules; (3) when a show-cause notice or memo of charges arrives, read it carefully — each charge, the facts alleged, the documents and witnesses relied on, and the reply deadline — and ask in writing for copies of the documents relied on; (4) draft your reply point by point with evidence attached, avoid admissions, and get proof that it was delivered on time.",
     ['Whether it is a major (Rule 14) or minor (Rule 16) penalty proceeding', 'Whether you are a central, state or PSU employee'], 'CCS (CCA) Rules, 1965 — Rules 14 and 16', 'govt-service', ['show cause notice', 'memo of charges', 'disciplinary proceedings', 'charge sheet government employee']);
