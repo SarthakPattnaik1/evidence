@@ -11,7 +11,7 @@
   const NS = ['unsure', "I'm not sure"];
   const PN = ['prefer_not', 'Prefer not to say'];
 
-  const KB_VERSION = '2.0.0-draft';
+  const KB_VERSION = '2.1.0';
   const REVIEWED = { status: 'reviewed', label: '', date: null };
 
   /* ---------- Official help directory ---------- */
