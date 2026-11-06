@@ -1106,6 +1106,20 @@ html[dir=rtl] .i-dir{transform:scaleX(-1)}
 .nomatch p{margin:0 0 8px}
 .nmacts{display:flex;flex-wrap:wrap;gap:8px}
 .btn.sm{min-height:44px;padding:8px 14px;font-size:14.5px}
+
+/* v38: Quick exit must always be on screen. On phones the header had no room for it (it sat 12px past the edge at 360px). */
+@media (max-width:520px){
+  header.top .wrap.has-exit .navq{display:none}
+  header.top .wrap.has-exit .nav.lang span{display:none}
+  header.top .wrap.has-exit .nav .lbl-short{display:none}
+  header.top .wrap.has-exit .nav.exit{margin-left:auto}
+}
+header.top .wrap.has-exit .nav.exit span{display:inline!important}
+/* v39: long language names (മലയാളം, ᱥᱟᱱᱛᱟᱲᱤ) pushed the header 12px past a 360px screen. */
+@media (max-width:400px){
+  header.top .nav{padding:8px 4px}
+  header.top .nav.lang span{max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+}
 </style>
 <script defer src="/_vercel/insights/script.js"></script>
 </head>
@@ -1128,7 +1142,7 @@ html[dir=rtl] .i-dir{transform:scaleX(-1)}
   const NS = ['unsure', "I'm not sure"];
   const PN = ['prefer_not', 'Prefer not to say'];
 
-  const KB_VERSION = '2.0.0-draft';
+  const KB_VERSION = '2.1.0';
   const REVIEWED = { status: 'reviewed', label: '', date: null };
 
   /* ---------- Official help directory ---------- */
@@ -1812,6 +1826,7 @@ html[dir=rtl] .i-dir{transform:scaleX(-1)}
         when: W('g_comms', 'yes') },
       { id: 'g_e_ids', name: 'Your ID and address proof, and the other side\'s name and address', fact: 'Who the parties are', why: 'Needed for any notice or case.', where: 'Your records.', preserve: '' },
       { id: 'g_e_timeline', name: 'A short written timeline of what happened', fact: 'The order of events', why: 'Saves time in the first meeting.', where: 'Use "My timeline" in this tool.', preserve: '', action: true },
+      { id: 'g_e_qs', name: 'The questions you want to ask the advocate, written down', fact: 'What you need to know', why: 'First meetings are short; a written list makes sure nothing is missed.', where: 'Write them in your notes; Saboot adds some for you.', preserve: '', action: true },
       { id: 'g_e_others', name: 'List of records held by others, and who holds them', fact: 'What may need to be requested', why: 'Your advocate can advise how to obtain them lawfully.', where: '—', preserve: '', holder: 'others',
         when: W('g_others', 'bank', 'employer', 'govt', 'otherparty') }
     ],
@@ -2152,6 +2167,7 @@ html[dir=rtl] .i-dir{transform:scaleX(-1)}
         where: 'Your email and messages.', preserve: '', when: W('cc_issue', 'unsolicited') },
       { id: 'cc_e_mitc', name: 'Most Important Terms and Conditions (MITC) and fee schedule', fact: 'What charges were agreed', why: 'Charges not disclosed may not be payable.', where: 'Issuer website, welcome kit.', preserve: '', when: W('cc_issue', 'charges') },
       { id: 'cc_e_merchant', name: 'Order, cancellation and merchant correspondence', fact: 'The merchant failed to deliver or refund', why: 'Supports a chargeback request.', where: 'Merchant email/app.', preserve: '', when: W('cc_issue', 'merchant') },
+      { id: 'cc_e_written', name: 'A written complaint to the card issuer (email or in-app) with its complaint number', fact: 'You complained in writing', why: 'A phone call is hard to prove, and the RBI Ombudsman needs a written complaint to the bank first.', where: 'Issuer’s email, app or grievance portal.', preserve: 'Save the acknowledgement.', action: true },
       { id: 'cc_e_calls', name: 'Recovery call logs and messages', fact: 'How recovery was done', why: 'Abusive recovery breaches RBI rules.', where: 'Your phone.', preserve: '', when: W('cc_issue', 'recovery') },
       { id: 'cc_e_credit', name: 'Your credit report showing the wrong entry', fact: 'The error', why: 'Needed for the correction request.', where: 'Free annual report from a credit bureau.', preserve: '', when: W('cc_issue', 'cibil') },
       { id: 'cc_e_reply', name: 'Issuer\'s reply or proof of no reply', fact: 'Bank had its chance', why: 'Needed for an RBI Ombudsman complaint.', where: 'Email.', preserve: '', when: W('cc_reply', 'rejected', 'none', 'partial') }
@@ -2392,6 +2408,7 @@ html[dir=rtl] .i-dir{transform:scaleX(-1)}
       { id: 'ip_e_bank', name: 'Passbooks, policy and share details, nominee details, and the institution\'s reply', fact: 'Assets held by banks/insurers', why: 'A nominee generally holds money for the legal heirs.', where: 'Bank, insurer, demat statements.', preserve: '', holder: 'others', when: ANY(W('ip_kind', 'bank'), W('ip_problem', 'bank', 'nominee')) },
       { id: 'ip_e_release', name: 'Any release deed or family settlement you signed', fact: 'Whether you gave up a share', why: 'Central to whether a claim survives.', where: 'Your records, sub-registrar.', preserve: '', when: W('ip_released', 'yes', 'unsure') },
       { id: 'ip_e_relation', name: 'Proof of your relationship (birth certificate, school records, ID with parent\'s name)', fact: 'You are an heir', why: 'Required to claim.', where: 'Your records.', preserve: '' },
+      { id: 'ip_e_assets', name: 'List of the property involved: address or survey number, bank accounts, gold, and who holds each now', fact: 'What is to be shared', why: 'A partition or claim must describe each property exactly.', where: 'Family records, passbooks, land records.', preserve: '' },
       { id: 'ip_e_case', name: 'Papers and orders in any pending case', fact: 'What is already decided', why: 'Avoids duplicate cases.', where: 'Your advocate, court.', preserve: '', when: W('ip_case', 'yes') }
     ],
     urgent: [
@@ -2848,6 +2865,8 @@ html[dir=rtl] .i-dir{transform:scaleX(-1)}
     evidence: [
       { id: 'oh_e_screens', name: 'Screenshots showing the content, profile name/URL, date and time', fact: 'The harassing content', why: 'Evidence before it is deleted.', where: 'Your phone/computer.', preserve: 'Capture the URL and the profile page. Keep the originals; do not edit.' },
       { id: 'oh_e_links', name: 'List of links (URLs), usernames and phone numbers involved', fact: 'Who and where', why: 'Platforms and police need exact links.', where: 'Copy from the app or browser.', preserve: '', action: true },
+      { id: 'oh_e_dates', name: 'A short dated list of each incident: what happened, when, and from which account', fact: 'The pattern over time', why: 'Repeated conduct is what makes stalking and harassment easier to prove.', where: 'Write it yourself; add to it each time.', preserve: '', action: true },
+      { id: 'oh_e_takedown', name: 'Takedown request for the images (platform report or StopNCII.org case number)', fact: 'You asked for removal', why: 'Platforms must remove intimate images shared without consent within 24 hours of a complaint (IT Rules 2021).', where: 'The platform’s report form; stopncii.org.', preserve: 'Do not delete the originals you have — keep them as evidence.', action: true, when: W('oh_what', 'images') },
       { id: 'oh_e_export', name: 'Full chat export and call log', fact: 'The pattern of messages', why: 'Shows frequency and threats.', where: 'WhatsApp/Telegram export.', preserve: '', when: W('oh_what', 'messages', 'blackmail', 'stalking') },
       { id: 'oh_e_payment', name: 'Payment demands and any payments already made', fact: 'Extortion', why: 'Supports extortion charges.', where: 'Messages, bank statements.', preserve: 'Do not pay further.', when: W('oh_what', 'blackmail') },
       { id: 'oh_e_report', name: 'Platform report confirmations and cybercrime complaint number', fact: 'Complaints made', why: 'Needed to escalate.', where: 'Email confirmations, portal.', preserve: '', when: W('oh_reported', 'platform', 'cyber', 'police') },
@@ -2970,6 +2989,7 @@ html[dir=rtl] .i-dir{transform:scaleX(-1)}
       { id: 'pa_e_stamp', name: 'Stamp duty payment / adjudication in India', fact: 'Duly stamped', why: 'Unstamped documents can be refused or impounded.', where: 'Sub-registrar / collector of stamps in your state.', preserve: '', time: 'Generally within 3 months of the document reaching India — confirm your state rule.', when: W('pa_stage', 'india', 'signed', 'rejected') },
       { id: 'pa_e_reg', name: 'Registration of the PoA (if it will be used to sell property)', fact: 'Registered authority to sell', why: 'Many registrars require it.', where: 'Sub-registrar office.', preserve: '', when: W('pa_for', 'sell') },
       { id: 'pa_e_ids', name: 'Passport/OCI copies of you and ID of the attorney holder; photos', fact: 'Identity of both parties', why: 'Required at execution and registration.', where: 'Your documents.', preserve: '' },
+      { id: 'pa_e_subject', name: 'Details of what the POA is for: property address and survey number, account, or case number', fact: 'The exact matter covered', why: 'A POA must describe the property or matter clearly; vague POAs are refused or misused.', where: 'Your property papers, bank, or court records.', preserve: '' },
       { id: 'pa_e_reason', name: 'The written rejection or objection', fact: 'What went wrong', why: 'Tells you what to fix.', where: 'Registrar, bank or court.', preserve: '', when: W('pa_stage', 'rejected') },
       { id: 'pa_e_revoke', name: 'Revocation deed executed abroad, and notices to the holder, sub-registrar, banks and buyers', fact: 'Authority was withdrawn', why: 'Revocation must be communicated to be effective against others.', where: ABROAD, preserve: 'Keep postal/email proof of each notice.', action: true, when: W('pa_goal', 'cancel', 'misuse') },
       { id: 'pa_e_misuse', name: 'Records of what the holder did (deeds, bank withdrawals, messages)', fact: 'Misuse of authority', why: 'Supports civil and criminal action.', where: 'Encumbrance certificate, bank statements, sub-registrar.', preserve: '', when: W('pa_goal', 'misuse') }
@@ -3241,6 +3261,7 @@ html[dir=rtl] .i-dir{transform:scaleX(-1)}
       { id: 'ip_e_use', name: 'Proof of earliest and continuous use: invoices, ads, packaging, dated web pages', fact: 'You used it first', why: 'Decides priority and passing off.', where: 'Your records; web archives.', preserve: '' },
       { id: 'ip_e_sales', name: 'Sales figures and marketing spend', fact: 'Your reputation (goodwill)', why: 'Needed for passing off.', where: 'Accounts.', preserve: '', when: W('ip_what', 'brand', 'design') },
       { id: 'ip_e_copy', name: 'Dated screenshots, URLs, test purchases and invoices of the copy', fact: 'The infringement', why: 'Shows what is copied and where.', where: 'Web, marketplaces, shops.', preserve: 'Keep the purchased product sealed.' },
+      { id: 'ip_e_whois', name: 'WHOIS record and dated screenshots of the copied domain or website', fact: 'Who registered the domain and when', why: 'Domain complaints (INDRP for .in, UDRP for .com) compare registration date with your first use.', where: 'whois lookup sites; registry.in for .in domains.', preserve: 'Save as PDF with the date.', when: W('ip_what', 'domain') },
       { id: 'ip_e_confusion', name: 'Instances of customer confusion (messages, reviews, misdirected orders)', fact: 'Consumers were misled', why: 'Strong evidence in brand cases.', where: 'Customer support, reviews.', preserve: '', when: W('ip_what', 'brand') },
       { id: 'ip_e_creation', name: 'Original files with creation dates (source files, drafts, code repos)', fact: 'You created it', why: 'Proves authorship in copyright cases.', where: 'Your systems.', preserve: '', when: W('ip_what', 'content', 'design') },
       { id: 'ip_e_employment', name: 'Employment/consultancy agreement with confidentiality clauses; exit records', fact: 'Confidentiality obligations', why: 'Basis for action over secrets.', where: 'HR records.', preserve: '', when: W('ip_what', 'secrets') },
@@ -4569,6 +4590,8 @@ html[dir=rtl] .i-dir{transform:scaleX(-1)}
       { id: 'lp_e_imei', name: 'IMEI number(s) of the phone', fact: 'Which phone', why: 'CEIR blocks by IMEI.', where: 'Phone box, purchase invoice, or Google/Apple account.', preserve: '', when: W('lp_what', 'phone') },
       { id: 'lp_e_bill', name: 'Purchase invoice of the phone', fact: 'You own it', why: 'Needed for CEIR and insurance.', where: 'Email, shop, e-commerce order.', preserve: '', when: W('lp_what', 'phone') },
       { id: 'lp_e_police', name: 'FIR or lost-article report with its number', fact: 'Reported to police', why: 'Needed for CEIR, duplicates and insurance.', where: 'State police website or police station.', preserve: 'Download the PDF.' },
+      { id: 'lp_e_place', name: 'Where and when you last had it: time, place, bus, train or cab details', fact: 'When and where it went missing', why: 'Police and transport lost-and-found offices search by place and time; CCTV is usually kept only a few days.', where: 'Your memory, tickets, ride receipts.', preserve: 'Ask the station, mall or cab company to keep CCTV for that time.', action: true },
+      { id: 'lp_e_items', name: 'List of what was in the bag, with bills or photos where you have them', fact: 'What was lost', why: 'Needed for the police report and any insurance claim.', where: 'Your bills, photos, bank statements.', preserve: '', when: W('lp_what', 'bag') },
       { id: 'lp_e_sim', name: 'Block the SIM with your operator and get a replacement', fact: 'Number secured', why: 'Stops OTP misuse.', where: 'Operator store or helpline.', preserve: '', action: true, when: W('lp_what', 'phone') },
       { id: 'lp_e_bank', name: 'Block UPI, cards and net banking', fact: 'Money protected', why: 'Prevents fraud.', where: 'Bank helpline / app from another phone.', preserve: 'Note the reference numbers.', action: true, when: ANY(W('lp_banking', 'yes'), W('lp_what', 'wallet')) },
       { id: 'lp_e_ceir', name: 'Block the phone on CEIR (Sanchar Saathi)', fact: 'Phone blocked on all networks', why: 'Makes it useless to thieves and helps trace it.', where: 'sancharsaathi.gov.in → Block your lost/stolen mobile', preserve: 'Keep the request ID to unblock later.', action: true, when: W('lp_what', 'phone') },
@@ -7872,9 +7895,14 @@ html[dir=rtl] .i-dir{transform:scaleX(-1)}
   const blank = () => ({ issueId: null, topic: null, answers: {}, skipped: {}, stage: 'quick', history: [], quickDone: false, deepDone: false,
     status: {}, records: {}, chrono: [], ackUrgent: {}, adv: null, excludeSensitive: true, notes: '', prefill: {}, chapterFound: [], breaks: 0, limDate: {} });
   let S = blank();
+  // Answers survive a reload or the phone discarding the tab (common when switching to WhatsApp or the gallery to
+  // find a paper). sessionStorage belongs to this tab only and is wiped when the tab is closed, by Delete all and by Quick exit.
+  const TAB_KEY = 'saboot_tab';
+  try { const t = sessionStorage.getItem(TAB_KEY); if (t) S = Object.assign(blank(), JSON.parse(t)); } catch (e) { /* private mode */ }
+  const clearTab = () => { try { sessionStorage.removeItem(TAB_KEY); } catch (e) { /* ignore */ } };
   const UI = { club: 'money', qcat: 'all', qsearch: '', mf: { i: 0, score: 0, ans: null, order: null } };
   let saveOn = false;
-  function persist() { if (!saveOn) return; try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); } catch (e) { /* unavailable */ } }
+  function persist() { try { sessionStorage.setItem(TAB_KEY, JSON.stringify(S)); } catch (e) { /* unavailable */ } if (!saveOn) return; try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); } catch (e) { /* unavailable */ } }
   function loadSaved() { try { const v = localStorage.getItem(STORE_KEY); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
   function clearSaved() { try { localStorage.removeItem(STORE_KEY); } catch (e) { /* ignore */ } }
   const issue = () => BY_ID[S.issueId];
@@ -8122,15 +8150,16 @@ ${JSON.stringify(map)}`;
     while (S.history.length > k) { const last = S.history.pop(); S.prefill[last.id] = S.answers[last.id]; delete S.answers[last.id]; delete S.skipped[last.id]; S.stage = last.stage; changed = true; }
     if (changed) { if (S.stage === 'quick') S.quickDone = false; else S.deepDone = false; E.prune(issue(), S.answers); persist(); }
   }
-  window.addEventListener('hashchange', () => { render(); trWait(); });
+  // A dialog left open (language, accessibility, share…) must not stay over the next page after Back or a link.
+  window.addEventListener('hashchange', () => { document.querySelectorAll('.overlay:not(.consent)').forEach((o) => o.remove()); render(); trWait(); });
 
   function shell(inner, opt = {}) {
-    const sensitive = !!(issue() && issue().sensitive && opt.inJourney);
+    const cur = opt.iss || issue(); const sensitive = !!(cur && cur.sensitive && (opt.inJourney || opt.exit));
     document.body.classList.toggle('calm', sensitive);
-    return `<header class="top"><div class="wrap">
+    return `<header class="top"><div class="wrap${sensitive ? ' has-exit' : ''}">
         <button class="brand" data-go="home" aria-label="Saboot home"><img class="bicon" src="${window.ER_BRAND.icon}" alt="" width="34" height="28"><img class="bwordimg" src="${window.ER_BRAND.word}" alt="Saboot" width="80" height="26"></button>
         <button class="nav navq" data-go="questions" aria-label="${esc(T('q'))}">${ic('q', 18)}<span class="lbl-long">${esc(T('q').replace(/\?$/, ''))}</span></button>
-        <button class="nav" data-go="help">${ic('phone', 18)}<span class="lbl-long">${esc(T('help').replace(/\?$/, ''))}</span><span class="lbl-short">${esc(H('nav_help', 'Help'))}</span></button>
+        <button class="nav" data-go="help" aria-label="${esc(H('nav_help', 'Help'))}">${ic('phone', 18)}<span class="lbl-long">${esc(T('help').replace(/\?$/, ''))}</span><span class="lbl-short">${esc(H('nav_help', 'Help'))}</span></button>
         <button class="nav axbtn" data-act="ax" aria-label="${esc(X('Accessibility: bigger text, contrast, read aloud'))}" title="${esc(X('Accessibility'))}">${ic('access', 20)}</button>
         <button class="nav lang" data-act="lang" aria-label="Language: ${esc(LMETA[LANG].name)}. Change language">${ic('globe', 18)}<span>${esc(LMETA[LANG].native)}</span></button>
         ${sensitive ? `<a class="nav exit" data-act="exit" href="https://www.google.com" target="_blank" rel="noopener noreferrer" title="Clears this page and opens a neutral website">${ic('x', 18)}<span>Exit</span></a>` : ''}
@@ -8445,7 +8474,7 @@ ${JSON.stringify(map)}`;
         <p class="small muted">${esc(X('About {q} quick questions · 2 minutes · skip any').replace('{q}', qs.length))}</p>
       </div>
       <details class="lawbox"><summary>${ic('file', 16)} ${esc(X('What the law says'))}${ic('down', 16)}</summary><p class="small">${revTag(iss)} ${esc(X(iss.juris))}</p>${srcBlock(iss)}</details>
-    </section></div>`);
+    </section></div>`, { exit: true, iss });
   }
   function advBanner(adv) {
     return `<div class="banner adv">${ic('user')}<div><h3>${adv.name ? esc(adv.name) + ' asked you to prepare' : 'Your advocate asked you to prepare'}</h3>${adv.note ? `<p>“${esc(adv.note)}”</p>` : ''}${adv.must && adv.must.length ? '<p class="small">Records they want are marked <span class="tag adv">Advocate asked</span>.</p>' : ''}</div></div>`;
@@ -8905,10 +8934,22 @@ ${JSON.stringify(map)}`;
     ov.querySelector('h2').focus();
   }
 
+  // Phones without Ol Chiki, Meetei Mayek and some other scripts showed the picker names as empty boxes.
+  // Load a tiny subset of each script's font containing only the letters of its own name.
+  function nameFonts() {
+    if (document.getElementById('font-names')) return;
+    const by = {}; I18N.LANGS.forEach((l) => { if (l.font) by[l.font] = (by[l.font] || '') + l.native; });
+    const fam = Object.entries(by).map(([f, t]) => 'family=' + encodeURIComponent(f).replace(/%20/g, '+') + ':wght@700').join('&');
+    const txt = [...new Set(Object.values(by).join(''))].join('');
+    const l = document.createElement('link'); l.id = 'font-names'; l.rel = 'stylesheet';
+    l.href = 'https://fonts.googleapis.com/css2?' + fam + '&text=' + encodeURIComponent(txt) + '&display=swap';
+    document.head.appendChild(l);
+  }
   function showLang() {
+    nameFonts();
     const ov = document.createElement('div'); ov.className = 'overlay'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-labelledby', 'langh');
     ov.innerHTML = `<div class="dialog wide"><h2 id="langh">${esc(T('lang'))}</h2><p class="small muted">${esc(T('auto'))}</p>
-      <div class="langgrid">${I18N.LANGS.map((l) => `<button class="langopt" lang="${l.code}" data-lang="${l.code}" aria-current="${LANG === l.code}"><b>${esc(l.native)}</b><span>${esc(l.name)}</span></button>`).join('')}</div>
+      <div class="langgrid">${I18N.LANGS.map((l) => `<button class="langopt" lang="${l.code}" data-lang="${l.code}" aria-current="${LANG === l.code}"><b${l.font ? ` style="font-family:'${l.font}',var(--body)"` : ''}>${esc(l.native)}</b><span>${esc(l.name)}</span></button>`).join('')}</div>
       <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn line" data-close>✕</button></div></div>`;
     document.body.appendChild(ov);
     const close = () => { ov.remove(); };
@@ -9379,10 +9420,10 @@ ${JSON.stringify(map)}`;
       case 'deep': TRACK.once('deep', { g: S.issueId }); S.stage = 'deep'; S.chapterFound = []; persist(); goQuiz(); break;
       case 'change': { const q = iss.questions.find((x) => x.id === t.dataset.q); if (!q) break; S.prefill[q.id] = S.answers[q.id]; delete S.answers[q.id]; delete S.skipped[q.id]; S.stage = q.deep ? 'deep' : 'quick'; S.history = S.history.filter((h) => h.id !== q.id); if (q.deep) S.deepDone = false; else S.quickDone = false; S.chapterFound = []; persist(); goQuiz(); break; }
       case 'savetoggle': if (t.checked) TRACK.once('save', { g: S.issueId }); saveOn = t.checked; if (saveOn) persist(); else clearSaved(); toast(saveOn ? 'Saved on this device' : 'Removed from this device'); break;
-      case 'clear': S = blank(); saveOn = false; clearSaved(); try { localStorage.removeItem('saboot_last'); } catch (e) { /* ignore */ } toast('Cleared'); go('home'); break;
+      case 'clear': S = blank(); saveOn = false; clearSaved(); clearTab(); try { localStorage.removeItem('saboot_last'); } catch (e) { /* ignore */ } toast('Cleared'); go('home'); break;
       case 'forget': clearSaved(); render(); break;
       case 'resume': { const v = loadSaved(); if (v) { S = Object.assign(blank(), v); saveOn = true; go('list'); } break; }
-      case 'exit': S = blank(); saveOn = false; clearSaved(); app.innerHTML = ''; history.replaceState(null, '', '#home'); render(); break;
+      case 'exit': S = blank(); saveOn = false; clearSaved(); clearTab(); app.innerHTML = ''; history.replaceState(null, '', '#home'); render(); break;
       case 'excl': S.excludeSensitive = t.checked; persist(); render(); break;
       case 'mic': TRACK.once('voice', { l: LANG }); VOICE.toggle(); break;
       case 'limremind': { const iss = issue(); const c = limData(iss); if (!c) break; let pre = null; if (c.exact) { pre = new Date(c.exact.end.getTime()); pre.setDate(pre.getDate() - 30); if (pre <= new Date()) pre = null; }

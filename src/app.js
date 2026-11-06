@@ -67,9 +67,14 @@
   const blank = () => ({ issueId: null, topic: null, answers: {}, skipped: {}, stage: 'quick', history: [], quickDone: false, deepDone: false,
     status: {}, records: {}, chrono: [], ackUrgent: {}, adv: null, excludeSensitive: true, notes: '', prefill: {}, chapterFound: [], breaks: 0, limDate: {} });
   let S = blank();
+  // Answers survive a reload or the phone discarding the tab (common when switching to WhatsApp or the gallery to
+  // find a paper). sessionStorage belongs to this tab only and is wiped when the tab is closed, by Delete all and by Quick exit.
+  const TAB_KEY = 'saboot_tab';
+  try { const t = sessionStorage.getItem(TAB_KEY); if (t) S = Object.assign(blank(), JSON.parse(t)); } catch (e) { /* private mode */ }
+  const clearTab = () => { try { sessionStorage.removeItem(TAB_KEY); } catch (e) { /* ignore */ } };
   const UI = { club: 'money', qcat: 'all', qsearch: '', mf: { i: 0, score: 0, ans: null, order: null } };
   let saveOn = false;
-  function persist() { if (!saveOn) return; try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); } catch (e) { /* unavailable */ } }
+  function persist() { try { sessionStorage.setItem(TAB_KEY, JSON.stringify(S)); } catch (e) { /* unavailable */ } if (!saveOn) return; try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); } catch (e) { /* unavailable */ } }
   function loadSaved() { try { const v = localStorage.getItem(STORE_KEY); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
   function clearSaved() { try { localStorage.removeItem(STORE_KEY); } catch (e) { /* ignore */ } }
   const issue = () => BY_ID[S.issueId];
@@ -1587,10 +1592,10 @@ ${JSON.stringify(map)}`;
       case 'deep': TRACK.once('deep', { g: S.issueId }); S.stage = 'deep'; S.chapterFound = []; persist(); goQuiz(); break;
       case 'change': { const q = iss.questions.find((x) => x.id === t.dataset.q); if (!q) break; S.prefill[q.id] = S.answers[q.id]; delete S.answers[q.id]; delete S.skipped[q.id]; S.stage = q.deep ? 'deep' : 'quick'; S.history = S.history.filter((h) => h.id !== q.id); if (q.deep) S.deepDone = false; else S.quickDone = false; S.chapterFound = []; persist(); goQuiz(); break; }
       case 'savetoggle': if (t.checked) TRACK.once('save', { g: S.issueId }); saveOn = t.checked; if (saveOn) persist(); else clearSaved(); toast(saveOn ? 'Saved on this device' : 'Removed from this device'); break;
-      case 'clear': S = blank(); saveOn = false; clearSaved(); try { localStorage.removeItem('saboot_last'); } catch (e) { /* ignore */ } toast('Cleared'); go('home'); break;
+      case 'clear': S = blank(); saveOn = false; clearSaved(); clearTab(); try { localStorage.removeItem('saboot_last'); } catch (e) { /* ignore */ } toast('Cleared'); go('home'); break;
       case 'forget': clearSaved(); render(); break;
       case 'resume': { const v = loadSaved(); if (v) { S = Object.assign(blank(), v); saveOn = true; go('list'); } break; }
-      case 'exit': S = blank(); saveOn = false; clearSaved(); app.innerHTML = ''; history.replaceState(null, '', '#home'); render(); break;
+      case 'exit': S = blank(); saveOn = false; clearSaved(); clearTab(); app.innerHTML = ''; history.replaceState(null, '', '#home'); render(); break;
       case 'excl': S.excludeSensitive = t.checked; persist(); render(); break;
       case 'mic': TRACK.once('voice', { l: LANG }); VOICE.toggle(); break;
       case 'limremind': { const iss = issue(); const c = limData(iss); if (!c) break; let pre = null; if (c.exact) { pre = new Date(c.exact.end.getTime()); pre.setDate(pre.getDate() - 30); if (pre <= new Date()) pre = null; }
