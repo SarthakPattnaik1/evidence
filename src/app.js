@@ -1100,10 +1100,22 @@ ${JSON.stringify(map)}`;
     ov.querySelector('h2').focus();
   }
 
+  // Phones without Ol Chiki, Meetei Mayek and some other scripts showed the picker names as empty boxes.
+  // Load a tiny subset of each script's font containing only the letters of its own name.
+  function nameFonts() {
+    if (document.getElementById('font-names')) return;
+    const by = {}; I18N.LANGS.forEach((l) => { if (l.font) by[l.font] = (by[l.font] || '') + l.native; });
+    const fam = Object.entries(by).map(([f, t]) => 'family=' + encodeURIComponent(f).replace(/%20/g, '+') + ':wght@700').join('&');
+    const txt = [...new Set(Object.values(by).join(''))].join('');
+    const l = document.createElement('link'); l.id = 'font-names'; l.rel = 'stylesheet';
+    l.href = 'https://fonts.googleapis.com/css2?' + fam + '&text=' + encodeURIComponent(txt) + '&display=swap';
+    document.head.appendChild(l);
+  }
   function showLang() {
+    nameFonts();
     const ov = document.createElement('div'); ov.className = 'overlay'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-labelledby', 'langh');
     ov.innerHTML = `<div class="dialog wide"><h2 id="langh">${esc(T('lang'))}</h2><p class="small muted">${esc(T('auto'))}</p>
-      <div class="langgrid">${I18N.LANGS.map((l) => `<button class="langopt" lang="${l.code}" data-lang="${l.code}" aria-current="${LANG === l.code}"><b>${esc(l.native)}</b><span>${esc(l.name)}</span></button>`).join('')}</div>
+      <div class="langgrid">${I18N.LANGS.map((l) => `<button class="langopt" lang="${l.code}" data-lang="${l.code}" aria-current="${LANG === l.code}"><b${l.font ? ` style="font-family:'${l.font}',var(--body)"` : ''}>${esc(l.native)}</b><span>${esc(l.name)}</span></button>`).join('')}</div>
       <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn line" data-close>✕</button></div></div>`;
     document.body.appendChild(ov);
     const close = () => { ov.remove(); };
