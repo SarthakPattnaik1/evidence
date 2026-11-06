@@ -194,6 +194,7 @@
       { id: 'ip_e_bank', name: 'Passbooks, policy and share details, nominee details, and the institution\'s reply', fact: 'Assets held by banks/insurers', why: 'A nominee generally holds money for the legal heirs.', where: 'Bank, insurer, demat statements.', preserve: '', holder: 'others', when: ANY(W('ip_kind', 'bank'), W('ip_problem', 'bank', 'nominee')) },
       { id: 'ip_e_release', name: 'Any release deed or family settlement you signed', fact: 'Whether you gave up a share', why: 'Central to whether a claim survives.', where: 'Your records, sub-registrar.', preserve: '', when: W('ip_released', 'yes', 'unsure') },
       { id: 'ip_e_relation', name: 'Proof of your relationship (birth certificate, school records, ID with parent\'s name)', fact: 'You are an heir', why: 'Required to claim.', where: 'Your records.', preserve: '' },
+      { id: 'ip_e_assets', name: 'List of the property involved: address or survey number, bank accounts, gold, and who holds each now', fact: 'What is to be shared', why: 'A partition or claim must describe each property exactly.', where: 'Family records, passbooks, land records.', preserve: '' },
       { id: 'ip_e_case', name: 'Papers and orders in any pending case', fact: 'What is already decided', why: 'Avoids duplicate cases.', where: 'Your advocate, court.', preserve: '', when: W('ip_case', 'yes') }
     ],
     urgent: [

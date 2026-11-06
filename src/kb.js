@@ -695,6 +695,7 @@
         when: W('g_comms', 'yes') },
       { id: 'g_e_ids', name: 'Your ID and address proof, and the other side\'s name and address', fact: 'Who the parties are', why: 'Needed for any notice or case.', where: 'Your records.', preserve: '' },
       { id: 'g_e_timeline', name: 'A short written timeline of what happened', fact: 'The order of events', why: 'Saves time in the first meeting.', where: 'Use "My timeline" in this tool.', preserve: '', action: true },
+      { id: 'g_e_qs', name: 'The questions you want to ask the advocate, written down', fact: 'What you need to know', why: 'First meetings are short; a written list makes sure nothing is missed.', where: 'Write them in your notes; Saboot adds some for you.', preserve: '', action: true },
       { id: 'g_e_others', name: 'List of records held by others, and who holds them', fact: 'What may need to be requested', why: 'Your advocate can advise how to obtain them lawfully.', where: '—', preserve: '', holder: 'others',
         when: W('g_others', 'bank', 'employer', 'govt', 'otherparty') }
     ],
