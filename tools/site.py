@@ -116,6 +116,9 @@ def run():
         shutil.copy(f, trd / f.name)
     cats = {c['id']: c['title'] for c in data['cats']}
     gdir = OUT / 'guide'; gdir.mkdir(exist_ok=True)
+    keep_g = {f"{i['id']}.html" for i in data['issues']} | {'index.html'}
+    for old in gdir.glob('*.html'):
+        if old.name not in keep_g: old.unlink()
     urls = [('/', '1.0')]
     index_rows = []
     sits = data.get('situations', [])
@@ -188,6 +191,10 @@ def run():
     # identical to an earlier situation of the same guide (and have no safety note) are kept for visitors but
     # marked noindex, so search engines never see near-duplicates.
     sdir = OUT / 's'; sdir.mkdir(exist_ok=True)
+    # Remove pages left over from situations that were renamed or deleted, so old URLs are not deployed.
+    keep = {f'{x["slug"]}.html' for x in sits} | {'index.html'}
+    for old in sdir.glob('*.html'):
+        if old.name not in keep: old.unlink()
     seen_sig = set(); n_index = 0; area_rows = {}
     KIND = {'good': 'In your favour', 'risk': 'Be careful', 'next': 'Next step'}
     for x in sits:
