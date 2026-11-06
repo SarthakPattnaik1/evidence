@@ -1147,6 +1147,10 @@ html.rm .marq{overflow-x:auto;-webkit-mask-image:none;mask-image:none}html.rm .m
 html.hc .tpill{border:2px solid #000;color:#000}
 @media print{.trend{display:none}}
 @media (max-width:520px){.tpill{font-size:14px;padding:5px 13px 5px 5px}.tpill .tic{width:26px;height:26px}.trend{margin-top:14px}}
+/* v41: while a page translates, the pill had both top:42% and bottom:86px set, so it stretched into a
+   tall dark oval over the page on phones. */
+.trpill{width:max-content;max-width:calc(100vw - 32px);line-height:1.35;border-radius:22px}
+body.trwait .trpill{bottom:auto}
 </style>
 <script defer src="/_vercel/insights/script.js"></script>
 </head>
