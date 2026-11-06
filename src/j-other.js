@@ -296,7 +296,7 @@
     id: 'online-harassment', cat: 'other', sensitive: true, title: 'Online harassment, stalking, fake profiles or leaked images', short: 'Online harassment',
     synonyms: ['online harassment', 'cyber stalking', 'fake profile', 'morphed photo', 'leaked photos', 'sextortion', 'blackmail', 'trolling', 'impersonation', 'revenge porn', 'abusive messages'],
     intro: 'You can stop at any time. First we\'ll make sure the evidence is saved, then get the content taken down.',
-    juris: 'Online harassment can be an offence under the Bharatiya Nyaya Sanhita and the IT Act. Platforms must act on complaints, and must remove intimate or morphed images within 24 hours of a complaint.',
+    juris: 'Online harassment can be an offence under the Bharatiya Nyaya Sanhita and the IT Act. Platforms must act on complaints, and must remove intimate or morphed images, including deepfakes, within 2 hours of a complaint (IT Rules as amended from 20 February 2026).',
     tips: ['Save evidence before blocking or reporting — once deleted, it is hard to recover.', 'Never pay a blackmailer. Payment usually leads to more demands.', 'Women and children can report anonymously at cybercrime.gov.in.'],
     questions: [
       { id: 'oh_safe', text: 'Are you safe right now?', sensitive: true, chapter: 'Safety', why: 'Safety first.', options: o([['safe', 'Yes'], ['threat', 'I have been threatened'], ['danger', 'I am in danger'], PN]) },
@@ -310,7 +310,7 @@
       { id: 'oh_e_screens', name: 'Screenshots showing the content, profile name/URL, date and time', fact: 'The harassing content', why: 'Evidence before it is deleted.', where: 'Your phone/computer.', preserve: 'Capture the URL and the profile page. Keep the originals; do not edit.' },
       { id: 'oh_e_links', name: 'List of links (URLs), usernames and phone numbers involved', fact: 'Who and where', why: 'Platforms and police need exact links.', where: 'Copy from the app or browser.', preserve: '', action: true },
       { id: 'oh_e_dates', name: 'A short dated list of each incident: what happened, when, and from which account', fact: 'The pattern over time', why: 'Repeated conduct is what makes stalking and harassment easier to prove.', where: 'Write it yourself; add to it each time.', preserve: '', action: true },
-      { id: 'oh_e_takedown', name: 'Takedown request for the images (platform report or StopNCII.org case number)', fact: 'You asked for removal', why: 'Platforms must remove intimate images shared without consent within 24 hours of a complaint (IT Rules 2021).', where: 'The platform’s report form; stopncii.org.', preserve: 'Do not delete the originals you have — keep them as evidence.', action: true, when: W('oh_what', 'images') },
+      { id: 'oh_e_takedown', name: 'Takedown request for the images (platform report or StopNCII.org case number)', fact: 'You asked for removal', why: 'Platforms must remove intimate or morphed images shared without consent within 2 hours of a complaint (IT Rules, as amended from 20 February 2026).', where: 'The platform’s report form; stopncii.org.', preserve: 'Do not delete the originals you have — keep them as evidence.', action: true, when: W('oh_what', 'images') },
       { id: 'oh_e_export', name: 'Full chat export and call log', fact: 'The pattern of messages', why: 'Shows frequency and threats.', where: 'WhatsApp/Telegram export.', preserve: '', when: W('oh_what', 'messages', 'blackmail', 'stalking') },
       { id: 'oh_e_payment', name: 'Payment demands and any payments already made', fact: 'Extortion', why: 'Supports extortion charges.', where: 'Messages, bank statements.', preserve: 'Do not pay further.', when: W('oh_what', 'blackmail') },
       { id: 'oh_e_report', name: 'Platform report confirmations and cybercrime complaint number', fact: 'Complaints made', why: 'Needed to escalate.', where: 'Email confirmations, portal.', preserve: '', when: W('oh_reported', 'platform', 'cyber', 'police') },
@@ -319,7 +319,7 @@
     ],
     urgent: [
       { id: 'oh_u_danger', level: 'now', when: W('oh_safe', 'danger'), title: 'Please get help now', text: 'If you are in danger, call 112.', help: ['e112', 'w181'] },
-      { id: 'oh_u_images', level: 'now', when: W('oh_what', 'images', 'blackmail'), title: 'Act now to stop the images spreading', text: 'Report at cybercrime.gov.in or 1930 and to the platform. Platforms must remove intimate images within 24 hours of a complaint. Don\'t pay.', help: ['cy1930', 'w181'] }
+      { id: 'oh_u_images', level: 'now', when: W('oh_what', 'images', 'blackmail'), title: 'Act now to stop the images spreading', text: 'Report at cybercrime.gov.in or 1930 and to the platform. Platforms must remove intimate images within 2 hours of a complaint. Don\'t pay.', help: ['cy1930', 'w181'] }
     ],
     lawyerQs: [{ text: 'Which offences apply, and should I file an FIR?' }, { text: 'How do I get the content removed if the platform doesn\'t act?' }, { text: 'Can I get an order against a known person?', when: W('oh_known', 'yes', 'suspect') }]
   });

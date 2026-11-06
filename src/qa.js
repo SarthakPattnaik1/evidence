@@ -135,8 +135,8 @@
     'A government scheme gives fixed compensation: ₹2 lakh for death and ₹50,000 for grievous injury. Apply through the claims enquiry officer (usually the SDM/tehsildar) with the FIR and medical or death papers.',
     ['FIR showing unknown vehicle'], 'Compensation to Victims of Hit and Run Motor Accidents Scheme 2022', 'road-accident', ['hit and run compensation']);
   Q('other', 'morphed-photos', 'Someone is threatening to share my private or morphed photos. What do I do?',
-    'Don\'t pay. Save screenshots and links, then report at cybercrime.gov.in or call 1930, and report to the platform. Platforms must remove such content within 24 hours of a complaint.',
-    ['Whether you know the person', 'Platform involved'], 'IT Act ss.66E, 67; BNS; IT Rules 2021', 'online-harassment', ['sextortion', 'morphed photo']);
+    'Don\'t pay. Save screenshots and links, then report at cybercrime.gov.in or call 1930, and report to the platform. Platforms must remove such content within 2 hours of a complaint.',
+    ['Whether you know the person', 'Platform involved'], 'IT Act ss.66E, 67; BNS; IT Rules 2021 r.3(2)(b), as amended Feb 2026', 'online-harassment', ['sextortion', 'morphed photo']);
   Q('other', 'rti', 'How do I file an RTI application?',
     'Write to the Public Information Officer of the department (or file online at rtionline.gov.in for central bodies), with a ₹10 fee. A reply is due within 30 days (48 hours if life or liberty is involved). If refused or not answered, file a first appeal within 30 days.',
     ['Central or state department'], 'Right to Information Act 2005 ss.6, 7, 19', null, ['rti']);
