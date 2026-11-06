@@ -1096,3 +1096,30 @@ header.top .wrap.has-exit .nav.exit span{display:inline!important}
   header.top .nav{padding:8px 4px}
   header.top .nav.lang span{max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 }
+/* v40: trending strip — calm, slow, pausable; becomes a swipeable row when motion is reduced */
+.trend{margin:18px 0 8px}
+.trendh{display:flex;align-items:center;gap:8px;margin:0 0 10px}
+.trendh h2{font-size:13px;font-family:var(--body);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);margin:0}
+.trendh .dot{width:8px;height:8px;border-radius:50%;background:var(--manila,#D7A455)}
+.trendh .dot.live{background:#2E9E6B;animation:tlive 2.6s ease-out infinite}
+@keyframes tlive{0%{box-shadow:0 0 0 0 rgba(46,158,107,.45)}70%,100%{box-shadow:0 0 0 7px rgba(46,158,107,0)}}
+.tpause{margin-left:auto;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--ink2);display:grid;place-items:center;cursor:pointer}
+.tpause:hover{color:var(--ink);border-color:var(--ink2)}
+.tpause:focus-visible,.tpill:focus-visible{outline:3px solid var(--manila,#D7A455);outline-offset:2px}
+.marq{overflow:hidden;margin:0 -4px;padding:4px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
+.mtrack{display:flex;width:max-content;animation:tmarq var(--dur,48s) linear infinite}
+.mset{display:flex;gap:10px;padding-right:10px}
+.marq:hover .mtrack,.marq:focus-within .mtrack,.trend.paused .mtrack,.trend.touch .mtrack{animation-play-state:paused}
+@keyframes tmarq{to{transform:translateX(-50%)}}
+html[dir=rtl] .mtrack{animation-name:tmarqr}
+@keyframes tmarqr{to{transform:translateX(50%)}}
+.tpill{display:inline-flex;align-items:center;gap:8px;padding:6px 15px 6px 6px;border-radius:999px;background:#fff;border:1px solid var(--line);font:600 14.5px/1.2 var(--body);color:var(--ink);white-space:nowrap;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}
+.tpill:hover{transform:translateY(-1px);border-color:rgba(11,31,54,.22);box-shadow:0 8px 18px -12px rgba(11,31,54,.45)}
+.tpill .tic{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;flex:none}
+.tpill .tic.pc0{background:var(--p-mint)}.tpill .tic.pc1{background:var(--p-sky)}.tpill .tic.pc2{background:var(--p-peach)}
+.tpill .tic.pc3{background:var(--p-lav)}.tpill .tic.pc4{background:var(--p-butter)}.tpill .tic.pc5{background:var(--p-rose)}
+@media (prefers-reduced-motion:reduce){.mtrack{animation:none}.marq{overflow-x:auto;-webkit-mask-image:none;mask-image:none}.mset.dup{display:none}.trendh .dot.live{animation:none}.tpause{display:none}}
+html.rm .marq{overflow-x:auto;-webkit-mask-image:none;mask-image:none}html.rm .mset.dup,html.rm .tpause{display:none}
+html.hc .tpill{border:2px solid #000;color:#000}
+@media print{.trend{display:none}}
+@media (max-width:520px){.tpill{font-size:14px;padding:5px 13px 5px 5px}.tpill .tic{width:26px;height:26px}.trend{margin-top:14px}}

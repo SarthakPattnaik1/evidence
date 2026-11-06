@@ -1120,6 +1120,33 @@ header.top .wrap.has-exit .nav.exit span{display:inline!important}
   header.top .nav{padding:8px 4px}
   header.top .nav.lang span{max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 }
+/* v40: trending strip — calm, slow, pausable; becomes a swipeable row when motion is reduced */
+.trend{margin:18px 0 8px}
+.trendh{display:flex;align-items:center;gap:8px;margin:0 0 10px}
+.trendh h2{font-size:13px;font-family:var(--body);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);margin:0}
+.trendh .dot{width:8px;height:8px;border-radius:50%;background:var(--manila,#D7A455)}
+.trendh .dot.live{background:#2E9E6B;animation:tlive 2.6s ease-out infinite}
+@keyframes tlive{0%{box-shadow:0 0 0 0 rgba(46,158,107,.45)}70%,100%{box-shadow:0 0 0 7px rgba(46,158,107,0)}}
+.tpause{margin-left:auto;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--ink2);display:grid;place-items:center;cursor:pointer}
+.tpause:hover{color:var(--ink);border-color:var(--ink2)}
+.tpause:focus-visible,.tpill:focus-visible{outline:3px solid var(--manila,#D7A455);outline-offset:2px}
+.marq{overflow:hidden;margin:0 -4px;padding:4px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
+.mtrack{display:flex;width:max-content;animation:tmarq var(--dur,48s) linear infinite}
+.mset{display:flex;gap:10px;padding-right:10px}
+.marq:hover .mtrack,.marq:focus-within .mtrack,.trend.paused .mtrack,.trend.touch .mtrack{animation-play-state:paused}
+@keyframes tmarq{to{transform:translateX(-50%)}}
+html[dir=rtl] .mtrack{animation-name:tmarqr}
+@keyframes tmarqr{to{transform:translateX(50%)}}
+.tpill{display:inline-flex;align-items:center;gap:8px;padding:6px 15px 6px 6px;border-radius:999px;background:#fff;border:1px solid var(--line);font:600 14.5px/1.2 var(--body);color:var(--ink);white-space:nowrap;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}
+.tpill:hover{transform:translateY(-1px);border-color:rgba(11,31,54,.22);box-shadow:0 8px 18px -12px rgba(11,31,54,.45)}
+.tpill .tic{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;flex:none}
+.tpill .tic.pc0{background:var(--p-mint)}.tpill .tic.pc1{background:var(--p-sky)}.tpill .tic.pc2{background:var(--p-peach)}
+.tpill .tic.pc3{background:var(--p-lav)}.tpill .tic.pc4{background:var(--p-butter)}.tpill .tic.pc5{background:var(--p-rose)}
+@media (prefers-reduced-motion:reduce){.mtrack{animation:none}.marq{overflow-x:auto;-webkit-mask-image:none;mask-image:none}.mset.dup{display:none}.trendh .dot.live{animation:none}.tpause{display:none}}
+html.rm .marq{overflow-x:auto;-webkit-mask-image:none;mask-image:none}html.rm .mset.dup,html.rm .tpause{display:none}
+html.hc .tpill{border:2px solid #000;color:#000}
+@media print{.trend{display:none}}
+@media (max-width:520px){.tpill{font-size:14px;padding:5px 13px 5px 5px}.tpill .tic{width:26px;height:26px}.trend{margin-top:14px}}
 </style>
 <script defer src="/_vercel/insights/script.js"></script>
 </head>
@@ -2853,7 +2880,7 @@ header.top .wrap.has-exit .nav.exit span{display:inline!important}
     id: 'online-harassment', cat: 'other', sensitive: true, title: 'Online harassment, stalking, fake profiles or leaked images', short: 'Online harassment',
     synonyms: ['online harassment', 'cyber stalking', 'fake profile', 'morphed photo', 'leaked photos', 'sextortion', 'blackmail', 'trolling', 'impersonation', 'revenge porn', 'abusive messages'],
     intro: 'You can stop at any time. First we\'ll make sure the evidence is saved, then get the content taken down.',
-    juris: 'Online harassment can be an offence under the Bharatiya Nyaya Sanhita and the IT Act. Platforms must act on complaints, and must remove intimate or morphed images within 24 hours of a complaint.',
+    juris: 'Online harassment can be an offence under the Bharatiya Nyaya Sanhita and the IT Act. Platforms must act on complaints, and must remove intimate or morphed images, including deepfakes, within 2 hours of a complaint (IT Rules as amended from 20 February 2026).',
     tips: ['Save evidence before blocking or reporting — once deleted, it is hard to recover.', 'Never pay a blackmailer. Payment usually leads to more demands.', 'Women and children can report anonymously at cybercrime.gov.in.'],
     questions: [
       { id: 'oh_safe', text: 'Are you safe right now?', sensitive: true, chapter: 'Safety', why: 'Safety first.', options: o([['safe', 'Yes'], ['threat', 'I have been threatened'], ['danger', 'I am in danger'], PN]) },
@@ -2867,7 +2894,7 @@ header.top .wrap.has-exit .nav.exit span{display:inline!important}
       { id: 'oh_e_screens', name: 'Screenshots showing the content, profile name/URL, date and time', fact: 'The harassing content', why: 'Evidence before it is deleted.', where: 'Your phone/computer.', preserve: 'Capture the URL and the profile page. Keep the originals; do not edit.' },
       { id: 'oh_e_links', name: 'List of links (URLs), usernames and phone numbers involved', fact: 'Who and where', why: 'Platforms and police need exact links.', where: 'Copy from the app or browser.', preserve: '', action: true },
       { id: 'oh_e_dates', name: 'A short dated list of each incident: what happened, when, and from which account', fact: 'The pattern over time', why: 'Repeated conduct is what makes stalking and harassment easier to prove.', where: 'Write it yourself; add to it each time.', preserve: '', action: true },
-      { id: 'oh_e_takedown', name: 'Takedown request for the images (platform report or StopNCII.org case number)', fact: 'You asked for removal', why: 'Platforms must remove intimate images shared without consent within 24 hours of a complaint (IT Rules 2021).', where: 'The platform’s report form; stopncii.org.', preserve: 'Do not delete the originals you have — keep them as evidence.', action: true, when: W('oh_what', 'images') },
+      { id: 'oh_e_takedown', name: 'Takedown request for the images (platform report or StopNCII.org case number)', fact: 'You asked for removal', why: 'Platforms must remove intimate or morphed images shared without consent within 2 hours of a complaint (IT Rules, as amended from 20 February 2026).', where: 'The platform’s report form; stopncii.org.', preserve: 'Do not delete the originals you have — keep them as evidence.', action: true, when: W('oh_what', 'images') },
       { id: 'oh_e_export', name: 'Full chat export and call log', fact: 'The pattern of messages', why: 'Shows frequency and threats.', where: 'WhatsApp/Telegram export.', preserve: '', when: W('oh_what', 'messages', 'blackmail', 'stalking') },
       { id: 'oh_e_payment', name: 'Payment demands and any payments already made', fact: 'Extortion', why: 'Supports extortion charges.', where: 'Messages, bank statements.', preserve: 'Do not pay further.', when: W('oh_what', 'blackmail') },
       { id: 'oh_e_report', name: 'Platform report confirmations and cybercrime complaint number', fact: 'Complaints made', why: 'Needed to escalate.', where: 'Email confirmations, portal.', preserve: '', when: W('oh_reported', 'platform', 'cyber', 'police') },
@@ -2876,7 +2903,7 @@ header.top .wrap.has-exit .nav.exit span{display:inline!important}
     ],
     urgent: [
       { id: 'oh_u_danger', level: 'now', when: W('oh_safe', 'danger'), title: 'Please get help now', text: 'If you are in danger, call 112.', help: ['e112', 'w181'] },
-      { id: 'oh_u_images', level: 'now', when: W('oh_what', 'images', 'blackmail'), title: 'Act now to stop the images spreading', text: 'Report at cybercrime.gov.in or 1930 and to the platform. Platforms must remove intimate images within 24 hours of a complaint. Don\'t pay.', help: ['cy1930', 'w181'] }
+      { id: 'oh_u_images', level: 'now', when: W('oh_what', 'images', 'blackmail'), title: 'Act now to stop the images spreading', text: 'Report at cybercrime.gov.in or 1930 and to the platform. Platforms must remove intimate images within 2 hours of a complaint. Don\'t pay.', help: ['cy1930', 'w181'] }
     ],
     lawyerQs: [{ text: 'Which offences apply, and should I file an FIR?' }, { text: 'How do I get the content removed if the platform doesn\'t act?' }, { text: 'Can I get an order against a known person?', when: W('oh_known', 'yes', 'suspect') }]
   });
@@ -7130,8 +7157,8 @@ header.top .wrap.has-exit .nav.exit span{display:inline!important}
     'A government scheme gives fixed compensation: ₹2 lakh for death and ₹50,000 for grievous injury. Apply through the claims enquiry officer (usually the SDM/tehsildar) with the FIR and medical or death papers.',
     ['FIR showing unknown vehicle'], 'Compensation to Victims of Hit and Run Motor Accidents Scheme 2022', 'road-accident', ['hit and run compensation']);
   Q('other', 'morphed-photos', 'Someone is threatening to share my private or morphed photos. What do I do?',
-    'Don\'t pay. Save screenshots and links, then report at cybercrime.gov.in or call 1930, and report to the platform. Platforms must remove such content within 24 hours of a complaint.',
-    ['Whether you know the person', 'Platform involved'], 'IT Act ss.66E, 67; BNS; IT Rules 2021', 'online-harassment', ['sextortion', 'morphed photo']);
+    'Don\'t pay. Save screenshots and links, then report at cybercrime.gov.in or call 1930, and report to the platform. Platforms must remove such content within 2 hours of a complaint.',
+    ['Whether you know the person', 'Platform involved'], 'IT Act ss.66E, 67; BNS; IT Rules 2021 r.3(2)(b), as amended Feb 2026', 'online-harassment', ['sextortion', 'morphed photo']);
   Q('other', 'rti', 'How do I file an RTI application?',
     'Write to the Public Information Officer of the department (or file online at rtionline.gov.in for central bodies), with a ₹10 fee. A reply is due within 30 days (48 hours if life or liberty is involved). If refused or not answered, file a first appeal within 30 days.',
     ['Central or state department'], 'Right to Information Act 2005 ss.6, 7, 19', null, ['rti']);
@@ -7890,6 +7917,8 @@ header.top .wrap.has-exit .nav.exit span{display:inline!important}
     scale: '<path d="M12 4v16M7 20h10M5 7h14"/><path d="m5 7-2.5 6a3 3 0 0 0 5 0Zm14 0-2.5 6a3 3 0 0 0 5 0Z"/>',
     mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3M8.5 21h7"/>',
     stop: '<rect x="7" y="7" width="10" height="10" rx="2"/>',
+    pause: '<path d="M9 6v12M15 6v12"/>',
+    play: '<path d="M8 5.5v13l11-6.5Z"/>',
     family: '<circle cx="8" cy="7" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M2.5 20c.5-3.6 2.8-6 5.5-6s5 2.4 5.5 6"/><path d="M14 20c.3-2.6 1.6-4.5 3.2-4.5S20.6 17.4 21 20"/>',
     bank: '<path d="M3 10 12 4l9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 20h18"/>',
     bag: '<path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
@@ -8194,6 +8223,7 @@ ${JSON.stringify(map)}`;
     if (changed) { if (S.stage === 'quick') S.quickDone = false; else S.deepDone = false; E.prune(issue(), S.answers); persist(); }
   }
   // A dialog left open (language, accessibility, share…) must not stay over the next page after Back or a link.
+  let trendT; document.addEventListener('touchstart', (e) => { const t = e.target.closest && e.target.closest('#trend'); if (!t) return; t.classList.add('touch'); clearTimeout(trendT); trendT = setTimeout(() => { const el = document.getElementById('trend'); if (el) el.classList.remove('touch'); }, 4000); }, { passive: true });
   window.addEventListener('hashchange', () => { document.querySelectorAll('.overlay:not(.consent)').forEach((o) => o.remove()); render(); trWait(); });
 
   function shell(inner, opt = {}) {
@@ -8290,6 +8320,48 @@ ${JSON.stringify(map)}`;
     ['rental-security-deposit', 'house', 'Deposit not returned', 'A written demand to the landlord is the first step.', 'sand'],
     ['police-complaint', 'shield', 'Police won\'t file FIR', 'Send it in writing to the Superintendent of Police.', 'sage']
   ].filter(([id]) => BY_ID[id]);
+  /* ---------- Trending strip ----------
+     Real data only: guide ids most started in the last 7 days (api/trending; at least 5 starts each, no counts).
+     Until there are 6 such guides it says "People often ask about" instead of claiming a trend. Sensitive guides
+     are never shown. Motion is slow, pauses on hover, focus or touch, has a pause button (WCAG 2.2.2), and
+     stops completely for reduced motion and Calm mode, where it becomes a row you can swipe. */
+  const TREND_HIDE = new Set(['general', 'intimate-images', 'gender-identity', 'mental-health-rights', 'pregnancy-rights', 'child-protection', 'prisoner-rights']);
+  const TREND_BASE = ['cheque-bounce', 'upi-cyber-fraud', 'digital-arrest-scam', 'rental-security-deposit', 'unpaid-salary', 'refund-refused', 'loan-app-harassment', 'job-investment-scam', 'traffic-challan', 'builder-delay', 'insurance-claim', 'legal-notice-received', 'land-encroachment', 'govt-service', 'ecommerce-order', 'travel-refund'];
+  // Short, spoken-style labels read faster in a moving strip than formal guide titles.
+  const TREND_LABEL = { 'cheque-bounce': 'Cheque bounced', 'upi-cyber-fraud': 'Money stolen online', 'digital-arrest-scam': '"Digital arrest" call', 'rental-security-deposit': 'Deposit not returned', 'unpaid-salary': 'Salary not paid', 'refund-refused': 'Refund refused', 'loan-app-harassment': 'Loan app harassment', 'job-investment-scam': 'Job or task scam', 'traffic-challan': 'Traffic challan', 'builder-delay': 'Flat not delivered', 'insurance-claim': 'Insurance claim rejected', 'legal-notice-received': 'Got a legal notice', 'land-encroachment': 'Land encroached', 'govt-service': 'Show-cause notice at work', 'ecommerce-order': 'Online order problem', 'travel-refund': 'Flight refund', 'bank-account-frozen': 'Bank account frozen', 'money-lent-not-returned': 'Money lent, not returned', 'loan-recovery': 'Loan recovery calls', 'defective-product': 'Defective product', 'eviction-tenancy': 'Asked to vacate', 'wrongful-termination': 'Fired from job', 'police-complaint': 'Police won’t file FIR', 'accused-arrest': 'Fear of arrest', 'road-accident': 'Road accident claim', 'account-hacked': 'Account hacked', 'property-purchase': 'Buying property safely', 'pf-gratuity': 'PF or gratuity stuck', 'medical-negligence': 'Hospital negligence', 'electricity-bill': 'Electricity bill', 'credit-report-error': 'CIBIL error', 'farmer-problem': 'Crop insurance', 'overseas-worker': 'Stuck abroad', 'demolition-eviction': 'Demolition notice' };
+  let TREND = { ids: null, live: false, paused: false };
+  const trendOk = (id) => BY_ID[id] && !BY_ID[id].sensitive && !TREND_HIDE.has(id);
+  const inCards = (id) => SITU.some((x) => x[0] === id); // already shown as cards just below
+  function trendIds() {
+    const live = (TREND.ids || []).filter(trendOk);
+    if (live.length >= 6) return { ids: live.slice(0, 14), live: true };
+    const ids = [...live, ...TREND_BASE.filter((x) => trendOk(x) && !inCards(x) && !live.includes(x))].slice(0, 14);
+    return { ids, live: false };
+  }
+  function trendPill(id, dup) {
+    const iss = BY_ID[id]; const ci = KB.categories.findIndex((c) => c.id === iss.cat); const c = KB.categories[ci] || {};
+    return `<button class="tpill" data-play="${id}" ${dup ? 'tabindex="-1" aria-hidden="true"' : ''}><span class="tic pc${(TREND_BASE.indexOf(id) + 6) % 6 || (Math.max(0, ci) % 6)}">${ic(c.icon || 'file', 16)}</span>${esc(TREND_LABEL[id] ? X(TREND_LABEL[id]) : G(iss, 's', iss.short))}</button>`;
+  }
+  function trendHTML() {
+    const { ids, live } = trendIds();
+    const one = ids.map((id) => trendPill(id, false)).join(''); const two = ids.map((id) => trendPill(id, true)).join('');
+    const label = live ? X('Trending this week') : X('People often ask about');
+    return `<section class="trend${TREND.paused ? ' paused' : ''}" id="trend" aria-labelledby="trendh">
+      <div class="trendh"><span class="dot${live ? ' live' : ''}" aria-hidden="true"></span><h2 id="trendh">${esc(label)}</h2>
+        <button class="tpause" data-act="trendpause" aria-pressed="${TREND.paused}" aria-label="${esc(X(TREND.paused ? 'Play moving list' : 'Pause moving list'))}">${ic(TREND.paused ? 'play' : 'pause', 16)}</button></div>
+      <div class="marq"><div class="mtrack" style="--dur:${Math.max(30, ids.length * 4)}s"><div class="mset">${one}</div><div class="mset dup" aria-hidden="true">${two}</div></div></div>
+    </section>`;
+  }
+  function trendLoad() {
+    if (TREND.ids) return;
+    TREND.ids = [];
+    try { const c = JSON.parse(sessionStorage.getItem('saboot_trend') || 'null'); if (c && Date.now() - c.t < 30 * 60e3) { TREND.ids = c.ids; return; } } catch (e) { /* ignore */ }
+    fetch('/api/trending').then((r) => (r.ok ? r.json() : null)).then((j) => {
+      if (!j || !Array.isArray(j.ids)) return;
+      TREND.ids = j.ids; try { sessionStorage.setItem('saboot_trend', JSON.stringify({ t: Date.now(), ids: j.ids })); } catch (e) { /* ignore */ }
+      const el = document.getElementById('trend'); if (el) el.outerHTML = trendHTML();
+    }).catch(() => {});
+  }
   function viewHome() {
     const saved = !S.issueId && loadSaved();
     const FEAT = [['chat', 'f1', 'Ask', 'f1s', 'In your language', 'sage'], ['file', 'f2', 'Prepare', 'f2s', 'Step by step', 'sky'], ['folder', 'f3', 'Organize', 'f3s', 'Your evidence', 'sand'], ['circlecheck', 'f4', 'Be Ready', 'f4s', 'With confidence', 'rose']];
@@ -8315,6 +8387,7 @@ ${JSON.stringify(map)}`;
         </div>
         <p class="voicehint" id="voicehint" aria-live="polite" hidden></p>
         <div id="results" class="results" aria-live="polite"></div>
+        ${(trendLoad(), trendHTML())}
         <section class="situ" id="suggest" aria-label="${esc(X('Common situations'))}">
           <div class="siturow" role="list">${SITU.map(([id, icn, t, fact, tone]) => `<button class="situcard" role="listitem" data-play="${id}"><span class="fic ${tone}">${ic(icn, 20)}</span><b>${esc(X(t))}</b><span>${esc(X(fact))}</span></button>`).join('')}</div>
         </section>
@@ -9437,6 +9510,7 @@ ${JSON.stringify(map)}`;
     switch (t.dataset.act) {
       case 'toshelf': document.getElementById('shelf').scrollIntoView({ behavior: 'smooth' }); break;
       case 'lang': showLang(); break;
+      case 'trendpause': { TREND.paused = !TREND.paused; const el = document.getElementById('trend'); if (el) el.outerHTML = trendHTML(); const b = document.querySelector('[data-act=trendpause]'); if (b) b.focus(); break; }
       case 'ax': showAx(); break;
       case 'disab': showDisab(); break;
       case 'sayq': sayQuestion(); break;

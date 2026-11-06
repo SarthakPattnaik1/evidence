@@ -19,6 +19,8 @@
     scale: '<path d="M12 4v16M7 20h10M5 7h14"/><path d="m5 7-2.5 6a3 3 0 0 0 5 0Zm14 0-2.5 6a3 3 0 0 0 5 0Z"/>',
     mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3M8.5 21h7"/>',
     stop: '<rect x="7" y="7" width="10" height="10" rx="2"/>',
+    pause: '<path d="M9 6v12M15 6v12"/>',
+    play: '<path d="M8 5.5v13l11-6.5Z"/>',
     family: '<circle cx="8" cy="7" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M2.5 20c.5-3.6 2.8-6 5.5-6s5 2.4 5.5 6"/><path d="M14 20c.3-2.6 1.6-4.5 3.2-4.5S20.6 17.4 21 20"/>',
     bank: '<path d="M3 10 12 4l9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 20h18"/>',
     bag: '<path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
@@ -323,6 +325,7 @@ ${JSON.stringify(map)}`;
     if (changed) { if (S.stage === 'quick') S.quickDone = false; else S.deepDone = false; E.prune(issue(), S.answers); persist(); }
   }
   // A dialog left open (language, accessibility, share…) must not stay over the next page after Back or a link.
+  let trendT; document.addEventListener('touchstart', (e) => { const t = e.target.closest && e.target.closest('#trend'); if (!t) return; t.classList.add('touch'); clearTimeout(trendT); trendT = setTimeout(() => { const el = document.getElementById('trend'); if (el) el.classList.remove('touch'); }, 4000); }, { passive: true });
   window.addEventListener('hashchange', () => { document.querySelectorAll('.overlay:not(.consent)').forEach((o) => o.remove()); render(); trWait(); });
 
   function shell(inner, opt = {}) {
@@ -419,6 +422,48 @@ ${JSON.stringify(map)}`;
     ['rental-security-deposit', 'house', 'Deposit not returned', 'A written demand to the landlord is the first step.', 'sand'],
     ['police-complaint', 'shield', 'Police won\'t file FIR', 'Send it in writing to the Superintendent of Police.', 'sage']
   ].filter(([id]) => BY_ID[id]);
+  /* ---------- Trending strip ----------
+     Real data only: guide ids most started in the last 7 days (api/trending; at least 5 starts each, no counts).
+     Until there are 6 such guides it says "People often ask about" instead of claiming a trend. Sensitive guides
+     are never shown. Motion is slow, pauses on hover, focus or touch, has a pause button (WCAG 2.2.2), and
+     stops completely for reduced motion and Calm mode, where it becomes a row you can swipe. */
+  const TREND_HIDE = new Set(['general', 'intimate-images', 'gender-identity', 'mental-health-rights', 'pregnancy-rights', 'child-protection', 'prisoner-rights']);
+  const TREND_BASE = ['cheque-bounce', 'upi-cyber-fraud', 'digital-arrest-scam', 'rental-security-deposit', 'unpaid-salary', 'refund-refused', 'loan-app-harassment', 'job-investment-scam', 'traffic-challan', 'builder-delay', 'insurance-claim', 'legal-notice-received', 'land-encroachment', 'govt-service', 'ecommerce-order', 'travel-refund'];
+  // Short, spoken-style labels read faster in a moving strip than formal guide titles.
+  const TREND_LABEL = { 'cheque-bounce': 'Cheque bounced', 'upi-cyber-fraud': 'Money stolen online', 'digital-arrest-scam': '"Digital arrest" call', 'rental-security-deposit': 'Deposit not returned', 'unpaid-salary': 'Salary not paid', 'refund-refused': 'Refund refused', 'loan-app-harassment': 'Loan app harassment', 'job-investment-scam': 'Job or task scam', 'traffic-challan': 'Traffic challan', 'builder-delay': 'Flat not delivered', 'insurance-claim': 'Insurance claim rejected', 'legal-notice-received': 'Got a legal notice', 'land-encroachment': 'Land encroached', 'govt-service': 'Show-cause notice at work', 'ecommerce-order': 'Online order problem', 'travel-refund': 'Flight refund', 'bank-account-frozen': 'Bank account frozen', 'money-lent-not-returned': 'Money lent, not returned', 'loan-recovery': 'Loan recovery calls', 'defective-product': 'Defective product', 'eviction-tenancy': 'Asked to vacate', 'wrongful-termination': 'Fired from job', 'police-complaint': 'Police won’t file FIR', 'accused-arrest': 'Fear of arrest', 'road-accident': 'Road accident claim', 'account-hacked': 'Account hacked', 'property-purchase': 'Buying property safely', 'pf-gratuity': 'PF or gratuity stuck', 'medical-negligence': 'Hospital negligence', 'electricity-bill': 'Electricity bill', 'credit-report-error': 'CIBIL error', 'farmer-problem': 'Crop insurance', 'overseas-worker': 'Stuck abroad', 'demolition-eviction': 'Demolition notice' };
+  let TREND = { ids: null, live: false, paused: false };
+  const trendOk = (id) => BY_ID[id] && !BY_ID[id].sensitive && !TREND_HIDE.has(id);
+  const inCards = (id) => SITU.some((x) => x[0] === id); // already shown as cards just below
+  function trendIds() {
+    const live = (TREND.ids || []).filter(trendOk);
+    if (live.length >= 6) return { ids: live.slice(0, 14), live: true };
+    const ids = [...live, ...TREND_BASE.filter((x) => trendOk(x) && !inCards(x) && !live.includes(x))].slice(0, 14);
+    return { ids, live: false };
+  }
+  function trendPill(id, dup) {
+    const iss = BY_ID[id]; const ci = KB.categories.findIndex((c) => c.id === iss.cat); const c = KB.categories[ci] || {};
+    return `<button class="tpill" data-play="${id}" ${dup ? 'tabindex="-1" aria-hidden="true"' : ''}><span class="tic pc${(TREND_BASE.indexOf(id) + 6) % 6 || (Math.max(0, ci) % 6)}">${ic(c.icon || 'file', 16)}</span>${esc(TREND_LABEL[id] ? X(TREND_LABEL[id]) : G(iss, 's', iss.short))}</button>`;
+  }
+  function trendHTML() {
+    const { ids, live } = trendIds();
+    const one = ids.map((id) => trendPill(id, false)).join(''); const two = ids.map((id) => trendPill(id, true)).join('');
+    const label = live ? X('Trending this week') : X('People often ask about');
+    return `<section class="trend${TREND.paused ? ' paused' : ''}" id="trend" aria-labelledby="trendh">
+      <div class="trendh"><span class="dot${live ? ' live' : ''}" aria-hidden="true"></span><h2 id="trendh">${esc(label)}</h2>
+        <button class="tpause" data-act="trendpause" aria-pressed="${TREND.paused}" aria-label="${esc(X(TREND.paused ? 'Play moving list' : 'Pause moving list'))}">${ic(TREND.paused ? 'play' : 'pause', 16)}</button></div>
+      <div class="marq"><div class="mtrack" style="--dur:${Math.max(30, ids.length * 4)}s"><div class="mset">${one}</div><div class="mset dup" aria-hidden="true">${two}</div></div></div>
+    </section>`;
+  }
+  function trendLoad() {
+    if (TREND.ids) return;
+    TREND.ids = [];
+    try { const c = JSON.parse(sessionStorage.getItem('saboot_trend') || 'null'); if (c && Date.now() - c.t < 30 * 60e3) { TREND.ids = c.ids; return; } } catch (e) { /* ignore */ }
+    fetch('/api/trending').then((r) => (r.ok ? r.json() : null)).then((j) => {
+      if (!j || !Array.isArray(j.ids)) return;
+      TREND.ids = j.ids; try { sessionStorage.setItem('saboot_trend', JSON.stringify({ t: Date.now(), ids: j.ids })); } catch (e) { /* ignore */ }
+      const el = document.getElementById('trend'); if (el) el.outerHTML = trendHTML();
+    }).catch(() => {});
+  }
   function viewHome() {
     const saved = !S.issueId && loadSaved();
     const FEAT = [['chat', 'f1', 'Ask', 'f1s', 'In your language', 'sage'], ['file', 'f2', 'Prepare', 'f2s', 'Step by step', 'sky'], ['folder', 'f3', 'Organize', 'f3s', 'Your evidence', 'sand'], ['circlecheck', 'f4', 'Be Ready', 'f4s', 'With confidence', 'rose']];
@@ -444,6 +489,7 @@ ${JSON.stringify(map)}`;
         </div>
         <p class="voicehint" id="voicehint" aria-live="polite" hidden></p>
         <div id="results" class="results" aria-live="polite"></div>
+        ${(trendLoad(), trendHTML())}
         <section class="situ" id="suggest" aria-label="${esc(X('Common situations'))}">
           <div class="siturow" role="list">${SITU.map(([id, icn, t, fact, tone]) => `<button class="situcard" role="listitem" data-play="${id}"><span class="fic ${tone}">${ic(icn, 20)}</span><b>${esc(X(t))}</b><span>${esc(X(fact))}</span></button>`).join('')}</div>
         </section>
@@ -1566,6 +1612,7 @@ ${JSON.stringify(map)}`;
     switch (t.dataset.act) {
       case 'toshelf': document.getElementById('shelf').scrollIntoView({ behavior: 'smooth' }); break;
       case 'lang': showLang(); break;
+      case 'trendpause': { TREND.paused = !TREND.paused; const el = document.getElementById('trend'); if (el) el.outerHTML = trendHTML(); const b = document.querySelector('[data-act=trendpause]'); if (b) b.focus(); break; }
       case 'ax': showAx(); break;
       case 'disab': showDisab(); break;
       case 'sayq': sayQuestion(); break;
