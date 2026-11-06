@@ -8202,7 +8202,14 @@ ${JSON.stringify(map)}`;
       quiet = busyNow() ? 0 : quiet + 1;
       // Draw the final page while still dimmed, then reveal it: nothing changes after it appears.
       if (quiet >= 3 || Date.now() - t0 > 10000) {
-        applyLangDom(); clearTimeout(srT); const y = window.scrollY; render(); window.scrollTo(0, y); body.classList.remove('trwait');
+        applyLangDom(); clearTimeout(srT); const y = window.scrollY;
+        // Keep whatever the person typed while the page was translating (search box, notes): re-rendering used to wipe it.
+        const a = document.activeElement; const keep = [...document.querySelectorAll('main input[id]:not([type=radio]):not([type=checkbox]), main textarea[id]')].filter((el) => el.value).map((el) => [el.id, el.value]);
+        const foc = a && a.id && /^(INPUT|TEXTAREA)$/.test(a.tagName) ? [a.id, a.selectionStart, a.selectionEnd] : null;
+        render(); window.scrollTo(0, y);
+        keep.forEach(([id, v]) => { const el = document.getElementById(id); if (el && !el.value) { el.value = v; el.dispatchEvent(new Event('input', { bubbles: true })); } });
+        if (foc) { const el = document.getElementById(foc[0]); if (el) { el.focus({ preventScroll: true }); try { el.setSelectionRange(foc[1], foc[2]); } catch (e) { /* not a text field */ } } }
+        body.classList.remove('trwait');
         if (trFailed[LANG] && !hasText(LANG)) toast(LMETA[LANG].native + ': translation is busy right now, so this page is in English. Please try again in a few minutes.', 7000);
         return;
       }
