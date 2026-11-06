@@ -317,7 +317,8 @@ ${JSON.stringify(map)}`;
     while (S.history.length > k) { const last = S.history.pop(); S.prefill[last.id] = S.answers[last.id]; delete S.answers[last.id]; delete S.skipped[last.id]; S.stage = last.stage; changed = true; }
     if (changed) { if (S.stage === 'quick') S.quickDone = false; else S.deepDone = false; E.prune(issue(), S.answers); persist(); }
   }
-  window.addEventListener('hashchange', () => { render(); trWait(); });
+  // A dialog left open (language, accessibility, share…) must not stay over the next page after Back or a link.
+  window.addEventListener('hashchange', () => { document.querySelectorAll('.overlay:not(.consent)').forEach((o) => o.remove()); render(); trWait(); });
 
   function shell(inner, opt = {}) {
     const cur = opt.iss || issue(); const sensitive = !!(cur && cur.sensitive && (opt.inJourney || opt.exit));
@@ -325,7 +326,7 @@ ${JSON.stringify(map)}`;
     return `<header class="top"><div class="wrap${sensitive ? ' has-exit' : ''}">
         <button class="brand" data-go="home" aria-label="Saboot home"><img class="bicon" src="${window.ER_BRAND.icon}" alt="" width="34" height="28"><img class="bwordimg" src="${window.ER_BRAND.word}" alt="Saboot" width="80" height="26"></button>
         <button class="nav navq" data-go="questions" aria-label="${esc(T('q'))}">${ic('q', 18)}<span class="lbl-long">${esc(T('q').replace(/\?$/, ''))}</span></button>
-        <button class="nav" data-go="help">${ic('phone', 18)}<span class="lbl-long">${esc(T('help').replace(/\?$/, ''))}</span><span class="lbl-short">${esc(H('nav_help', 'Help'))}</span></button>
+        <button class="nav" data-go="help" aria-label="${esc(H('nav_help', 'Help'))}">${ic('phone', 18)}<span class="lbl-long">${esc(T('help').replace(/\?$/, ''))}</span><span class="lbl-short">${esc(H('nav_help', 'Help'))}</span></button>
         <button class="nav axbtn" data-act="ax" aria-label="${esc(X('Accessibility: bigger text, contrast, read aloud'))}" title="${esc(X('Accessibility'))}">${ic('access', 20)}</button>
         <button class="nav lang" data-act="lang" aria-label="Language: ${esc(LMETA[LANG].name)}. Change language">${ic('globe', 18)}<span>${esc(LMETA[LANG].native)}</span></button>
         ${sensitive ? `<a class="nav exit" data-act="exit" href="https://www.google.com" target="_blank" rel="noopener noreferrer" title="Clears this page and opens a neutral website">${ic('x', 18)}<span>Exit</span></a>` : ''}
