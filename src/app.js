@@ -320,9 +320,9 @@ ${JSON.stringify(map)}`;
   window.addEventListener('hashchange', () => { render(); trWait(); });
 
   function shell(inner, opt = {}) {
-    const sensitive = !!(issue() && issue().sensitive && opt.inJourney);
+    const cur = opt.iss || issue(); const sensitive = !!(cur && cur.sensitive && (opt.inJourney || opt.exit));
     document.body.classList.toggle('calm', sensitive);
-    return `<header class="top"><div class="wrap">
+    return `<header class="top"><div class="wrap${sensitive ? ' has-exit' : ''}">
         <button class="brand" data-go="home" aria-label="Saboot home"><img class="bicon" src="${window.ER_BRAND.icon}" alt="" width="34" height="28"><img class="bwordimg" src="${window.ER_BRAND.word}" alt="Saboot" width="80" height="26"></button>
         <button class="nav navq" data-go="questions" aria-label="${esc(T('q'))}">${ic('q', 18)}<span class="lbl-long">${esc(T('q').replace(/\?$/, ''))}</span></button>
         <button class="nav" data-go="help">${ic('phone', 18)}<span class="lbl-long">${esc(T('help').replace(/\?$/, ''))}</span><span class="lbl-short">${esc(H('nav_help', 'Help'))}</span></button>
@@ -640,7 +640,7 @@ ${JSON.stringify(map)}`;
         <p class="small muted">${esc(X('About {q} quick questions · 2 minutes · skip any').replace('{q}', qs.length))}</p>
       </div>
       <details class="lawbox"><summary>${ic('file', 16)} ${esc(X('What the law says'))}${ic('down', 16)}</summary><p class="small">${revTag(iss)} ${esc(X(iss.juris))}</p>${srcBlock(iss)}</details>
-    </section></div>`);
+    </section></div>`, { exit: true, iss });
   }
   function advBanner(adv) {
     return `<div class="banner adv">${ic('user')}<div><h3>${adv.name ? esc(adv.name) + ' asked you to prepare' : 'Your advocate asked you to prepare'}</h3>${adv.note ? `<p>“${esc(adv.note)}”</p>` : ''}${adv.must && adv.must.length ? '<p class="small">Records they want are marked <span class="tag adv">Advocate asked</span>.</p>' : ''}</div></div>`;

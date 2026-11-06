@@ -1082,3 +1082,12 @@ html[dir=rtl] .i-dir{transform:scaleX(-1)}
 .nomatch p{margin:0 0 8px}
 .nmacts{display:flex;flex-wrap:wrap;gap:8px}
 .btn.sm{min-height:44px;padding:8px 14px;font-size:14.5px}
+
+/* v38: Quick exit must always be on screen. On phones the header had no room for it (it sat 12px past the edge at 360px). */
+@media (max-width:520px){
+  header.top .wrap.has-exit .navq{display:none}
+  header.top .wrap.has-exit .nav.lang span{display:none}
+  header.top .wrap.has-exit .nav .lbl-short{display:none}
+  header.top .wrap.has-exit .nav.exit{margin-left:auto}
+}
+header.top .wrap.has-exit .nav.exit span{display:inline!important}
