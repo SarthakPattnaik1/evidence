@@ -1091,3 +1091,8 @@ html[dir=rtl] .i-dir{transform:scaleX(-1)}
   header.top .wrap.has-exit .nav.exit{margin-left:auto}
 }
 header.top .wrap.has-exit .nav.exit span{display:inline!important}
+/* v39: long language names (മലയാളം, ᱥᱟᱱᱛᱟᱲᱤ) pushed the header 12px past a 360px screen. */
+@media (max-width:400px){
+  header.top .nav{padding:8px 4px}
+  header.top .nav.lang span{max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+}
