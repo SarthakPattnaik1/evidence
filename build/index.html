@@ -8667,10 +8667,10 @@ ${JSON.stringify(map)}`;
     if (!u) return viewQuiz();
     const help = (u.help || []).map((h) => KB.help[h]).filter(Boolean);
     return shell(`<div class="wrap narrow" style="padding:26px 0 60px">
-      <div class="banner now" role="alert">${ic('alert', 24)}<div><h1 style="font-size:clamp(24px,4vw,32px);margin:0 0 6px">${esc(u.title)}</h1><p>${esc(u.text)}</p></div></div>
+      <div class="banner now" role="alert">${ic('alert', 24)}<div><h1 style="font-size:clamp(24px,4vw,32px);margin:0 0 6px">${esc(G(iss, u.id + '.t', u.title))}</h1><p>${esc(G(iss, u.id + '.x', u.text))}</p></div></div>
       <div class="grid" style="margin:16px 0">${help.map(helpCard).join('')}</div>
       <p class="muted">${esc(X('Your answers are kept on this page. Come back and finish when you can.'))}</p>
-      <div class="row"><button class="btn go" data-act="ackurgent">Continue</button></div>
+      <div class="row"><button class="btn go" data-act="ackurgent">${esc(X('Continue'))}</button></div>
     </div>`, { inJourney: true });
   }
   function helpCard(h) {
