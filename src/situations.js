@@ -519,6 +519,11 @@
     ['Gig worker in Karnataka or Rajasthan — welfare board', 'gig workers act|gig welfare board', { gw_state: 'kar' }]
   ]);
   G('govt-service', [
+    ['Government employee expecting disciplinary proceedings', 'fear disciplinary action|departmental action coming|might get charge sheet', { gs_what: 'memo', gs_stage: 'fear' }],
+    ['Got a show-cause notice at my government job', 'show cause notice government|scn from department|explanation called', { gs_what: 'memo', gs_stage: 'scn' }],
+    ['Received a memo of charges (charge sheet) from my department', 'memo of charges|articles of charge|rule 14 charge sheet|major penalty', { gs_what: 'memo', gs_stage: 'charge' }],
+    ['Need to reply to a show-cause notice within days', 'reply show cause urgent|written statement of defence deadline', { gs_what: 'memo', gs_stage: 'scn', gs_days: 'u3' }, 'Reply before the deadline — or ask for more time in writing today and keep the receipt.'],
+    ['Not given copies of documents relied on in my charge sheet', 'documents relied upon not given|inspection of documents charge sheet', { gs_what: 'memo', gs_stage: 'charge' }],
     ['Suspended from a government job', 'government employee suspended', { gs_what: 'suspend' }],
     ['Transferred as punishment', 'punishment transfer|transfer order challenge', { gs_what: 'transfer' }],
     ['Promotion denied to me', 'promotion denied|seniority dispute', { gs_what: 'promo' }],

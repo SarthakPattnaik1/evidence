@@ -195,6 +195,9 @@
     ['Your state’s rent law', 'Terms of your agreement'], 'State rent laws; Specific Relief Act s.6', 'eviction-tenancy', ['eviction without court', 'landlord threw out']);
 
   /* ---------- Work ---------- */
+  Q('work', 'govt-show-cause-steps', 'I am a government employee and fear disciplinary proceedings. What should I do?',
+    "Four steps: (1) collect copies of every document about the matter — orders, letters, emails, file notings and records; (2) collect the rules that apply, such as the CCS (CCA) Rules 1965, the CCS (Conduct) Rules 1964 or your state's service rules; (3) when a show-cause notice or memo of charges arrives, read it carefully — each charge, the facts alleged, the documents and witnesses relied on, and the reply deadline — and ask in writing for copies of the documents relied on; (4) draft your reply point by point with evidence attached, avoid admissions, and get proof that it was delivered on time.",
+    ['Whether it is a major (Rule 14) or minor (Rule 16) penalty proceeding', 'Whether you are a central, state or PSU employee'], 'CCS (CCA) Rules, 1965 — Rules 14 and 16', 'govt-service', ['show cause notice', 'memo of charges', 'disciplinary proceedings', 'charge sheet government employee']);
   Q('work', 'salary-due-date', 'By when must my salary be paid?',
     "Monthly wages must be paid by the 7th of the next month. If you leave, resign or are removed, wages must be paid within two working days.",
     ['Whether you are an employee or a contractor'], 'Code on Wages, 2019 s.17 (in force from 21 Nov 2025)', 'unpaid-salary', ['salary date', 'salary late', 'fnf two days']);
