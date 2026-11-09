@@ -202,6 +202,11 @@ CAST = {
  'anjali': dict(name='Anjali', full='Anjali', skin='#d6a07a', hair='#1c1512', hstyle='long', earrings=True, bindi=4, sig='#b4552d'),
  'mediator': dict(name='Mediator', full='Mediator', skin='#c99470', hair='#55504b', hstyle='part_bun', glasses='round', gcol='#4a3a2a', earrings=True, old=True, brow='#6e6862', saree='#2f7a6b', border='#e6c36a', blouse='#245e52', sig='#2f7a6b'),
  'judge': dict(name='Judge', full='Family Court judge', skin='#bf875f', hair='#d9d6d1', hstyle='neat', grey_sides='#ece9e4', glasses='rect', gcol='#2a2420', old=True, brow='#bdb8b2', sig='#222222'),
+ 'lokesh': dict(name='Lokesh', full='Lokesh', skin='#bd8560', hair='#7c7772', hstyle='short', grey_sides='#c9c5c0', moustache='thick', mcol='#d2cec8', glasses='rect', gcol='#4a3d32', old=True, brow='#a29d97', sig='#6a4a2a'),
+ 'sushma': dict(name='Sushma', full='Sushma', skin='#cf9a73', hair='#3a3330', hstyle='part_bun', sindoor=True, bindi=5, earrings=True, old=True, saree='#7d3a5a', border='#e0b85a', blouse='#5e2a44', sig='#7d3a5a'),
+ 'clerk': dict(name='Clerk', full='Pension clerk', skin='#c08a62', hair='#1d1916', hstyle='side', moustache='thin', mcol='#1d1916', sig='#5a6b2f'),
+ 'officer': dict(name='DLSA officer', full='DLSA officer', skin='#c9926a', hair='#1b1513', hstyle='part_bun', glasses='round', gcol='#3a2e2a', earrings=True, bindi=4, sig='#1f5d8c'),
+ 'lawyer': dict(name='Panel lawyer', full='Panel lawyer', skin='#d29a72', hair='#1a1411', hstyle='pony', accent='#ffffff', earrings=True, sig='#222222'),
  'vakeel': dict(name='Vakeel sahab', full='Adv. R. K. Sinha', skin='#b8805a', hair='#8d8985', hstyle='neat', grey_sides='#c9c6c2', glasses='rect', gcol='#2a2420', old=True, moustache='thin', mcol='#8d8985', brow='#7a7672', sig='#222222'),
 }
 
@@ -247,6 +252,24 @@ def outfit(key, c):
                 '<path d="M120,330 L180,330 M118,390 L182,390 M122,440 L182,440 M220,330 L280,330 M218,390 L284,390 M218,440 L290,440" stroke="#9e4a14" stroke-width="3" opacity=".6"/>' +
                 '<path d="M150,276 L272,470" stroke="#2a2a2a" stroke-width="8"/><rect x="236" y="430" width="88" height="68" rx="8" fill="#3a3f4a"/><rect x="250" y="444" width="30" height="6" rx="3" fill="#c2601e"/>' +
                 hands(sk))
+    if key == 'lokesh':
+        return (legs('#5a5550', shoes='#3a2a20') + torso('#e8e2d2') + arms('#e8e2d2', sk) +
+                '<path d="M120,300 Q122,282 146,276 L200,334 L254,276 Q278,282 280,300 L290,470 Q200,478 110,470Z" fill="#7a6248"/>' +
+                '<path d="M176,272 L200,304 L224,272" fill="#e8e2d2" stroke="#d6cfbd" stroke-width="3"/><circle cx="200" cy="360" r="5" fill="#5a4630"/><circle cx="200" cy="405" r="5" fill="#5a4630"/>' +
+                '<rect x="130" y="452" width="140" height="10" rx="4" fill="#4a3a28"/>' + hands(sk))
+    if key == 'sushma':
+        return saree(c) + hands(sk)
+    if key == 'clerk':
+        return (legs('#4a4a52') + torso('#e9dc9a') + arms('#e9dc9a', sk, short=True) +
+                '<path d="M176,272 L200,300 L224,272" fill="#d8ca86"/><path d="M200,300 L200,470" stroke="#d8ca86" stroke-width="3"/>' +
+                '<rect x="218" y="318" width="40" height="34" rx="4" fill="#d8ca86"/><rect x="228" y="302" width="6" height="34" rx="2" fill="#1f2430"/>' + hands(sk))
+    if key == 'officer':
+        return (legs('#e8e0d0', shoes='#5a3a2a', top=520) + torso('#1f5d8c', 1.0, 548, flare=14) + arms('#1f5d8c', sk, l_angle=6) +
+                '<path d="M118,288 Q200,334 282,288 L298,318 Q200,372 102,318Z" fill="#f2c94c"/>' + hands(sk) + file_folder(270, 390, '#f3efe4'))
+    if key == 'lawyer':
+        return (legs('#1f1f22', shoes='#111', top=520) + torso('#1f1f22', 1.0, 540, flare=10) + arms('#1f1f22', sk, l_angle=6) +
+                '<path d="M172,272 L200,326 L228,272Z" fill="#fafafa"/><path d="M162,276 L200,344 L178,276Z" fill="#2c2c30"/><path d="M238,276 L200,344 L222,276Z" fill="#2c2c30"/>' +
+                '<rect x="192" y="288" width="7" height="28" rx="2" fill="#fff"/><rect x="201" y="288" width="7" height="28" rx="2" fill="#fff"/>' + hands(sk))
     if key == 'vidyut':
         return (legs('#3d4552', shoes='#2a211c') + torso('#8fb6d6') + arms('#8fb6d6', sk) +
                 '<path d="M176,272 L200,302 L224,272" fill="#7aa3c6"/><path d="M200,302 L200,470" stroke="#7aa3c6" stroke-width="3"/><circle cx="200" cy="340" r="3" fill="#5f87aa"/><circle cx="200" cy="385" r="3" fill="#5f87aa"/><circle cx="200" cy="430" r="3" fill="#5f87aa"/>' +

@@ -14,6 +14,11 @@ VOICES = {
     'vakeel':   ('hm_psi', 0.97, 0.0),
     'judge':    ('hm_psi', 0.92, -2.0),    # same model as the advocate, lower and slower
     'mediator': ('hf_beta', 0.94, 0.0),
+    'lokesh':   ('hm_omega', 0.92, -2.0),  # retired clerk, older and slower
+    'sushma':   ('hf_beta', 0.95, -1.0),
+    'clerk':    ('hm_psi', 1.06, 1.0),
+    'officer':  ('hf_beta', 1.00, 1.0),
+    'lawyer':   ('hf_alpha', 1.00, 0.0),
 }
 
 # What each line sounds like (Devanagari, so the Hindi voice pronounces it right). Keys are the bubble text.
@@ -99,15 +104,19 @@ def main(lines):
 if __name__ == '__main__':
     sys.path.insert(0, HERE)
     import film
+    if len(sys.argv) > 1: __import__(sys.argv[1])          # a story module that sets film.FILMS etc.
+    try:
+        from pension import HINDI_EXTRA; HINDI.update(HINDI_EXTRA)
+    except Exception: pass
     lines = []
     for p, F in film.FILMS.items():
         for sc in [film.COLD[p]] + F['scenes']:
             if isinstance(sc, tuple):
-                if sc[1].get('say') and ('vakeel', sc[1]['say']) not in lines: lines.append(('vakeel', sc[1]['say']))
+                if sc[1].get('say') and (film.NARRATOR, sc[1]['say']) not in lines: lines.append((film.NARRATOR, sc[1]['say']))
                 continue
             for b in sc['beats']:
                 if b[0] == 'say' and (b[1], b[2]) not in lines: lines.append((b[1], b[2]))
-    lines.append(('vakeel', film.END_SAY))
+    lines.append((film.NARRATOR, film.END_SAY))
     done = json.load(open(os.path.join(VOICE_DIR, 'index.json'))) if os.path.exists(os.path.join(VOICE_DIR, 'index.json')) else {}
     lines = [l for l in lines if l[0] + '|' + l[1] not in done] or []
     print('new lines', len(lines))

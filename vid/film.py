@@ -14,8 +14,9 @@ GROUND = 1440                        # feet line, scene-local
 CH_H = 1100                           # character height on screen
 INK = (19, 35, 58)
 OUT = '/tmp/vid/out/'
-COL = {'vidyut': (31, 95, 139), 'anjali': (180, 85, 45), 'vakeel': (34, 34, 34), 'judge': (60, 60, 60), 'mediator': (47, 122, 107), 'phone': (110, 118, 130)}
-NAME = {'vidyut': 'Vidyut', 'anjali': 'Anjali', 'vakeel': 'Advocate', 'judge': 'Judge', 'mediator': 'Mediator', 'phone': 'Relative · on the phone'}
+HEADER = 'VIDYUT & ANJALI'; NARRATOR = 'vakeel'; SLUG = 'vidyut-anjali'; TITLE_FN = None; EXTRA_SETS = {}
+COL = {'lokesh': (106, 74, 42), 'sushma': (125, 58, 90), 'clerk': (90, 107, 47), 'officer': (31, 93, 140), 'lawyer': (34, 34, 34), 'vidyut': (31, 95, 139), 'anjali': (180, 85, 45), 'vakeel': (34, 34, 34), 'judge': (60, 60, 60), 'mediator': (47, 122, 107), 'phone': (110, 118, 130)}
+NAME = {'lokesh': 'Lokesh', 'sushma': 'Sushma', 'clerk': 'Pension clerk', 'officer': 'DLSA officer', 'lawyer': 'Panel lawyer', 'vidyut': 'Vidyut', 'anjali': 'Anjali', 'vakeel': 'Advocate', 'judge': 'Judge', 'mediator': 'Mediator', 'phone': 'Relative · on the phone'}
 
 def ease(t): t = max(0, min(1, t)); return t * t * (3 - 2 * t)
 
@@ -130,6 +131,7 @@ def _vignette():
     v = Image.new('RGBA', (W, SH), (10, 14, 30, 0)); v.putalpha(Image.fromarray(a)); return v
 VIG = None
 def get_set(name):
+    if name in EXTRA_SETS and name not in SETS: SETS[name] = EXTRA_SETS[name]()
     if name not in SETS:
         SETS[name] = {'wedding': set_wedding, 'home': set_home, 'night': lambda: set_home(night=True), 'warm': lambda: set_home(warm=True),
                       'split': set_split, 'chamber': set_chamber, 'court': set_court, 'mediation': set_mediation}[name]()
@@ -149,11 +151,12 @@ def fg_table(im, oy):
     d = ImageDraw.Draw(im)
     d.ellipse([180, oy + 1170, 900, oy + 1320], fill=(150, 104, 70)); d.ellipse([180, oy + 1146, 900, oy + 1286], fill=(176, 124, 84))
 
-def fg_desk(im, oy):
+FG = {}
+def fg_desk(im, oy, plate='ADVOCATE'):
     d = ImageDraw.Draw(im)
     d.rectangle([560, oy + 1060, 1060, oy + 1330], fill=(122, 84, 58)); d.rectangle([560, oy + 1060, 1060, oy + 1086], fill=(146, 104, 72))
     d.rectangle([600, oy + 1030, 720, oy + 1062], fill=(240, 236, 226)); d.rectangle([740, oy + 1040, 830, oy + 1062], fill=(160, 40, 40))
-    t = 'ADVOCATE'; tw = text_w(t, 'ns700', 32); d.rounded_rectangle([810 - tw // 2 - 24, oy + 1110, 810 + tw // 2 + 24, oy + 1166], 8, fill=(255, 250, 240)); draw_text(im, (810 - tw // 2, oy + 1118), t, 'ns700', 32, INK)
+    t = plate; tw = text_w(t, 'ns700', 32); d.rounded_rectangle([810 - tw // 2 - 24, oy + 1110, 810 + tw // 2 + 24, oy + 1166], 8, fill=(255, 250, 240)); draw_text(im, (810 - tw // 2, oy + 1118), t, 'ns700', 32, INK)
 
 def fg_door(im, oy, state):
     d = ImageDraw.Draw(im); x0, x1, y0, y1 = 900, 1080, 560, GROUND - 120
@@ -217,11 +220,11 @@ def scene_frames(part, scene, sfx_out, t_offset):
     for v in st.values(): v.setdefault('expr', 'neutral'); v.setdefault('pose', 'idle'); v.setdefault('prop', None); v.setdefault('tilt', 0); v.setdefault('a', 1.0)
     base = Image.new('RGB', (W, H), (245, 240, 232))
     d = ImageDraw.Draw(base); d.rectangle([0, 0, W, TOP], fill=NAVY)
-    draw_text(base, (44, 40), f'VIDYUT & ANJALI · PART {part} OF 3', 'ns700', 30, GOLD); draw_text(base, (44, 84), scene['title'], 'ns400', 36, (200, 210, 224))
+    draw_text(base, (44, 40), f'{HEADER} · PART {part} OF 3', 'ns700', 30, GOLD); draw_text(base, (44, 84), scene['title'], 'ns400', 36, (200, 210, 224))
     t2 = 'A fictional story · general legal information, not legal advice'; tw = text_w(t2, 'ns400', 25); draw_text(base, ((W - tw) // 2, BOT + 70), t2, 'ns400', 25, MUTED)
     t3 = 'saboot.org'; tw = text_w(t3, 'ns700', 34); draw_text(base, ((W - tw) // 2, BOT + 120), t3, 'ns700', 34, INK)
     stage = get_set(scene['set'])
-    AMB.append((t_offset, t_offset + plan(scene)[1], scene.get('amb', {'wedding': 'crowd', 'night': 'night', 'court': 'court', 'chamber': 'room', 'mediation': 'room', 'home': 'room', 'warm': 'room', 'split': 'room'}[scene['set']])))
+    AMB.append((t_offset, t_offset + plan(scene)[1], scene.get('amb', {'office': 'court', 'dlsa': 'room', 'tribunal': 'court', 'wedding': 'crowd', 'night': 'night', 'court': 'court', 'chamber': 'room', 'mediation': 'room', 'home': 'room', 'warm': 'room', 'split': 'room'}[scene['set']])))
     # schedule sounds
     for (t0, t1, b) in ev:
         if b[0] == 'say':
@@ -285,7 +288,8 @@ def scene_frames(part, scene, sfx_out, t_offset):
             else: img.paste(r, (x, y), r)
             if who == 'judge': fg_court(img, TOP)
         if scene.get('table'): fg_table(img, TOP)
-        if scene.get('desk'): fg_desk(img, TOP)
+        if scene.get('desk'): fg_desk(img, TOP, scene.get('plate', 'ADVOCATE'))
+        if scene.get('counter'): FG['counter'](img, TOP)
         for (t0, t1, b) in ev:
             if b[0] == 'fx' and t >= t0: b[1](img, t - t0)
         # ---- camera: ease in on whoever is speaking, drift back out between lines
@@ -324,7 +328,7 @@ def narrate(frames, v, with_fig=True):
         fi = int((i / FPS - 0.5) * FPS); m = tr[fi] if 0 <= fi < len(tr) else 0
         if not with_fig: continue
         a = ease((i - 6) / 12)
-        r = render('vakeel', 'neutral', m, (i % 120) < 4, int(round(2 * math.sin(i / 11))) if m else 0, 'gesture' if 0 <= fi < len(tr) and (fi // 45) % 2 == 0 else 'idle', None, 560, -1)
+        r = render(NARRATOR, 'neutral', m, (i % 120) < 4, int(round(2 * math.sin(i / 11))) if m else 0, 'gesture' if 0 <= fi < len(tr) and (fi // 45) % 2 == 0 else 'idle', None, 560, -1)
         if a < 1: r = r.copy(); r.putalpha(r.split()[3].point(lambda q: int(q * a)))
         im.paste(r, (int(860 - r.width / 2), int(1805 - r.height)), r)
 
@@ -429,21 +433,22 @@ END_SAY = 'Apne adhikaar samjhiye. Saboot dot org par — free mein.'
 END = 'Understand your rights. Explore your legal options. Make informed decisions about your matrimonial future.'
 
 def build(p, mode='full'):
+    FILMS, COLD = globals()['FILMS'], globals()['COLD']
     F = FILMS[p]; parts = []; sfx = []; music = []; t = 0.0; VOICE_EVENTS.clear()
     segs = [COLD[p], ('title', None)] + F['scenes'] + [('end', None)]
     AMB.clear(); CAMS.clear()
     for idx, sc in enumerate(segs):
         kind = sc[0] if isinstance(sc, tuple) else 'scene'
         if kind == 'title':
-            fr = CS.title_frames(p, F['sub'], n=72); mood = 'sad' if p == 1 else ('neutral' if p == 2 else 'hopeful'); sfx.append((t + 0.02, 'whoosh'))
+            fr = (TITLE_FN or CS.title_frames)(p, F['sub'], n=72); mood = 'sad' if p == 1 else ('neutral' if p == 2 else 'hopeful'); sfx.append((t + 0.02, 'whoosh'))
         elif kind == 'card':
-            o = sc[1]; v = voice_of('vakeel', o['say']) if o.get('say') else None
+            o = sc[1]; v = voice_of(NARRATOR, o['say']) if o.get('say') else None
             n = max(int(o.get('n', 200) * 0.6), int((v[1] + 1.6) * FPS)) if v else o.get('n', 200)
             fr = CS.card_frames(p, '', o['kicker'], o['head'], o['body'], n=n, chip=o.get('chip'), dark=o.get('dark', True), cta=o.get('cta'), fig=o.get('fig'))
             if v: narrate(fr, v, with_fig=not o.get('fig')); VOICE_EVENTS.append((t + 0.5, v[0]))
             mood = o.get('music', 'neutral'); sfx.append((t + 0.05, 'whoosh'))
         elif kind == 'end':
-            v = voice_of('vakeel', END_SAY)
+            v = voice_of(NARRATOR, END_SAY)
             fr = CS.end_frames(END, F['nxt'], n=max(150, int((v[1] + 2.0) * FPS)) if v else 150); mood = 'hopeful' if p == 3 else 'neutral'; sfx.append((t + 0.3, 'chime'))
             if v: VOICE_EVENTS.append((t + 0.9, v[0]))
         else:
@@ -461,7 +466,7 @@ def build(p, mode='full'):
     lst = f'{OUT}film{p}.txt'; open(lst, 'w').write(''.join(f"file '{x}'\n" for x in parts))
     v = f'{OUT}film{p}_v.mp4'; subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', lst, '-c', 'copy', v], check=True)
     a = f'{OUT}film{p}_a.m4a'; audio.mix(t, music, sfx, a, voices=list(VOICE_EVENTS), amb=list(AMB))
-    final = f'{OUT}vidyut-anjali-part{p}.mp4'
+    final = f'{OUT}{SLUG}-part{p}.mp4'
     subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', v, '-i', a, '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'copy', '-shortest', '-movflags', '+faststart', final], check=True)
     print('done', final)
 
