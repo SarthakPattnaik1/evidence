@@ -9592,7 +9592,8 @@ ${JSON.stringify(map)}`;
     try { const today = new Date().toISOString().slice(0, 10); let f = localStorage.getItem('sb_first'); if (!/^\d{4}-\d\d-\d\d$/.test(f || '')) { f = today; localStorage.setItem('sb_first', f); } backDays = Math.max(0, Math.round((Date.parse(today) - Date.parse(f)) / 86400000)); } catch (e) { /* storage blocked */ }
     setTimeout(() => getTok && getTok(), 0);
     let sid = ''; try { sid = sessionStorage.getItem('pa_s') || ''; if (!sid) { sid = Math.random().toString(36).slice(2, 12) + Date.now().toString(36).slice(-4); sessionStorage.setItem('pa_s', sid); } } catch (e) { sid = Math.random().toString(36).slice(2, 14); }
-    const seen = new Set(); let q = []; let first = true; let timer = null;
+    // 'first' (device, state, city, new/returning) is sent once per visit (tab session), not again on every reload.
+    const seen = new Set(); let q = []; let first = true; try { first = !sessionStorage.getItem('pa_f'); } catch (e) { /* private mode */ } let timer = null;
     // Signed session token from the server (proves events came through a real page load) and human signals.
     let tok = ''; let tokP = null; let hf = navigator.webdriver ? 0 : 4; let visMs = 0; let visAt = document.visibilityState === 'visible' ? Date.now() : 0;
     const getTok = () => tokP || (tokP = fetch('/api/s', { credentials: 'omit' }).then((r) => r.json()).then((j) => { tok = j.k || ''; }).catch(() => { tokP = null; }));
@@ -9608,7 +9609,7 @@ ${JSON.stringify(map)}`;
       if (!tok) { getTok().then(() => { if (tok) { try { sessionStorage.setItem('pa_k', tok); } catch (e) { /* ignore */ } flush(); } }); return; }
       vis();
       const payload = { k: tok, h: hf, l: LANG, d: dev(), e: q.splice(0, 60) };
-      if (first) { payload.first = 1; payload.r = ref; payload.u = utm; if (backDays >= 0) payload.n = backDays; first = false; }
+      if (first) { payload.first = 1; payload.r = ref; payload.u = utm; if (backDays >= 0) payload.n = backDays; first = false; try { sessionStorage.setItem('pa_f', '1'); } catch (e) { /* ignore */ } }
       const body = JSON.stringify(payload);
       try { if (!(navigator.sendBeacon && navigator.sendBeacon('/api/e', new Blob([body], { type: 'application/json' })))) fetch('/api/e', { method: 'POST', body, headers: { 'content-type': 'application/json' }, keepalive: true }).catch(() => {}); } catch (e) { /* ignore */ }
       if (q.length) flush();
