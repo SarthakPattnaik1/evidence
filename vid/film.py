@@ -39,13 +39,13 @@ def mouth_track(path):
 
 # ---------------------------------------------------------------- character renders (cached)
 _rc = {}
-def render(key, expr, mouth, blink, tilt, pose, prop, h=CH_H):
-    k = (key, expr, mouth, blink, tilt, pose, prop, h)
+def render(key, expr, mouth, blink, tilt, pose, prop, h=CH_H, look=0):
+    k = (key, expr, mouth, blink, tilt, pose, prop, h, look)
     if k not in _rc:
-        CAST.ANIM.update(dict(mouth=mouth, blink=blink, tilt=tilt, pose=pose, prop=prop))
+        CAST.ANIM.update(dict(mouth=mouth, blink=blink, tilt=tilt, pose=pose, prop=prop, look=look))
         png = cairosvg.svg2png(bytestring=CAST.svg(key, expr).encode(), output_width=int(h * 400 / 610))
         _rc[k] = Image.open(io.BytesIO(png)).convert('RGBA')
-        CAST.ANIM.update(dict(mouth=0, blink=False, tilt=0, pose='idle', prop=None))
+        CAST.ANIM.update(dict(mouth=0, blink=False, tilt=0, pose='idle', prop=None, look=0))
     return _rc[k]
 
 # ---------------------------------------------------------------- sets
@@ -123,6 +123,12 @@ def set_mediation():
     return im
 
 SETS = {}
+def _vignette():
+    import numpy as np
+    yy, xx = np.mgrid[0:SH, 0:W]; d = np.sqrt(((xx - W / 2) / (W * 0.62)) ** 2 + ((yy - SH * 0.48) / (SH * 0.62)) ** 2)
+    a = (np.clip(d - 0.55, 0, 1) * 150).astype('uint8')
+    v = Image.new('RGBA', (W, SH), (10, 14, 30, 0)); v.putalpha(Image.fromarray(a)); return v
+VIG = None
 def get_set(name):
     if name not in SETS:
         SETS[name] = {'wedding': set_wedding, 'home': set_home, 'night': lambda: set_home(night=True), 'warm': lambda: set_home(warm=True),
@@ -203,6 +209,8 @@ def plan(scene):
 
 MOUTH = [1, 2, 3, 2, 1, 0, 2, 3, 1, 2, 0, 1, 3, 2]
 VOICE_EVENTS = []
+CAMS = {}
+AMB = []
 def scene_frames(part, scene, sfx_out, t_offset):
     ev, total = plan(scene); n = int(total * FPS)
     st = {k: dict(v) for k, v in scene['cast'].items()}
@@ -213,6 +221,7 @@ def scene_frames(part, scene, sfx_out, t_offset):
     t2 = 'A fictional story · general legal information, not legal advice'; tw = text_w(t2, 'ns400', 25); draw_text(base, ((W - tw) // 2, BOT + 70), t2, 'ns400', 25, MUTED)
     t3 = 'saboot.org'; tw = text_w(t3, 'ns700', 34); draw_text(base, ((W - tw) // 2, BOT + 120), t3, 'ns700', 34, INK)
     stage = get_set(scene['set'])
+    AMB.append((t_offset, t_offset + plan(scene)[1], scene.get('amb', {'wedding': 'crowd', 'night': 'night', 'court': 'court', 'chamber': 'room', 'mediation': 'room', 'home': 'room', 'warm': 'room', 'split': 'room'}[scene['set']])))
     # schedule sounds
     for (t0, t1, b) in ev:
         if b[0] == 'say':
@@ -239,6 +248,8 @@ def scene_frames(part, scene, sfx_out, t_offset):
                 if b[0] == 'door': door = ('closing', t0)
             if b[0] == 'say' and t0 <= t < t1 + 0.1: speaking, line = b[1], (b, t0, t1)
         img = base.copy(); sc = stage.copy()
+        # who looks where: listeners look at the speaker; the speaker looks at the nearest other person
+        others = {w: v['x'] for w, v in st.items()}
         # door behind characters? draw door in set layer, characters in front
         if door is not None:
             ds = 0.0
@@ -259,7 +270,12 @@ def scene_frames(part, scene, sfx_out, t_offset):
                     mouth = tr[fi] if 0 <= fi < len(tr) else 0
             blink = ((i + (hash(who) % 50)) % 110) < 4
             sway = s['tilt'] + (int(round(2.5 * math.sin(i / 9))) if talk else 0) + (int(round(3 * math.sin(i / 3))) if walking else 0)
-            r = render(who, s['expr'], mouth, blink, max(-8, min(8, sway)), s['pose'], s['prop'], s.get('h', CH_H))
+            if speaking and speaking in st and speaking != who: tgx = st[speaking]['x']
+            elif len(others) > 1: tgx = min((v for w2, v in others.items() if w2 != who), key=lambda v: abs(v - s['x']))
+            else: tgx = s['x']
+            look = 0 if s.get('pose') == 'cover' or abs(tgx - s['x']) < 60 else (1 if tgx > s['x'] else -1)
+            if who in ('judge', 'mediator') and not speaking: look = 0
+            r = render(who, s['expr'], mouth, blink, max(-8, min(8, sway)), s['pose'], s['prop'], s.get('h', CH_H), look)
             bob = (abs(math.sin(i / 3)) * -14 if walking else math.sin((i + hash(who) % 30) / 20) * 3)
             hy = s.get('base', GROUND)
             x = int(s['x'] - r.width / 2); y = int(TOP + hy - r.height * 0.995 + bob)
@@ -272,6 +288,21 @@ def scene_frames(part, scene, sfx_out, t_offset):
         if scene.get('desk'): fg_desk(img, TOP)
         for (t0, t1, b) in ev:
             if b[0] == 'fx' and t >= t0: b[1](img, t - t0)
+        # ---- camera: ease in on whoever is speaking, drift back out between lines
+        global VIG
+        if VIG is None: VIG = _vignette()
+        scene_img = img.crop((0, TOP, W, BOT)); scene_img.paste(VIG, (0, 0), VIG)
+        if line and line[0][1] in st and not scene.get('nocam'):
+            sp = st[line[0][1]]; tz = scene.get('zoom', 1.16); tx = sp['x']; ty = sp.get('base', GROUND) - sp.get('h', CH_H) * 0.62
+        else:
+            tz = 1.0; tx = W / 2; ty = SH / 2
+        cam = CAMS.setdefault(id(scene), [1.0, W / 2, SH / 2])
+        k = 0.06; cam[0] += (tz - cam[0]) * k; cam[1] += (tx - cam[1]) * k; cam[2] += (ty - cam[2]) * k
+        z = cam[0] * (1 + 0.012 * math.sin(i / 47)); cw, chh = W / z, SH / z
+        cx0 = min(max(cam[1] - cw / 2, 0), W - cw); cy0 = min(max(cam[2] - chh * 0.42, 0), SH - chh)
+        if z > 1.001: scene_img = scene_img.resize((W, SH), Image.BICUBIC, box=(cx0, cy0, cx0 + cw, cy0 + chh))
+        img.paste(scene_img, (0, TOP))
+        CAMXF = (cx0, z)
         chip(img, scene.get('chip'), ease(t / 0.4) * (1 - ease((t - 3.2) / 0.5)))
         if line:
             b, t0, t1 = line; txt = b[2]; v = voice_of(b[1], txt)
@@ -280,10 +311,22 @@ def scene_frames(part, scene, sfx_out, t_offset):
             if shown < len(txt): sp = txt.rfind(' ', 0, shown + 1); shown = sp if sp > 0 else 0
             who = b[1]; cx = st[who]['x'] if who in st else st[b[3].get('via', 'vidyut')]['x'] if len(b) > 3 else 540
             a = min(ease((t - t0) / 0.15), 1 - ease((t - t1) / 0.12))
+            cx = (cx - CAMXF[0]) * CAMXF[1]
             bubble(img, who, txt, shown, cx, a, TOP)
         if i < 6: img = Image.blend(Image.new('RGB', (W, H), (0, 0, 0)), img, i / 6)
         frames.append(img)
     return frames, total
+
+def narrate(frames, v, with_fig=True):
+    """The advocate explains the card out loud: he stands bottom-right and his mouth follows the voice."""
+    tr = mouth_track(v[0])
+    for i, im in enumerate(frames):
+        fi = int((i / FPS - 0.5) * FPS); m = tr[fi] if 0 <= fi < len(tr) else 0
+        if not with_fig: continue
+        a = ease((i - 6) / 12)
+        r = render('vakeel', 'neutral', m, (i % 120) < 4, int(round(2 * math.sin(i / 11))) if m else 0, 'gesture' if 0 <= fi < len(tr) and (fi // 45) % 2 == 0 else 'idle', None, 560, -1)
+        if a < 1: r = r.copy(); r.putalpha(r.split()[3].point(lambda q: int(q * a)))
+        im.paste(r, (int(860 - r.width / 2), int(1805 - r.height)), r)
 
 # ---------------------------------------------------------------- fx helpers
 def hearts_fx(img, dt):
@@ -306,6 +349,17 @@ def petition_fx(img, dt):
 
 # ---------------------------------------------------------------- the three films
 L, R = 300, 780
+COLD = {
+ 1: dict(set='night', title='Part 1 · The conflict', chip='', music='sad', door=0.0, zoom=1.24, tail=0.35,
+         cast={'vidyut': dict(x=L, expr='worried', pose='open'), 'anjali': dict(x=720, expr='angry', prop='bag')},
+         beats=[('say', 'anjali', 'Bahut baat ho gayi. Main maa ke ghar ja rahi hoon.', {}), ('sfx', 'door')]),
+ 2: dict(set='chamber', title='Part 2 · The legal remedy', chip='', music='tense', desk=True, zoom=1.22, tail=0.4,
+         cast={'vidyut': dict(x=270, expr='worried'), 'vakeel': dict(x=800, expr='neutral', pose='gesture')},
+         beats=[('say', 'vakeel', 'Par ek baat saaf samjho — court kisi ko saath rehne pe majboor nahi kar sakta.', {}), ('set', 'vidyut', {'expr': 'shocked'})]),
+ 3: dict(set='mediation', title='Part 3 · Mediation', chip='', music='sad', table=True, zoom=1.24, tail=0.4,
+         cast={'mediator': dict(x=540, expr='neutral', base=1300, h=900), 'vidyut': dict(x=185, expr='worried', h=980), 'anjali': dict(x=895, expr='worried', h=980)},
+         beats=[('say', 'anjali', 'Mujhe lagta tha meri baat ka koi matlab hi nahi.', {'pose': 'open'})]),
+}
 FILMS = {
  1: dict(sub='The conflict', nxt='Part 2 · The legal remedy', scenes=[
    dict(set='wedding', title='Part 1 · The conflict', chip='December 2025 · Their wedding', music='warm',
@@ -327,8 +381,8 @@ FILMS = {
    dict(set='night', title='Part 1 · The conflict', chip='', music='sad',
         cast={'vidyut': dict(x=540, expr='worried')},
         beats=[('sfx', 'heart'), ('fx', heart_beat), ('say', 'vidyut', 'Main use khona nahi chahta.', {'tilt': 4}), ('say', 'vidyut', 'Kya koi raasta hai… ise bachane ka?', {'pose': 'open', 'tilt': 0}), ('wait', 0.8)]),
-   ('card', dict(kicker='DID YOU KNOW?', chip='Section 14 · Hindu Marriage Act', head='Divorce in the first year needs the court’s permission.', body=['A divorce petition cannot normally be filed within one year of marriage.', 'The court allows it early only for exceptional hardship or exceptional depravity.'], n=270, music='neutral')),
-   ('card', dict(kicker='THE QUESTION', head='What legal options does Vidyut have?', body=['He doesn’t want a divorce. He wants his wife back.'], cta='Watch Part 2', fig=[('vidyut', 'worried', 820, 560)], n=170, music='neutral')),
+   ('card', dict(say='Kya aap jaante hain? Shaadi ke pehle saal mein divorce ki petition ke liye court ki ijaazat chahiye — sirf exceptional hardship mein.', kicker='DID YOU KNOW?', chip='Section 14 · Hindu Marriage Act', head='Divorce in the first year needs the court’s permission.', body=['A divorce petition cannot normally be filed within one year of marriage.', 'The court allows it early only for exceptional hardship or exceptional depravity.'], n=270, music='neutral')),
+   ('card', dict(say='Toh Vidyut ke paas kya raasta hai? Dekhiye Part 2.', kicker='THE QUESTION', head='What legal options does Vidyut have?', body=['He doesn’t want a divorce. He wants his wife back.'], cta='Watch Part 2', fig=[('vidyut', 'worried', 820, 560)], n=170, music='neutral')),
  ]),
  2: dict(sub='The legal remedy', nxt='Part 3 · Mediation and reconciliation', scenes=[
    dict(set='chamber', title='Part 2 · The legal remedy', chip="Next morning · An advocate's chamber", music='neutral', desk=True,
@@ -337,20 +391,20 @@ FILMS = {
                ('say', 'vakeel', 'Hindu Marriage Act mein iska ek raasta hai — Section 9.', {'pose': 'gesture'}, {'vidyut': {'pose': 'idle'}}),
                ('say', 'vakeel', 'Restitution of conjugal rights. Court se kehte hain ki married life wapas shuru ho.', {}),
                ('say', 'vidyut', 'Matlab court use wapas aane ko kahega?', {'expr': 'neutral'}, {'vakeel': {'pose': 'idle'}}), ('wait', 0.4)]),
-   ('card', dict(kicker='THE LAW', chip='Section 9 · Hindu Marriage Act', head='Restitution of conjugal rights', body=['If one spouse leaves the other without a reasonable excuse, the court can order that married life be restored.', 'The spouse who left has to show the reasonable excuse.', '(This assumes both are Hindus, so the Act applies.)'], n=300, music='neutral')),
+   ('card', dict(say='Section 9: agar ek saathi bina reasonable excuse ke chala jaaye, toh court married life wapas shuru karne ka order de sakta hai.', kicker='THE LAW', chip='Section 9 · Hindu Marriage Act', head='Restitution of conjugal rights', body=['If one spouse leaves the other without a reasonable excuse, the court can order that married life be restored.', 'The spouse who left has to show the reasonable excuse.', '(This assumes both are Hindus, so the Act applies.)'], n=300, music='neutral')),
    dict(set='chamber', title='Part 2 · The legal remedy', chip='', music='tense', desk=True,
         cast={'vidyut': dict(x=270, expr='neutral'), 'vakeel': dict(x=800, expr='neutral')},
         beats=[('say', 'vakeel', 'Par ek baat saaf samjho — court kisi ko saath rehne pe majboor nahi kar sakta.', {'pose': 'gesture'}),
                ('say', 'vidyut', 'Phir iska fayda kya?', {'expr': 'worried', 'pose': 'open'}, {'vakeel': {'pose': 'idle'}}),
                ('say', 'vakeel', 'Court pehle dono ko milane ki koshish karta hai. Asli mauka wahi hai.', {'expr': 'happy', 'pose': 'gesture'}, {'vidyut': {'pose': 'idle'}}), ('wait', 0.4)]),
-   ('card', dict(kicker='BUT KNOW THIS', head='A court order cannot rebuild a marriage.', body=['• No court can force anyone to live together.', '• If the order is not followed for a year, either spouse can ask for divorce (Section 13(1A)(ii)).', '• The Supreme Court is still examining whether this remedy is valid.'], n=330, dark=False, music='neutral')),
+   ('card', dict(say='Lekin court kisi ko saath rehne pe majboor nahi kar sakta. Aur order ek saal tak na maana jaaye, toh dono mein se koi bhi divorce maang sakta hai.', kicker='BUT KNOW THIS', head='A court order cannot rebuild a marriage.', body=['• No court can force anyone to live together.', '• If the order is not followed for a year, either spouse can ask for divorce (Section 13(1A)(ii)).', '• The Supreme Court is still examining whether this remedy is valid.'], n=330, dark=False, music='neutral')),
    dict(set='court', title='Part 2 · The legal remedy', chip='Family Court', music='neutral',
         cast={'judge': dict(x=540, expr='neutral', base=1090, h=820), 'vidyut': dict(x=185, expr='neutral', h=980), 'anjali': dict(x=895, expr='worried', h=980)},
         beats=[('sfx', 'gavel'), ('wait', 0.9), ('say', 'judge', 'Faisle se pehle, court dekhna chahta hai ki yeh shaadi bach sakti hai ya nahi.', {}),
                ('say', 'judge', 'Dono pakshon ko mediation ke liye bheja jaata hai.', {'pose': 'open'}),
                ('say', 'anjali', '…Theek hai.', {'expr': 'neutral', 'tilt': -4}, {'judge': {'pose': 'idle'}}), ('set', 'vidyut', {'expr': 'happy'}), ('wait', 1.0)]),
-   ('card', dict(kicker='THE COURT’S DUTY', chip='Sec 23(2) HMA · Sec 9 Family Courts Act', head='Reconciliation comes first.', body=['Family Courts must, in the first instance, try to settle the dispute or reconcile the couple — often through counselling or mediation.'], n=240, music='neutral')),
-   ('card', dict(kicker='THE QUESTION', head='Can a court case actually help them reconcile?', body=[], cta='Watch Part 3', fig=[('vidyut', 'worried', 700, 520), ('anjali', 'worried', 900, 500)], n=150, music='neutral')),
+   ('card', dict(say='Family court ka pehla kaam hai — dono ko milane ki koshish karna.', kicker='THE COURT’S DUTY', chip='Sec 23(2) HMA · Sec 9 Family Courts Act', head='Reconciliation comes first.', body=['Family Courts must, in the first instance, try to settle the dispute or reconcile the couple — often through counselling or mediation.'], n=240, music='neutral')),
+   ('card', dict(say='Kya mediation se rishta bach sakta hai? Dekhiye Part 3.', kicker='THE QUESTION', head='Can a court case actually help them reconcile?', body=[], cta='Watch Part 3', fig=[('vidyut', 'worried', 700, 520), ('anjali', 'worried', 900, 500)], n=150, music='neutral')),
  ]),
  3: dict(sub='Mediation and reconciliation', nxt=None, scenes=[
    dict(set='mediation', title='Part 3 · Mediation', chip='Mediation centre', music='neutral', table=True,
@@ -367,24 +421,31 @@ FILMS = {
    dict(set='warm', title='Part 3 · Mediation', chip='A month later', music='hopeful',
         cast={'vidyut': dict(x=420, expr='happy'), 'anjali': dict(x=1250, expr='happy')},
         beats=[('sfx', 'chime'), ('move', 'anjali', 670, 1.4), ('fx', hearts_fx), ('say', 'anjali', 'Chai banaun?', {'tilt': -4}), ('say', 'vidyut', 'Aaj main banata hoon.', {'pose': 'gesture'}), ('wait', 1.2)]),
-   ('card', dict(kicker='THE LEGAL LEARNING', head='Matrimonial law is not only about divorce.', body=['Counselling, mediation and the court’s duty to attempt reconciliation can help a couple find their way back —', 'while respecting the rights, dignity and choice of both.'], n=270, music='hopeful')),
-   ('card', dict(kicker='SAFETY FIRST', head='Reconciliation only where both are willing — and it is safe.', body=['If there is violence or threats, safety comes first.', 'Women’s helpline 181 · Emergency 112.'], n=230, dark=False, music='neutral')),
+   ('card', dict(say='Shaadi ka kanoon sirf divorce ke baare mein nahi hai. Counselling aur mediation se bhi raasta nikal sakta hai.', kicker='THE LEGAL LEARNING', head='Matrimonial law is not only about divorce.', body=['Counselling, mediation and the court’s duty to attempt reconciliation can help a couple find their way back —', 'while respecting the rights, dignity and choice of both.'], n=270, music='hopeful')),
+   ('card', dict(say='Lekin agar hinsa ya dhamki hai, toh pehle apni suraksha. Helpline 181 ya 112 par call kariye.', kicker='SAFETY FIRST', head='Reconciliation only where both are willing — and it is safe.', body=['If there is violence or threats, safety comes first.', 'Women’s helpline 181 · Emergency 112.'], n=230, dark=False, music='neutral')),
  ]),
 }
+END_SAY = 'Apne adhikaar samjhiye. Saboot dot org par — free mein.'
 END = 'Understand your rights. Explore your legal options. Make informed decisions about your matrimonial future.'
 
 def build(p, mode='full'):
     F = FILMS[p]; parts = []; sfx = []; music = []; t = 0.0; VOICE_EVENTS.clear()
-    segs = [('title', None)] + F['scenes'] + [('end', None)]
+    segs = [COLD[p], ('title', None)] + F['scenes'] + [('end', None)]
+    AMB.clear(); CAMS.clear()
     for idx, sc in enumerate(segs):
         kind = sc[0] if isinstance(sc, tuple) else 'scene'
         if kind == 'title':
-            fr = CS.title_frames(p, F['sub']); mood = 'sad' if p == 1 else ('neutral' if p == 2 else 'hopeful')
+            fr = CS.title_frames(p, F['sub'], n=72); mood = 'sad' if p == 1 else ('neutral' if p == 2 else 'hopeful'); sfx.append((t + 0.02, 'whoosh'))
         elif kind == 'card':
-            o = sc[1]; fr = CS.card_frames(p, '', o['kicker'], o['head'], o['body'], n=o.get('n', 200), chip=o.get('chip'), dark=o.get('dark', True), cta=o.get('cta'), fig=o.get('fig'))
+            o = sc[1]; v = voice_of('vakeel', o['say']) if o.get('say') else None
+            n = max(int(o.get('n', 200) * 0.6), int((v[1] + 1.6) * FPS)) if v else o.get('n', 200)
+            fr = CS.card_frames(p, '', o['kicker'], o['head'], o['body'], n=n, chip=o.get('chip'), dark=o.get('dark', True), cta=o.get('cta'), fig=o.get('fig'))
+            if v: narrate(fr, v, with_fig=not o.get('fig')); VOICE_EVENTS.append((t + 0.5, v[0]))
             mood = o.get('music', 'neutral'); sfx.append((t + 0.05, 'whoosh'))
         elif kind == 'end':
-            fr = CS.end_frames(END, F['nxt']); mood = 'hopeful' if p == 3 else 'neutral'; sfx.append((t + 0.3, 'chime'))
+            v = voice_of('vakeel', END_SAY)
+            fr = CS.end_frames(END, F['nxt'], n=max(150, int((v[1] + 2.0) * FPS)) if v else 150); mood = 'hopeful' if p == 3 else 'neutral'; sfx.append((t + 0.3, 'chime'))
+            if v: VOICE_EVENTS.append((t + 0.9, v[0]))
         else:
             fr, _ = scene_frames(p, sc, sfx, t); mood = sc['music']
         dur = len(fr) / FPS
@@ -399,7 +460,7 @@ def build(p, mode='full'):
     if mode == 'stills': return
     lst = f'{OUT}film{p}.txt'; open(lst, 'w').write(''.join(f"file '{x}'\n" for x in parts))
     v = f'{OUT}film{p}_v.mp4'; subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', lst, '-c', 'copy', v], check=True)
-    a = f'{OUT}film{p}_a.m4a'; audio.mix(t, music, sfx, a, voices=list(VOICE_EVENTS))
+    a = f'{OUT}film{p}_a.m4a'; audio.mix(t, music, sfx, a, voices=list(VOICE_EVENTS), amb=list(AMB))
     final = f'{OUT}vidyut-anjali-part{p}.mp4'
     subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', v, '-i', a, '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'copy', '-shortest', '-movflags', '+faststart', final], check=True)
     print('done', final)

@@ -50,6 +50,15 @@ HINDI = {
  'Pakka.': 'पक्का।',
  'Chai banaun?': 'चाय बनाऊँ?',
  'Aaj main banata hoon.': 'आज मैं बनाता हूँ।',
+ 'Kya aap jaante hain? Shaadi ke pehle saal mein divorce ki petition ke liye court ki ijaazat chahiye — sirf exceptional hardship mein.': 'क्या आप जानते हैं? शादी के पहले साल में डिवोर्स की पिटीशन के लिए कोर्ट की इजाज़त चाहिए — सिर्फ़ एक्सेप्शनल हार्डशिप में।',
+ 'Toh Vidyut ke paas kya raasta hai? Dekhiye Part 2.': 'तो विद्युत के पास क्या रास्ता है? देखिए पार्ट टू।',
+ 'Section 9: agar ek saathi bina reasonable excuse ke chala jaaye, toh court married life wapas shuru karne ka order de sakta hai.': 'सेक्शन नौ: अगर एक साथी बिना रीज़नेबल एक्सक्यूज़ के चला जाए, तो कोर्ट मैरिड लाइफ़ वापस शुरू करने का ऑर्डर दे सकता है।',
+ 'Lekin court kisi ko saath rehne pe majboor nahi kar sakta. Aur order ek saal tak na maana jaaye, toh dono mein se koi bhi divorce maang sakta hai.': 'लेकिन कोर्ट किसी को साथ रहने पे मजबूर नहीं कर सकता। और ऑर्डर एक साल तक न माना जाए, तो दोनों में से कोई भी डिवोर्स माँग सकता है।',
+ 'Family court ka pehla kaam hai — dono ko milane ki koshish karna.': 'फ़ैमिली कोर्ट का पहला काम है — दोनों को मिलाने की कोशिश करना।',
+ 'Kya mediation se rishta bach sakta hai? Dekhiye Part 3.': 'क्या मीडिएशन से रिश्ता बच सकता है? देखिए पार्ट थ्री।',
+ 'Shaadi ka kanoon sirf divorce ke baare mein nahi hai. Counselling aur mediation se bhi raasta nikal sakta hai.': 'शादी का कानून सिर्फ़ डिवोर्स के बारे में नहीं है। काउंसलिंग और मीडिएशन से भी रास्ता निकल सकता है।',
+ 'Lekin agar hinsa ya dhamki hai, toh pehle apni suraksha. Helpline 181 ya 112 par call kariye.': 'लेकिन अगर हिंसा या धमकी है, तो पहले अपनी सुरक्षा। हेल्पलाइन एक सौ इक्यासी या एक सौ बारह पर कॉल करिए।',
+ 'Apne adhikaar samjhiye. Saboot dot org par — free mein.': 'अपने अधिकार समझिए। सबूत डॉट ओ आर जी पर — फ़्री में।',
 }
 
 def ffmpeg_bin():
@@ -84,17 +93,24 @@ def main(lines):
         info = sf.info(out)
         idx[who + '|' + roman] = {'file': fid + '.wav', 'dur': round(info.duration, 3)}
         print(who, round(info.duration, 2), 's', roman[:40], flush=True)
-    json.dump(idx, open(os.path.join(VOICE_DIR, 'index.json'), 'w'), ensure_ascii=False, indent=1)
+    old = json.load(open(os.path.join(VOICE_DIR, 'index.json'))) if os.path.exists(os.path.join(VOICE_DIR, 'index.json')) else {}
+    old.update(idx); json.dump(old, open(os.path.join(VOICE_DIR, 'index.json'), 'w'), ensure_ascii=False, indent=1)
 
 if __name__ == '__main__':
     sys.path.insert(0, HERE)
     import film
     lines = []
     for p, F in film.FILMS.items():
-        for sc in F['scenes']:
-            if isinstance(sc, tuple): continue
+        for sc in [film.COLD[p]] + F['scenes']:
+            if isinstance(sc, tuple):
+                if sc[1].get('say') and ('vakeel', sc[1]['say']) not in lines: lines.append(('vakeel', sc[1]['say']))
+                continue
             for b in sc['beats']:
                 if b[0] == 'say' and (b[1], b[2]) not in lines: lines.append((b[1], b[2]))
+    lines.append(('vakeel', film.END_SAY))
+    done = json.load(open(os.path.join(VOICE_DIR, 'index.json'))) if os.path.exists(os.path.join(VOICE_DIR, 'index.json')) else {}
+    lines = [l for l in lines if l[0] + '|' + l[1] not in done] or []
+    print('new lines', len(lines))
     missing = [r for _, r in lines if r not in HINDI]
     if missing: sys.exit('No Hindi for: ' + '; '.join(missing))
     main(lines)

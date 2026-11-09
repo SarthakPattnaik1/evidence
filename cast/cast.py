@@ -7,7 +7,7 @@ OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'out')
 os.makedirs(OUT, exist_ok=True)
 INK = '#2b2522'
 # Animation state for the frame being drawn: mouth 0-3 (talking), blink, head tilt in degrees, arm pose, held prop.
-ANIM = dict(mouth=0, blink=False, tilt=0, pose='idle', prop=None)
+ANIM = dict(mouth=0, blink=False, tilt=0, pose='idle', prop=None, look=0)
 ARM = {}
 
 def shade(hexc, f):
@@ -38,8 +38,9 @@ def face(c, expr):
     elif ANIM['blink']:
         s.append(f'<path d="M164,{ey+1} Q172,{ey+5} 180,{ey+1} M220,{ey+1} Q228,{ey+5} 236,{ey+1}" stroke="{INK}" stroke-width="4.5" fill="none" stroke-linecap="round"/>')
     else:
+        lk = ANIM.get('look', 0) * 5
         for x in (172, 228):
-            s.append(f'<ellipse cx="{x}" cy="{ey}" rx="7.5" ry="{ry}" fill="{INK}"/><circle cx="{x+2.5}" cy="{ey-3.5}" r="2.4" fill="#fff"/>')
+            s.append(f'<ellipse cx="{x+lk}" cy="{ey}" rx="7.5" ry="{ry}" fill="{INK}"/><circle cx="{x+lk+2.5}" cy="{ey-3.5}" r="2.4" fill="#fff"/>')
     # brows
     bc = c.get('brow', INK); by = 152
     B = {'neutral': ((158, by, 184, by - 3), (216, by - 3, 242, by)),

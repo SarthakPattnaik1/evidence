@@ -125,11 +125,35 @@ def load_voice(path):
     if sr != SR: x = np.interp(np.arange(int(len(x) * SR / sr)) * sr / SR, np.arange(len(x)), x)
     return x
 
-def mix(total, music_segments, events, out_path, voices=()):
+def ambience(kind, dur):
+    n = int(dur * SR); t = np.arange(n) / SR; r = np.random.default_rng(11)
+    brown = np.cumsum(r.standard_normal(n)); brown -= np.convolve(brown, np.ones(4410) / 4410, 'same'); brown /= (np.max(np.abs(brown)) or 1)
+    out = 0.05 * brown
+    if kind in ('crowd', 'court'):
+        x = r.standard_normal(n); bp = np.convolve(x, np.ones(18) / 18, 'same') - np.convolve(x, np.ones(90) / 90, 'same')
+        mod = 0.6 + 0.4 * np.sin(2 * np.pi * 0.31 * t) * np.sin(2 * np.pi * 0.17 * t + 1)
+        out += (0.5 if kind == 'crowd' else 0.18) * bp / (np.max(np.abs(bp)) or 1) * mod
+    if kind == 'night':
+        ch = np.zeros(n); k = 0
+        while k < n:
+            for j in range(3):
+                s0 = k + j * int(0.055 * SR); ln = int(0.03 * SR)
+                if s0 + ln < n: tt = np.arange(ln) / SR; ch[s0:s0 + ln] += np.sin(2 * np.pi * 4700 * tt) * np.sin(np.pi * tt / 0.03)
+            k += int(r.uniform(0.5, 1.1) * SR)
+        out += 0.07 * ch
+    if kind == 'room':
+        for k in range(0, n, SR):
+            tt = np.arange(int(0.02 * SR)) / SR; seg = 0.03 * np.sin(2 * np.pi * 2200 * tt) * np.exp(-tt * 300)
+            out[k:k + len(seg)] += seg[:max(0, n - k)]
+    return out * env(n, 0.6, 0.6)
+
+def mix(total, music_segments, events, out_path, voices=(), amb=()):
     m = music(music_segments, total) * 0.55
     fx = np.zeros_like(m); vo = np.zeros_like(m)
     for (t, path) in voices:
         x = load_voice(path); x = x / (np.max(np.abs(x)) or 1) * 0.9; i = int(t * SR); vo[i:i + len(x)] += x[:max(0, len(vo) - i)]
+    for (s0, s1, kind) in amb:
+        x = ambience(kind, s1 - s0) * 0.35; i = int(s0 * SR); fx[i:i + len(x)] += x[:max(0, len(fx) - i)]
     if len(voices):
         act = np.convolve(np.abs(vo), np.ones(int(0.25 * SR)) / int(0.25 * SR), 'same'); act = np.clip(act * 12, 0, 1)
         m = m * (1 - 0.6 * act)                      # music steps back while someone speaks
