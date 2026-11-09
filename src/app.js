@@ -1691,7 +1691,8 @@ ${JSON.stringify(map)}`;
     setTimeout(() => getTok && getTok(), 0);
     let sid = ''; try { sid = sessionStorage.getItem('pa_s') || ''; if (!sid) { sid = Math.random().toString(36).slice(2, 12) + Date.now().toString(36).slice(-4); sessionStorage.setItem('pa_s', sid); } } catch (e) { sid = Math.random().toString(36).slice(2, 14); }
     // 'first' (device, state, city, new/returning) is sent once per visit (tab session), not again on every reload.
-    const seen = new Set(); let q = []; let first = true; try { first = !sessionStorage.getItem('pa_f'); } catch (e) { /* private mode */ } let timer = null;
+    // Things already counted in this visit survive a reload, so reloading does not count the same guide twice.
+    const seen = new Set((() => { try { return JSON.parse(sessionStorage.getItem('pa_seen') || '[]'); } catch (e) { return []; } })()); let q = []; let first = true; try { first = !sessionStorage.getItem('pa_f'); } catch (e) { /* private mode */ } let timer = null;
     // Signed session token from the server (proves events came through a real page load) and human signals.
     let tok = ''; let tokP = null; let hf = navigator.webdriver ? 0 : 4; let visMs = 0; let visAt = document.visibilityState === 'visible' ? Date.now() : 0;
     const getTok = () => tokP || (tokP = fetch('/api/s', { credentials: 'omit' }).then((r) => r.json()).then((j) => { tok = j.k || ''; }).catch(() => { tokP = null; }));
@@ -1706,6 +1707,9 @@ ${JSON.stringify(map)}`;
       if (!q.length) return; clearTimeout(timer); timer = null;
       if (!tok) { getTok().then(() => { if (tok) { try { sessionStorage.setItem('pa_k', tok); } catch (e) { /* ignore */ } flush(); } }); return; }
       vis();
+      // Not yet on screen for 3 seconds (prerendered page, background tab, instant bounce): hold the events, and
+      // drop them if the page goes away first. Such a page is not a visit.
+      if (!(hf & 2)) { if (document.visibilityState === 'hidden') q = []; else timer = setTimeout(flush, 1500); return; }
       const payload = { k: tok, h: hf, l: LANG, d: dev(), e: q.splice(0, 60) };
       if (first) { payload.first = 1; payload.r = ref; payload.u = utm; if (backDays >= 0) payload.n = backDays; first = false; try { sessionStorage.setItem('pa_f', '1'); } catch (e) { /* ignore */ } }
       const body = JSON.stringify(payload);
@@ -1713,11 +1717,11 @@ ${JSON.stringify(map)}`;
       if (q.length) flush();
     }
     function ev(t, o) { q.push(Object.assign({ t }, o || {})); if (q.length >= 25) flush(); else if (!timer) timer = setTimeout(flush, 4000); }
-    function once(t, o) { const k = t + '|' + JSON.stringify(o || {}); if (seen.has(k)) return; seen.add(k); ev(t, o); }
+    function once(t, o) { const k = t + '|' + JSON.stringify(o || {}); if (seen.has(k)) return; seen.add(k); try { sessionStorage.setItem('pa_seen', JSON.stringify([...seen].slice(-400))); } catch (e) { /* ignore */ } ev(t, o); }
     addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); });
     addEventListener('pagehide', flush);
-    let errs = 0;
-    addEventListener('error', (e) => { if (errs++ < 5) ev('err', { x: String((e && e.message) || 'error') + (e && e.lineno ? ' @' + e.lineno : ''), v: KB.version }); });
+    let errs = 0; try { errs = Number(sessionStorage.getItem('pa_errs')) || 0; } catch (e) { /* ignore */ }
+    addEventListener('error', (e) => { if (errs++ < 5) { try { sessionStorage.setItem('pa_errs', String(errs)); } catch (er) { /* ignore */ } } if (errs <= 5) ev('err', { x: String((e && e.message) || 'error') + (e && e.lineno ? ' @' + e.lineno : ''), v: KB.version }); });
     document.addEventListener('click', (e) => {
       const a = e.target.closest && e.target.closest('a[href]'); if (!a) return;
       const h = a.getAttribute('href');
@@ -1747,10 +1751,11 @@ ${JSON.stringify(map)}`;
       try { E.urgent(iss, S.answers).filter((u) => u.level === 'now').forEach((u) => TRACK.once('urg', { g: id, x: u.id })); } catch (e) { /* ignore */ }
     }
   }
-  let searchT = null;
+  let searchT = null; let lastSearch = '';
   function trackSearch(qv) {
     clearTimeout(searchT); const v = String(qv || '').trim(); if (v.length < 3) return;
-    searchT = setTimeout(() => { let n = 0; try { n = searchAll(v).length; } catch (e) { /* ignore */ } TRACK.ev('search', { n, x: v }); }, 1500);
+    // Logged once the person stops typing for 2.5 s, and never the same words twice in a row (keeps the list clean).
+    searchT = setTimeout(() => { if (v.toLowerCase() === lastSearch) return; lastSearch = v.toLowerCase(); let n = 0; try { n = searchAll(v).length; } catch (e) { /* ignore */ } TRACK.ev('search', { n, x: v }); }, 2500);
   }
   try { const fi = document.createElement('link'); fi.rel = 'icon'; fi.href = window.ER_BRAND.icon; document.head.appendChild(fi); } catch (e) { /* none */ }
   applyLangDom(); dictLoad(); setTimeout(trWait, 0);

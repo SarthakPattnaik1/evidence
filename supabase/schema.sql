@@ -36,16 +36,26 @@ alter table public.pa_login enable row level security;
 create or replace function public.pa_ingest(p_day date, p_inc jsonb, p_uniq jsonb, p_logs jsonb)
 returns void language plpgsql set search_path = public as $$
 begin
-  insert into pa_daily (day, field, n)
-    select p_day, key, value::bigint from jsonb_each_text(coalesce(p_inc, '{}'::jsonb))
-  on conflict (day, field) do update set n = pa_daily.n + excluded.n;
+  -- Hard ceiling: a day can have at most 3,000 different counters. Past that, only counters that already exist
+  -- go up; new ones are refused and noted in 'x:cap'. A normal day uses a few hundred.
+  if (select count(*) from pa_daily where day = p_day) < 3000 then
+    insert into pa_daily (day, field, n)
+      select p_day, key, value::bigint from jsonb_each_text(coalesce(p_inc, '{}'::jsonb))
+    on conflict (day, field) do update set n = pa_daily.n + excluded.n;
+  else
+    update pa_daily d set n = d.n + i.value::bigint from jsonb_each_text(coalesce(p_inc, '{}'::jsonb)) i where d.day = p_day and d.field = i.key;
+    insert into pa_daily (day, field, n)
+      select p_day, 'x:cap', count(*) from jsonb_each_text(coalesce(p_inc, '{}'::jsonb)) i
+      where not exists (select 1 from pa_daily d where d.day = p_day and d.field = i.key)
+    on conflict (day, field) do update set n = pa_daily.n + excluded.n;
+  end if;
 
   insert into pa_uniq (day, kind, h)
     select p_day, x->>0, x->>1 from jsonb_array_elements(coalesce(p_uniq, '[]'::jsonb)) x
   on conflict do nothing;
 
   insert into pa_log (kind, data)
-    select x->>0, x->1 from jsonb_array_elements(coalesce(p_logs, '[]'::jsonb)) x;
+    select x->>0, x->1 from jsonb_array_elements(coalesce(p_logs, '[]'::jsonb)) x limit 20;
 
   -- Space saver, every call (cheap when there is nothing to do): once a day is over, its anonymous hashes are only
   -- needed as a count. Turn each day's hashes into one 'U:<kind>' number and delete them. The hashes were salted
