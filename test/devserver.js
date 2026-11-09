@@ -18,6 +18,7 @@ function cmd([c, k, ...a]) {
     case 'LTRIM': { const l = db.get(k) || []; db.set(k, l.slice(+a[0], +a[1] + 1)); return 'OK'; }
     case 'LRANGE': { const l = db.get(k) || []; return l.slice(+a[0], +a[1] + 1); }
     case 'INCR': { const v = (db.get(k) || 0) + 1; db.set(k, v); return v; }
+    case 'INCRBY': { const v = (db.get(k) || 0) + Number(a[0]); db.set(k, v); return v; }
     case 'DEL': db.delete(k); return 1;
     default: throw new Error('unsupported ' + c);
   }

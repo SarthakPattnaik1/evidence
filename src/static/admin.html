@@ -104,6 +104,7 @@ select{border:1px solid var(--line);border-radius:8px;padding:5px 8px;background
     <a class="logo" href="/"><img src="/mark.png?v=2" alt="" style="width:auto;height:24px;border-radius:0"> Saboot</a><span class="pill">Admin</span>
     <span class="sp"></span>
     <div class="seg" role="group" aria-label="Date range"><button data-days="1">Today</button><button data-days="7">7 days</button><button data-days="30" aria-pressed="true">30 days</button><button data-days="90">90 days</button></div>
+    <a class="btn" href="https://saboot.org/#nocount" target="_blank" rel="noopener" title="Open on each phone or computer you use to test, so your own visits stop being counted">Don't count my device</a>
     <button class="btn" id="refresh">Refresh</button>
     <button class="btn" id="logout">Sign out</button>
   </div></div>
@@ -112,6 +113,10 @@ select{border:1px solid var(--line);border-radius:8px;padding:5px 8px;background
     <p class="sub" id="range">—</p>
     <div id="setup"></div>
 
+    <div class="card sec" id="howto" style="margin-top:0">
+      <div class="sechead"><h2>How to read these numbers</h2></div>
+      <p class="small" style="margin:6px 0 0;line-height:1.6"><b>Page views</b> count screens, not people. Every question in a guide is a new screen, so one person who finishes one guide makes about 10–15 page views. <b>Visits</b> = one browser session. <b>People</b> = different browsers per day (the same person on phone and laptop counts twice; a whole office on one Wi-Fi counts once in “verified”). <b>Returning</b> = a browser that has opened Saboot on an earlier day. Your own testing counts too unless you press <b>Don’t count my device</b> on each phone and computer you use. Only saboot.org is counted; preview links and local copies are not.</p>
+    </div>
     <div class="grid g4" id="tiles"></div>
 
     <div class="sec card" id="trustcard">
@@ -153,6 +158,7 @@ select{border:1px solid var(--line);border-radius:8px;padding:5px 8px;background
       <div class="card"><div class="sechead"><h2>Where visitors come from</h2><p>Referring site</p></div><div class="bars" id="refs"></div></div>
       <div class="card"><div class="sechead"><h2>States</h2><p>From the visitor's network</p></div><div class="bars" id="geo"></div></div>
     </div>
+    <div class="sec card"><div class="sechead"><h2>Cities</h2><p>Nearest city of the visitor's network, per visit. Mobile data often shows the operator's hub city (e.g. a Bhubaneswar user on Jio may show as Kolkata), so read this as a region, not a town.</p></div><div class="bars" id="city"></div></div>
 
     <div class="sec grid g3">
       <div class="card"><div class="sechead"><h2>Devices</h2></div><div class="bars" id="dev"></div></div>
@@ -348,12 +354,12 @@ select{border:1px solid var(--line);border-radius:8px;padding:5px 8px;background
     { const V = (DATA.verified || {}).cur || {}, VP = (DATA.verified || {}).prev || {}; const cc = DATA.cur || {};
       const VL = [['v:visit', 'People'], ['v:agree', 'Agreed to disclaimer'], ['v:start', 'Started a guide'], ['v:list', 'Got a list of papers'], ['v:print', 'Printed / saved'], ['v:share', 'Shared'], ['v:done', 'Answered every question'], ['v:voice', 'Used voice'], ['v:remind', 'Set a deadline reminder'], ['v:aid', 'Likely free-lawyer eligible'], ['v:met', 'Said they met an advocate'], ['v:helped', 'Said the list helped']];
       const vt = $('#vtiles'); if (vt) vt.innerHTML = VL.map(([k, l]) => `<div class="card tile"><div class="lab">${l}</div><div class="num">${fmt(V[k] || 0)}</div>${delta(V[k] || 0, VP[k] || 0)}</div>`).join('');
-      const rej = (cc['x:origin'] || 0) + (cc['x:token'] || 0), nh = cc['x:nothuman'] || 0, agree = cc['consent:agree'] || 0, dis = cc['consent:disagree'] || 0;
-      const tn = $('#trustnote'); if (tn) tn.innerHTML = `Rejected (fake or outside pages): <b>${fmt(rej)}</b> events · batches without human signals (ignored for verified counts): <b>${fmt(nh)}</b> · disclaimer: <b>${fmt(agree)}</b> agreed, <b>${fmt(dis)}</b> disagreed · follow-up answers: <b>${fmt(cc['oc:all'] || 0)}</b> (met an advocate: ${fmt(cc['oc:met:yes'] || 0)}, not yet: ${fmt(cc['oc:met:notyet'] || 0)}; list helped: ${fmt((cc['oc:help:yes'] || 0) + (cc['oc:help:little'] || 0))}) · read aloud: ${fmt((cc['read:device'] || 0) + (cc['read:server'] || 0))} · reminders: ${fmt((cc['remind:cal'] || 0) + (cc['remind:wa'] || 0))} · public, hash-chained daily record: <a href="/api/impact" target="_blank" rel="noopener">/api/impact</a> (committed nightly to GitHub: impact/ledger.json).`;
+      const rej = (cc['x:origin'] || 0) + (cc['x:token'] || 0), lim = cc['x:rate'] || 0, nh = cc['x:nothuman'] || 0, agree = cc['consent:agree'] || 0, dis = cc['consent:disagree'] || 0;
+      const tn = $('#trustnote'); if (tn) tn.innerHTML = `Rejected (fake, outside or test pages): <b>${fmt(rej)}</b> events · over the daily limit of 400 per network (dropped): <b>${fmt(lim)}</b> · batches without human signals (ignored for verified counts): <b>${fmt(nh)}</b> · disclaimer: <b>${fmt(agree)}</b> agreed, <b>${fmt(dis)}</b> disagreed · follow-up answers: <b>${fmt(cc['oc:all'] || 0)}</b> (met an advocate: ${fmt(cc['oc:met:yes'] || 0)}, not yet: ${fmt(cc['oc:met:notyet'] || 0)}; list helped: ${fmt((cc['oc:help:yes'] || 0) + (cc['oc:help:little'] || 0))}) · read aloud: ${fmt((cc['read:device'] || 0) + (cc['read:server'] || 0))} · reminders: ${fmt((cc['remind:cal'] || 0) + (cc['remind:wa'] || 0))} · public, hash-chained daily record: <a href="/api/impact" target="_blank" rel="noopener">/api/impact</a> (committed nightly to GitHub: impact/ledger.json).`;
     }
     const c = DATA.cur || {}, p = DATA.prev || {};
     const tiles = [
-      ['Visitors (unique each day)', DATA.uniq.cur, DATA.uniq.prev],
+      ['People (different browsers per day)', DATA.uniq.cur, DATA.uniq.prev],
       ['Guides started', c['all:start'] || 0, p['all:start'] || 0],
       ['Lists of papers made', c['all:list'] || 0, p['all:list'] || 0],
       ['Helpline taps', Object.entries(c).filter(([k]) => k.startsWith('call:')).reduce((s, [, v]) => s + v, 0), Object.entries(p).filter(([k]) => k.startsWith('call:')).reduce((s, [, v]) => s + v, 0)]
@@ -362,7 +368,8 @@ select{border:1px solid var(--line);border-radius:8px;padding:5px 8px;background
     $('#tiles').innerHTML = tiles.map(([l, v, pv, note]) => `<div class="card tile"><div class="lab">${l}</div><div class="num">${fmt(v)}</div>${delta(v, pv)}</div>`).join('') +
       `<div class="card tile"><div class="lab">Visits</div><div class="num">${fmt(visits)}</div>${delta(visits, DATA.sessions.prev)}</div>` +
       `<div class="card tile"><div class="lab">Visits that ended with a list</div><div class="num">${visits ? (conv * 100).toFixed(1) + '%' : '—'}</div><span class="d">${convP ? 'was ' + (convP * 100).toFixed(1) + '%' : 'No earlier data'}</span></div>` +
-      `<div class="card tile"><div class="lab">Page views</div><div class="num">${fmt(c.pv || 0)}</div>${delta(c.pv || 0, p.pv || 0)}</div>` +
+      `<div class="card tile"><div class="lab">Page views (screens)</div><div class="num">${fmt(c.pv || 0)}</div><span class="d">${visits ? ((c.pv || 0) / visits).toFixed(1) + ' screens per visit' : 'No visits yet'}</span></div>` +
+      (() => { const nw = c['ret:new'] || 0, bk = (c['ret:week'] || 0) + (c['ret:month'] || 0) + (c['ret:older'] || 0); return `<div class="card tile"><div class="lab">New vs returning visits</div><div class="num">${fmt(nw)} <span style="font-size:.55em;font-weight:600">new</span> · ${fmt(bk)} <span style="font-size:.55em;font-weight:600">back</span></div><span class="d">${nw + bk ? 'back within a week: ' + fmt(c['ret:week'] || 0) + ' · a month: ' + fmt(c['ret:month'] || 0) + ' · later: ' + fmt(c['ret:older'] || 0) : 'Counting starts with this update'}</span></div>`; })() +
       `<div class="card tile"><div class="lab">Found the list useful</div><div class="num">${(() => { const y = Object.entries(c).filter(([k]) => /^fb:.+:y$/.test(k)).reduce((s, [, v]) => s + v, 0); const n = Object.entries(c).filter(([k]) => /^fb:.+:n$/.test(k)).reduce((s, [, v]) => s + v, 0); return y + n ? Math.round((y / (y + n)) * 100) + '%' : '—'; })()}</div><span class="d">${(() => { const t = Object.entries(c).filter(([k]) => /^fb:/.test(k)).reduce((s, [, v]) => s + v, 0); return t ? 'from ' + fmt(t) + ' votes' : 'No votes yet'; })()}</span></div>`;
 
     line($('#trend'), DATA.days, [{ k: 'u', n: 'Visitors', c: 'var(--series-1)' }, { k: 'list', n: 'Lists made', c: 'var(--series-2)' }]);
@@ -376,6 +383,7 @@ select{border:1px solid var(--line);border-radius:8px;padding:5px 8px;background
     bars($('#langs'), top(group(c, 'pvl:'), 23).map(([k, v]) => [k, v, LN[k] || k]));
     bars($('#refs'), top(group(c, 'ref:'), 10).map(([k, v]) => [k, v, k === 'direct' ? 'Direct / app / WhatsApp' : k]));
     bars($('#geo'), top(group(c, 'geo:'), 12).map(([k, v]) => { const [cc, rg] = k.split('-'); return [k, v, cc === 'IN' ? (STATES[rg] || (rg ? 'India · ' + rg : 'India')) : cc + (rg ? ' · ' + rg : '')]; }));
+    bars($('#city'), top(group(c, 'city:'), 15).map(([k, v]) => { const i = k.indexOf(':'); const reg = k.slice(0, i); const nm = k.slice(i + 1); const [cc, rg] = reg.split('-'); return [k, v, nm + ' · ' + (cc === 'IN' ? (STATES[rg] || rg || 'India') : cc)]; }), { empty: 'Cities are counted from this update on.' });
     bars($('#dev'), top(group(c, 'dev:')).map(([k, v]) => [k, v, { m: 'Phone', t: 'Tablet', d: 'Computer' }[k] || k]));
     bars($('#out'), top(group(c, 'out:'), 10), { empty: 'No official links opened yet.' });
 
@@ -429,10 +437,11 @@ select{border:1px solid var(--line);border-radius:8px;padding:5px 8px;background
       <tr><td>Content version</td><td class="mono">${esc(META.version || '—')}</td></tr>
       <tr><td>Advocate-reviewed guides</td><td>${(META.guides || []).filter((g) => g.review).length} of ${(META.guides || []).length}</td></tr>
       <tr><td>Guides</td><td>${(META.guides || []).length} · ${stale ? `<span class="tag warn">! ${stale} need a law re-check</span>` : '<span class="tag good">✓ All law checks under 90 days</span>'}</td></tr>
+      <tr><td>Database size</td><td>${(() => { const z = DATA && DATA.size; if (!z) return DATA && DATA.backend === 'supabase' ? '<span class="tag warn">! Unknown — run the updated supabase/schema.sql once</span>' : '—'; const mb = z.db / 1048576, cap = 500, sh = mb / cap; const t = Object.entries(z.tables || {}).sort((a, b) => b[1] - a[1]).map(([k, v]) => esc(k) + ' ' + (v / 1048576).toFixed(1) + ' MB').join(' · '); return `<span class="tag ${sh > 0.8 ? 'crit' : sh > 0.5 ? 'warn' : 'good'}">${mb.toFixed(1)} MB of ${cap} MB free plan (${(sh * 100).toFixed(1)}%)</span><div class="small" style="margin-top:4px">${t} · Postgres itself uses ~8 MB even when empty</div>`; })()}</td></tr>
       <tr><td>Events counted in this period</td><td>${DATA && DATA.cur ? fmt(DATA.cur.ev || 0) : '—'}</td></tr>
     </tbody></table>
     <div style="margin-top:10px"><button class="btn" id="trtest">Test translation now (Hindi)</button><div id="trres" class="small" style="margin-top:8px;white-space:pre-wrap;overflow-wrap:anywhere"></div></div>
-    <p class="small" style="margin:10px 0 0">Stored: daily counts only, kept 400 days. No answers, names, IP addresses or cookies on the public site.</p>`;
+    <p class="small" style="margin:10px 0 0">Stored: daily counts only. Anonymous daily visitor codes are turned into a number the next day; detailed counts are kept 180 days, daily totals 3 years. No answers, names, IP addresses or cookies on the public site.</p>`;
   }
 
   document.addEventListener('click', async (e) => {

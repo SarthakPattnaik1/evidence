@@ -55,6 +55,6 @@ module.exports = async function handler(req, res) {
     cur: sum(r.days.map((x) => x.h)), prev: r.prevH,
     uniq: { cur: r.uCur, prev: r.uPrev }, sessions: { cur: r.sCur, prev: r.sPrev }, listSessions: { cur: r.slCur, prev: r.slPrev },
     verified: { cur: r.v || {}, prev: r.vPrev || {} },
-    nomatch: r.search, errors: r.errors, reports: r.reports || []
+    nomatch: r.search, errors: r.errors, reports: r.reports || [], size: r.size || null
   });
 };

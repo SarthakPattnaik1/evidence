@@ -13,6 +13,9 @@ import json as _j, os as _o
 _src=''.join((r/f).read_text() for f in sorted(_o.listdir(r)) if f.endswith('.js') and f!='brand.js')
 _a=pathlib.Path(_o.path.join(_o.path.dirname(_o.path.abspath(__file__)),'api'));_a.mkdir(exist_ok=True)
 (_a/'_corpus.js').write_text('module.exports='+_j.dumps(_src)+';\n')
+# guide and warning ids that /api/e will accept (anything else is ignored, so fake ids cannot create rows)
+_g=_sp.run(['node',_o.path.join(_o.path.dirname(_o.path.abspath(__file__)),'tools','guides.js')],capture_output=True,text=True,check=True).stdout
+(_a/'_guides.js').write_text('module.exports='+_g+';\n')
 # static SEO pages, sitemap, manifest, service worker
 import importlib.util as _iu
 _sp=_iu.spec_from_file_location('saboot_site',_o.path.join(_o.path.dirname(_o.path.abspath(__file__)),'tools','site.py'));_m=_iu.module_from_spec(_sp);_sp.loader.exec_module(_m)

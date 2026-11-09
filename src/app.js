@@ -1676,7 +1676,18 @@ ${JSON.stringify(map)}`;
   const TRACK = (() => {
     const on = /^https:$/.test(location.protocol) && !/claude\.ai|anthropic|claudeusercontent|localhost$/.test(location.hostname) && navigator.doNotTrack !== '1' && window.doNotTrack !== '1';
     const forced = /^http:$/.test(location.protocol) && /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && /saboot_track=1/.test(document.cookie + location.search);
-    if (!on && !forced) return { ev() {}, once() {}, flush() {} };
+    // Owner/testing switch: opening saboot.org/#nocount stops this browser from being counted (#count turns it back on).
+    let mine = false;
+    try {
+      if (location.hash === '#nocount') { localStorage.setItem('sb_nocount', '1'); history.replaceState(null, '', location.pathname); setTimeout(() => alert('This browser will no longer be counted in Saboot\'s numbers. Open saboot.org/#count to undo.'), 300); }
+      if (location.hash === '#count') { localStorage.removeItem('sb_nocount'); history.replaceState(null, '', location.pathname); }
+      mine = localStorage.getItem('sb_nocount') === '1';
+    } catch (e) { /* storage blocked */ }
+    if ((!on && !forced) || mine) return { ev() {}, once() {}, flush() {} };
+    // New or returning: this browser remembers only the date of its own first visit (never sent), and reports how
+    // many days ago that was. Nothing ties one visit to another on our side.
+    let backDays = -1;
+    try { const today = new Date().toISOString().slice(0, 10); let f = localStorage.getItem('sb_first'); if (!/^\d{4}-\d\d-\d\d$/.test(f || '')) { f = today; localStorage.setItem('sb_first', f); } backDays = Math.max(0, Math.round((Date.parse(today) - Date.parse(f)) / 86400000)); } catch (e) { /* storage blocked */ }
     setTimeout(() => getTok && getTok(), 0);
     let sid = ''; try { sid = sessionStorage.getItem('pa_s') || ''; if (!sid) { sid = Math.random().toString(36).slice(2, 12) + Date.now().toString(36).slice(-4); sessionStorage.setItem('pa_s', sid); } } catch (e) { sid = Math.random().toString(36).slice(2, 14); }
     const seen = new Set(); let q = []; let first = true; let timer = null;
@@ -1695,7 +1706,7 @@ ${JSON.stringify(map)}`;
       if (!tok) { getTok().then(() => { if (tok) { try { sessionStorage.setItem('pa_k', tok); } catch (e) { /* ignore */ } flush(); } }); return; }
       vis();
       const payload = { k: tok, h: hf, l: LANG, d: dev(), e: q.splice(0, 60) };
-      if (first) { payload.first = 1; payload.r = ref; payload.u = utm; first = false; }
+      if (first) { payload.first = 1; payload.r = ref; payload.u = utm; if (backDays >= 0) payload.n = backDays; first = false; }
       const body = JSON.stringify(payload);
       try { if (!(navigator.sendBeacon && navigator.sendBeacon('/api/e', new Blob([body], { type: 'application/json' })))) fetch('/api/e', { method: 'POST', body, headers: { 'content-type': 'application/json' }, keepalive: true }).catch(() => {}); } catch (e) { /* ignore */ }
       if (q.length) flush();

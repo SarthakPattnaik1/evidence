@@ -55,7 +55,7 @@ const store = {
   async stats(cur, prev) {
     if (backend() === 'supabase') {
       const j = await rpc('pa_stats', { p_days: cur, p_prev: prev });
-      return { days: j.days.map((x) => ({ d: x.d, h: x.h || {}, u: +x.u, s: +x.s, sl: +x.sl })), prevH: j.prev || {}, uCur: +j.ucur, uPrev: +j.uprev, sCur: +j.scur, sPrev: +j.sprev, slCur: +j.slcur, slPrev: +j.slprev, v: j.v || {}, vPrev: j.vprev || {}, search: parse(j.search), errors: parse(j.err), reports: parse(j.rep) };
+      return { days: j.days.map((x) => ({ d: x.d, h: x.h || {}, u: +x.u, s: +x.s, sl: +x.sl })), prevH: j.prev || {}, uCur: +j.ucur, uPrev: +j.uprev, sCur: +j.scur, sPrev: +j.sprev, slCur: +j.slcur, slPrev: +j.slprev, v: j.v || {}, vPrev: j.vprev || {}, search: parse(j.search), errors: parse(j.err), reports: parse(j.rep), size: j.size || null };
     }
     const cmds = [];
     cur.forEach((d) => cmds.push(['HGETALL', 'pa:d:' + d], ['PFCOUNT', 'pa:u:' + d], ['PFCOUNT', 'pa:s:' + d], ['PFCOUNT', 'pa:sl:' + d]));
@@ -76,6 +76,12 @@ const store = {
     const cmds = []; days.forEach((d) => { V_KINDS.forEach((k) => cmds.push(['PFCOUNT', 'pa:' + k + ':' + d])); cmds.push(['HMGET', 'pa:d:' + d, 'x:origin', 'x:token']); });
     const r = await pipe(cmds); let i = 0;
     return days.map((d) => { const v = {}; V_KINDS.forEach((k) => { const n = r[i++] || 0; if (n) v[k] = n; }); const x = r[i++] || []; return { d, v, rejected: (+x[0] || 0) + (+x[1] || 0) }; });
+  },
+  // Events counted so far today from one network (salted hash), after adding n. Supabase only; elsewhere unlimited.
+  async rate(day, net, n) {
+    if (backend() === 'supabase') return Number(await rpc('pa_rate', { p_day: day, p_net: net, p_n: n })) || 0;
+    if (backend() === 'upstash') { const [c] = await pipe([['INCRBY', 'pa:rate:' + day + ':' + net, n], ['EXPIRE', 'pa:rate:' + day + ':' + net, 172800]]); return c || 0; }
+    return 0;
   },
   async loginHit(ip) {
     if (backend() === 'supabase') return Number(await rpc('pa_login_hit', { p_ip: ip })) || 0;
